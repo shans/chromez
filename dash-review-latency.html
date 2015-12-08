@@ -1,0 +1,42 @@
+
+<link rel="import" href="bower_components/polymer/polymer.html">
+<link rel="import" href="bower_components/iron-ajax/iron-ajax.html">
+
+<dom-module id="dash-review-latency">
+
+  <template>
+    <iron-ajax
+      id='search'
+      auto
+      params="{{params}}"
+      handleAs="json"
+      url="https://codereview.chromium.org/search"
+      on-response="handleResponse"></iron-ajax>
+  </template>
+
+  <script>
+    Polymer({
+      is: "dash-review-latency",
+      properties: {
+        params: {
+          type: Object,
+          value: function() { return {
+            reviewer: 'shans',
+            closed: 3,
+            format: 'json_pretty'
+          }}
+        }
+      },
+
+      handleResponse(response) {
+        console.log(response);
+        console.log(this.$.search.lastResponse);
+
+        console.log(response.detail.response.results.map(a => a.modified));
+        console.log(response.detail.response.results[0]);
+      }
+    });
+  </script>
+</dom-module>
+
+<dash-review-latency></dash-review-latency>
