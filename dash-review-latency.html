@@ -23,17 +23,47 @@
           value: function() { return {
             reviewer: 'shans',
             closed: 3,
-            format: 'json_pretty'
+            format: 'json',
+            with_messages: 'True',
+            limit: 100
           }}
         }
       },
 
       handleResponse(response) {
-        console.log(response);
-        console.log(this.$.search.lastResponse);
+        var data = response.detail.response;
+        console.log(data.results[0]);
 
-        console.log(response.detail.response.results.map(a => a.modified));
-        console.log(response.detail.response.results[0]);
+        for (var i = 0; i < data.results.length; i++) {
+          var issue = data.results[i];
+          var reviewers = issue.reviewers;
+          console.log(issue.issue, reviewers);
+          var foundAuthorComment = false;
+          var lastAuthorTimestamp = undefined;
+          for (var j = issue.messages.length - 1; j >= 0; j--) {
+            var message = issue.messages[j];
+            if (message.auto_generated)
+              continue;
+            if (message.sender == issue.owner_email) {
+              foundAuthorComment = true;
+              lastAuthorTimestamp = message.date;
+              continue;
+            }
+            if (!foundAuthorComment) {
+              var idx = reviewers.indexOf(message.sender);
+              if (idx > -1)
+                reviewers.splice(idx, 1);
+            }
+            console.log('\t', message.sender, message.date, reviewers);
+          }
+
+          if (lastAuthorTimestamp == undefined)
+            lastAuthorTimestamp = issue.created;
+     
+          if (reviewers.length == 1)
+            console.log(reviewers[0], lastAuthorTimestamp);
+ 
+        }
       }
     });
   </script>
