@@ -21,7 +21,7 @@
         params: {
           type: Object,
           value: function() { return {
-            reviewer: 'shans',
+            reviewer: 'Timothy Loh',
             closed: 3,
             format: 'json',
             with_messages: 'True',
@@ -31,39 +31,65 @@
       },
 
       handleResponse(response) {
+        var now = Date.now() + (new Date()).getTimezoneOffset() * 60 * 1000;
         var data = response.detail.response;
-        console.log(data.results[0]);
+        var latency = 0;
+        var abandonedBugs = [];
+        var latencyPerBug = [];
 
         for (var i = 0; i < data.results.length; i++) {
           var issue = data.results[i];
           var reviewers = issue.reviewers;
-          console.log(issue.issue, reviewers);
+          // console.log(issue.issue);
+
           var foundAuthorComment = false;
           var lastAuthorTimestamp = undefined;
           for (var j = issue.messages.length - 1; j >= 0; j--) {
             var message = issue.messages[j];
             if (message.auto_generated)
               continue;
-            if (message.sender == issue.owner_email) {
+            if (!foundAuthorComment && message.sender == issue.owner_email) {
               foundAuthorComment = true;
+              wasNonAuthorComment = false;
               lastAuthorTimestamp = message.date;
               continue;
             }
-            if (!foundAuthorComment) {
+            // deal with multiple author comments in a row without a response.
+            if (!wasNonAuthorComment && message.sender == issue.owner_email) {
+              lastAuthorTimestamp = message.date;
+            } else {
+              wasNonAuthorComment = true;
+            }
+
+            if (!foundAuthorComment || message.approval) {
               var idx = reviewers.indexOf(message.sender);
               if (idx > -1)
                 reviewers.splice(idx, 1);
+              // author comments after an lgtm are likely to be
+              // responses to nits or pings for review, so should
+              // not reset the clock.
+              lastAuthorTimestamp = message.date;
             }
-            console.log('\t', message.sender, message.date, reviewers);
+            // console.log('\t', message.sender, message.date, reviewers);
           }
 
           if (lastAuthorTimestamp == undefined)
             lastAuthorTimestamp = issue.created;
-     
-          if (reviewers.length == 1)
-            console.log(reviewers[0], lastAuthorTimestamp);
- 
+
+          if (reviewers.length == 1 && reviewers[0] == 'timloh@chromium.org') {
+            var thisLatency = (now - Date.parse(lastAuthorTimestamp)) / 1000 / 60 / 60;
+            if (thisLatency > 24 * 31)
+              abandonedBugs.push(issue.issue);
+            else {
+              latency += thisLatency;
+              latencyPerBug.push({issue: issue.issue, latency: thisLatency});
+            }
+          }
         }
+
+        console.log("total latency:", latency);
+        console.log("abandoned bugs:", abandonedBugs);
+        console.log("latent bugs:", latencyPerBug);
       }
     });
   </script>
