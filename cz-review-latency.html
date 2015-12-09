@@ -1,0 +1,78 @@
+<link rel="import" href="bower_components/polymer/polymer.html">
+
+<dom-module id="cz-review-latency">
+
+  <template>
+  </template>
+
+  <script>
+    Polymer({
+      is: "cz-review-latency",
+     
+      registerQuery: function(query, callback) {
+        registerSource("cz-codereview", {user: query.user, type: 'search'}, function(data) {
+
+          var now = Date.now() + (new Date()).getTimezoneOffset() * 60 * 1000;
+          var latency = 0;
+          var abandonedBugs = [];
+          var latencyPerBug = [];
+          
+          for (var i = 0; i < data.results.length; i++) {
+            var issue = data.results[i];
+            var reviewers = issue.reviewers;
+            // console.log(issue.issue);
+  
+            var foundAuthorComment = false;
+            var lastAuthorTimestamp = undefined;
+            var wasNonAuthorComment = true;
+
+            for (var j = issue.messages.length - 1; j >= 0; j--) {
+              var message = issue.messages[j];
+              if (message.auto_generated)
+               continue;
+              if (!foundAuthorComment && message.sender == issue.owner_email) {
+                foundAuthorComment = true;
+                wasNonAuthorComment = false;
+                lastAuthorTimestamp = message.date;
+                continue;
+              }
+              // deal with multiple author comments in a row without a response.
+              if (!wasNonAuthorComment && message.sender == issue.owner_email) {
+                lastAuthorTimestamp = message.date;
+              } else {
+                wasNonAuthorComment = true;
+              }
+
+              if (!foundAuthorComment || message.approval) {
+                var idx = reviewers.indexOf(message.sender);
+                if (idx > -1)
+                  reviewers.splice(idx, 1);
+                // author comments after an lgtm are likely to be
+                // responses to nits or pings for review, so should
+                // not reset the clock.
+                lastAuthorTimestamp = message.date;
+              }
+
+            }
+
+            if (lastAuthorTimestamp == undefined)
+              lastAuthorTimestamp = issue.created;
+
+            if (reviewers.length == 1 && reviewers[0] == query.email) {
+              var thisLatency = (now - Date.parse(lastAuthorTimestamp)) / 1000 / 60 / 60;
+              if (thisLatency > 24 * 31)
+                abandonedBugs.push(issue.issue);
+              else {
+                latency += thisLatency;
+                latencyPerBug.push({issue: issue.issue, latency: thisLatency});
+              }
+            }
+          }
+
+          callback({latency: latency, abandonedBugs: abandonedBugs, latencyPerBug: latencyPerBug});
+        });
+      }
+    });
+  </script>
+
+</dom-module>

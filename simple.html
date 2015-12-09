@@ -1,12 +1,13 @@
 <link rel="import" href="cz-registry.html">
 <link rel="import" href="cz-config.html">
+<link rel="import" href="cz-review-latency.html">
+<link rel="import" href="cz-codereview.html">
+<link rel="import" href="cz-review-latency-dash.html">
+
+<script src="chromez-api.js"></script>
 
 <cz-registry>
   <cz-config></cz-config>
 </cz-registry>
 
-<script>
-var registry = document.querySelector('cz-registry');
-console.log(registry.registerSource('cz-config', 'users'));
-console.log(registry.registerSource('cz-review-latency'));
-</script>
+<cz-review-latency-dash></cz-review-latency-dash>

@@ -1,0 +1,42 @@
+<link rel="import" href="bower_components/polymer/polymer.html">
+
+<dom-module id="cz-review-latency-dash">
+
+  <template>
+    <style>
+      .user {
+        border: black 1px solid;
+      }
+    </style>
+
+    <template is="dom-repeat" items="{{users}}">
+      <div class='user'><span>{{item.user}}</span> latency <span>{{item.latency}}</span></div>
+    </template>
+  </template>
+
+  <script>
+    Polymer({
+      is: "cz-review-latency-dash",
+   
+      properties: {
+        users: {
+          type: 'Object',
+          value: function() { return [{user: 'Timothy Loh', email: 'timloh@chromium.org'}, 
+                                      {user: 'shans', email: 'shans@chromium.org'},
+                                      {user: 'dstockwell', email: 'dstockwell@chromium.org'}]; },
+          observer: "usersChanged"
+        }
+      },
+
+      usersChanged: function(users) {
+        // TODO: this probably only works for all-or-nothing changes to users right now.
+        users.forEach(function(user, idx) {
+          registerSource('cz-review-latency', {user: user.user, email: user.email}, function(data) {
+            this.set('users.' + idx + '.latency', data.latency);
+          }.bind(this));
+        }.bind(this));
+      }
+ 
+    });
+  </script>
+</dom-module>
