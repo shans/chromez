@@ -8,20 +8,21 @@
   <script>
     Polymer({
       is: "cz-review-latency",
-     
+
       registerQuery: function(query, callback) {
         registerSource("cz-codereview", {user: query.user, type: 'search'}, function(data) {
-
+          console.log(query)
           var now = Date.now() + (new Date()).getTimezoneOffset() * 60 * 1000;
           var latency = 0;
           var abandonedBugs = [];
           var latencyPerBug = [];
-          
+          var multipleOutstanding = [];
+
           for (var i = 0; i < data.results.length; i++) {
             var issue = data.results[i];
             var reviewers = issue.reviewers;
             // console.log(issue.issue);
-  
+
             var foundAuthorComment = false;
             var lastAuthorTimestamp = undefined;
             var wasNonAuthorComment = true;
@@ -33,7 +34,8 @@
               if (!foundAuthorComment && message.sender == issue.owner_email) {
                 foundAuthorComment = true;
                 wasNonAuthorComment = false;
-                lastAuthorTimestamp = message.date;
+                if (!lastAuthorTimestamp)
+                  lastAuthorTimestamp = message.date;
                 continue;
               }
               // deal with multiple author comments in a row without a response.
@@ -65,11 +67,14 @@
               else {
                 latency += thisLatency;
                 latencyPerBug.push({issue: issue.issue, latency: thisLatency});
+                console.log(thisLatency, issue.issue)
               }
+            } else {
+              multipleOutstanding.push(issue.issue);
             }
           }
 
-          callback({latency: latency, abandonedBugs: abandonedBugs, latencyPerBug: latencyPerBug});
+          callback({latency: latency, abandonedBugs: abandonedBugs, latencyPerBug: latencyPerBug, multipleOutstanding: multipleOutstanding});
         });
       }
     });

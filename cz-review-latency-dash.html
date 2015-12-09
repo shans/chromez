@@ -10,22 +10,32 @@
     </style>
 
     <template is="dom-repeat" items="{{users}}">
-      <div class='user'><span>{{item.user}}</span> latency <span>{{item.latency}}</span></div>
+      <div class='user'>{{item.user}} latency {{hourString(item.latency)}}</div>
     </template>
   </template>
 
   <script>
     Polymer({
       is: "cz-review-latency-dash",
-   
+
       properties: {
         users: {
           type: 'Object',
-          value: function() { return [{user: 'Timothy Loh', email: 'timloh@chromium.org'}, 
+          value: function() { return [{user: 'Timothy Loh', email: 'timloh@chromium.org'},
                                       {user: 'shans', email: 'shans@chromium.org'},
-                                      {user: 'dstockwell', email: 'dstockwell@chromium.org'}]; },
+                                      {user: 'dstockwell', email: 'dstockwell@chromium.org'},
+                                      {user: 'alancutter', email: 'alancutter@chromium.org'},
+                                      {user: 'mikelawther@chromium.org', email: 'mikelawther@chromium.org'}]; },
           observer: "usersChanged"
         }
+      },
+
+      hourString(hours) {
+        if (hours == undefined)
+          return "pending"
+        var days = Math.floor(hours / 24);
+        hours = Math.floor(hours % 24);
+        return (days > 0 ? days + "d " : "") + hours + "h";
       },
 
       usersChanged: function(users) {
@@ -36,7 +46,7 @@
           }.bind(this));
         }.bind(this));
       }
- 
+
     });
   </script>
 </dom-module>
