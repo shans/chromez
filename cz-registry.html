@@ -1,0 +1,32 @@
+
+<link rel="import" href="bower_components/polymer/polymer.html">
+
+<dom-module id="cz-registry">
+
+  <template>
+  </template>
+
+  <script>
+    Polymer({
+      is: "cz-registry",
+
+      registerSource(type, query, callback) {
+        var existingSources = Polymer.dom(this).children;
+        var source = undefined;
+        for (var i = 0; i < existingSources.length; i++) {
+          if (existingSources[i].nodeName.toLowerCase() == type) {
+            source = existingSources[i];
+            break;
+          }
+        }
+        if (source == undefined) {
+          source = document.createElement(type);
+          Polymer.dom(this).appendChild(source);
+        }
+        source.registerQuery(query, callback);
+        return source;
+      }
+    });
+  </script>
+
+</dom-module>

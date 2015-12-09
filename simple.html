@@ -1,0 +1,12 @@
+<link rel="import" href="cz-registry.html">
+<link rel="import" href="cz-config.html">
+
+<cz-registry>
+  <cz-config></cz-config>
+</cz-registry>
+
+<script>
+var registry = document.querySelector('cz-registry');
+console.log(registry.registerSource('cz-config', 'users'));
+console.log(registry.registerSource('cz-review-latency'));
+</script>
