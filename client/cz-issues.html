@@ -1,5 +1,6 @@
-<link rel="import" href="bower_components/polymer/polymer.html">
-<link rel="import" href="bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+<script src="../bower_components/papaparse/papaparse.min.js"></script>
 
 <dom-module id="cz-issues">
 
@@ -8,9 +9,11 @@
       <iron-ajax
         auto
         params="{{item.params}}"
-        handleAs="text"
-        url="https://code.google.com/p/chromium/issues/csv"
-        on-response="handleResponse"></iron-ajax>
+        handle-as="text"
+        url="../?"
+        on-response="handleResponse"
+        content-type='text/plain'
+        verbose=true></iron-ajax>
     </template>
   </template>
 
@@ -26,8 +29,15 @@
       },
 
       handleResponse: function(data) {
-        console.log(data);
-      }
+        var query = this.searchQueries[data.model.index];
+        var result = data.detail.response;
+        result = Papa.parse(result, {header: true}).data;
+        result = result.filter(a => a.ID !== "");
+        query.dataCache = data.detail.response;
+        query.element = data.target;
+        for (var i = 0; i < query.callbacks.length; i++)
+          query.callbacks[i](result);
+      },
 
       registerQuery: function(query, callback) {
         if (query.type == 'open') {
@@ -43,12 +53,17 @@
             callbacks: [callback],
             user: query.user,
             params: {
+              site: 'issues',
               can: 2,
-              owner: query.user,
+              q: "owner:" + query.user,
               colspec: "ID+Pri+M+Stars+ReleaseBlock+Cr+Status+Owner+Summary+OS+Modified",
               x: "m",
               y: "releaseblock",
               cells: "tiles"
             }
           });
-
+        }
+      }
+    });
+  </script>
+</dom-module>

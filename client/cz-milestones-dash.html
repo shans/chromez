@@ -1,0 +1,114 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../bower_components/paper-item/paper-item-body.html">
+
+<dom-module id="cz-milestones-dash">
+
+  <template>
+    <style>
+
+      paper-card .card-flex {
+        display: flex;
+        flex-direction: column;
+        flex-wrap: wrap;
+        height: 400px;
+        align-content: flex-start;
+      }
+      paper-card {
+        width: 100%;
+      }
+
+      paper-item {
+        max-width: 200px;
+      }
+    </style>
+      <paper-card heading="Issue Milestone Targets" id='card'>
+        <div class="card-content">
+
+          <div class='card-flex'>
+            <template is="dom-repeat" items="{{users}}"
+                      filter="filterUsers" sort="sortUsers"
+                      observe="data">
+              <paper-item>
+                <paper-item-body two-line>
+                  <div>{{item.user}}</div>
+                  <div secondary>{{milestones(item.data)}}</div>
+                </paper-item-body>
+              </paper-item>
+            </template>
+          </div>
+        </div>
+      </paper-card>
+  </template>
+
+  <script>
+    Polymer({
+      is: "cz-milestones-dash",
+
+      properties: {
+        users: {
+          type: 'Object',
+          value: function() { return []; },
+          observer: "usersChanged"
+        }
+      },
+
+      filterUsers(item) {
+        if (item.data == undefined)
+          return true;
+        return (item.data.filter(a => a.M != "").length > 0);
+      },
+
+      sortUsers(a, b) {
+        if (a.data == undefined || b.data == undefined)
+          return 0;
+        var minMilestoneA = undefined
+        for (var i = 0; i < a.data.length; i++) {
+          var milestone = Number(a.data[i].M);
+          if (milestone == 0)
+            continue;
+          if (minMilestoneA == undefined || milestone < minMilestoneA)
+            minMilestoneA = milestone;
+        }
+
+        var minMilestoneB = undefined
+        for (var i = 0; i < b.data.length; i++) {
+          var milestone = Number(b.data[i].M);
+          if (milestone == 0)
+            continue;
+          if (minMilestoneB == undefined || milestone < minMilestoneB)
+            minMilestoneB = milestone;
+        }
+
+        if (minMilestoneA < minMilestoneB)
+          return -1;
+        if (minMilestoneA > minMilestoneB)
+          return 1;
+        return 0;
+      },
+
+      attached: function() {
+        registerSource('cz-config', 'users', function(users) {
+          this.set('users', users);
+        }.bind(this));
+      },
+
+      milestones: function(data) {
+        if (data == undefined)
+          return "pending"
+        return data.map(a => a.M).filter(a => a != "").join()
+      },
+
+      usersChanged: function(users) {
+        // TODO: this probably only works for all-or-nothing changes to users right now.
+        users.forEach(function(user, idx) {
+          registerSource('cz-issues', {user: user.email, type: 'open'}, function(data) {
+            this.set('users.' + idx + '.data', data);
+          }.bind(this));
+        }.bind(this));
+      }
+
+    });
+  </script>
+</dom-module>

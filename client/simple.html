@@ -3,6 +3,8 @@
 <link rel="import" href="cz-review-latency.html">
 <link rel="import" href="cz-codereview.html">
 <link rel="import" href="cz-review-latency-dash.html">
+<link rel="import" href="cz-issues.html">
+<link rel="import" href="cz-milestones-dash.html">
 
 <script src="chromez-api.js"></script>
 
@@ -10,10 +12,18 @@
 * {
   font-family: Roboto;
 }
+
+paper-card {
+  margin-bottom: 20px;
+}
+
 </style>
 
 <cz-registry>
   <cz-config></cz-config>
 </cz-registry>
 
+<div class='distribute'>
 <cz-review-latency-dash></cz-review-latency-dash>
+<cz-milestones-dash></cz-milestones-dash>
+</div>
