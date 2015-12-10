@@ -11,12 +11,12 @@
 
       registerQuery: function(query, callback) {
         registerSource("cz-codereview", {user: query.email, type: 'search'}, function(data) {
-          console.log(query)
           var now = Date.now() + (new Date()).getTimezoneOffset() * 60 * 1000;
           var latency = 0;
           var abandonedBugs = [];
           var latencyPerBug = [];
           var multipleOutstanding = [];
+          var multipleLatency = 0;
 
           for (var i = 0; i < data.results.length; i++) {
             var issue = data.results[i];
@@ -60,21 +60,23 @@
             if (lastAuthorTimestamp == undefined)
               lastAuthorTimestamp = issue.created;
 
-            if (reviewers.length == 1 && reviewers[0] == query.email) {
-              var thisLatency = (now - Date.parse(lastAuthorTimestamp)) / 1000 / 60 / 60;
-              if (thisLatency > 24 * 31)
-                abandonedBugs.push(issue.issue);
-              else {
+            var thisLatency = (now - Date.parse(lastAuthorTimestamp)) / 1000 / 60 / 60;
+            if (thisLatency > 24 * 31) {
+              abandonedBugs.push(issue.issue);
+            } else {
+              if (reviewers.length == 1 && reviewers[0] == query.email) {
                 latency += thisLatency;
                 latencyPerBug.push({issue: issue.issue, latency: thisLatency});
-                console.log(thisLatency, issue.issue)
+              } else {
+                multipleOutstanding.push({issue: issue.issue, latency: thisLatency});
+                multipleLatency += thisLatency;
               }
-            } else {
-              multipleOutstanding.push(issue.issue);
             }
           }
 
-          callback({latency: latency, abandonedBugs: abandonedBugs, latencyPerBug: latencyPerBug, multipleOutstanding: multipleOutstanding});
+          callback({latency: latency, abandonedBugs: abandonedBugs,
+                    latencyPerBug: latencyPerBug, multipleLatency: multipleLatency,
+                    multipleOutstanding: multipleOutstanding});
         });
       }
     });
