@@ -1,0 +1,54 @@
+<link rel="import" href="bower_components/polymer/polymer.html">
+<link rel="import" href="bower_components/iron-ajax/iron-ajax.html">
+
+<dom-module id="cz-issues">
+
+  <template>
+    <template is="dom-repeat" items="{{searchQueries}}">
+      <iron-ajax
+        auto
+        params="{{item.params}}"
+        handleAs="text"
+        url="https://code.google.com/p/chromium/issues/csv"
+        on-response="handleResponse"></iron-ajax>
+    </template>
+  </template>
+
+  <script>
+    Polymer({
+      is: "cz-issues",
+
+      properties: {
+        searchQueries: {
+          type: Object,
+          value: function() { return []; }
+        }
+      },
+
+      handleResponse: function(data) {
+        console.log(data);
+      }
+
+      registerQuery: function(query, callback) {
+        if (query.type == 'open') {
+          for (var i = 0; i < this.searchQueries.length; i++) {
+            if (this.searchQueries[i].user == query.user) {
+              this.searchQueries[i].callbacks.push(callback);
+              if (this.searchQueries[i].dataCache)
+                callback(this.searchQueries[i].dataCache);
+              return;
+            }
+          }
+          this.push('searchQueries', {
+            callbacks: [callback],
+            user: query.user,
+            params: {
+              can: 2,
+              owner: query.user,
+              colspec: "ID+Pri+M+Stars+ReleaseBlock+Cr+Status+Owner+Summary+OS+Modified",
+              x: "m",
+              y: "releaseblock",
+              cells: "tiles"
+            }
+          });
+
