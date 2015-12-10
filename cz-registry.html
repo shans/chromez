@@ -11,7 +11,19 @@
     Polymer({
       is: "cz-registry",
 
-      registerSource(type, query, callback) {
+      attached: function() {
+        this.async(this.update, 30000);
+      },
+
+      update: function() {
+        var sources = Polymer.dom(this).children;
+        for (var i = 0; i < sources.length; i++) {
+          sources[i].update && sources[i].update();
+        }
+        this.async(this.update, 30000);
+      },
+
+      registerSource: function(type, query, callback) {
         var existingSources = Polymer.dom(this).children;
         var source = undefined;
         for (var i = 0; i < existingSources.length; i++) {

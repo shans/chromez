@@ -77,7 +77,7 @@
           callback({latency: latency, abandonedBugs: abandonedBugs,
                     latencyPerBug: latencyPerBug, multipleLatency: multipleLatency,
                     multipleOutstanding: multipleOutstanding});
-        });
+        }.bind(this));
       }
     });
   </script>

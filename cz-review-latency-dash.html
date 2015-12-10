@@ -1,17 +1,45 @@
 <link rel="import" href="bower_components/polymer/polymer.html">
+<link rel="import" href="bower_components/paper-card/paper-card.html">
+<link rel="import" href="bower_components/paper-item/paper-item.html">
+<link rel="import" href="bower_components/paper-item/paper-item-body.html">
 
 <dom-module id="cz-review-latency-dash">
 
   <template>
     <style>
-      .user {
-        border: black 1px solid;
+
+      paper-card .card-flex {
+        display: flex;
+        flex-direction: column;
+        flex-wrap: wrap;
+        height: 400px;
+        align-content: flex-start;
+      }
+      paper-card {
+        width: 100%;
+      }
+
+      paper-item {
+        max-width: 200px;
       }
     </style>
+      <paper-card heading="Pending Code Review Latency" id='card'>
+        <div class="card-content">
 
-    <template is="dom-repeat" items="{{users}}">
-      <div class='user'>{{item.user}}: latency {{hourString(item.latency)}}, abandoned {{count(item.abandonedBugs)}}, multiple {{count(item.multipleOutstanding)}}</div>
-    </template>
+          <div class='card-flex'>
+            <template is="dom-repeat" items="{{users}}"
+                      filter="filterUsers" sort="sortUsers"
+                      observe="data">
+              <paper-item>
+                <paper-item-body two-line>
+                  <div>{{item.user}}</div>
+                  <div secondary>{{hourString(item.data.latency)}} ({{count(item.data.latencyPerBug)}}) // {{hourString(item.data.multipleLatency)}} ({{count(item.data.multipleOutstanding)}}) // {{count(item.data.abandonedBugs)}}</div>
+                </paper-item-body>
+              </paper-item>
+            </template>
+          </div>
+        </div>
+      </paper-card>
   </template>
 
   <script>
@@ -24,6 +52,30 @@
           value: function() { return []; },
           observer: "usersChanged"
         }
+      },
+
+      filterUsers(item) {
+        if (item.data == undefined)
+          return true;
+        return item.data.latency > 0 || item.data.multipleLatency > 0 || item.data.abandonedBugs > 0;
+      },
+
+      sortUsers(a, b) {
+          if (a.data == undefined || b.data == undefined)
+            return 0;
+          if (a.data.latency < b.data.latency)
+            return 1;
+          if (a.data.latency > b.data.latency)
+            return -1;
+          if (a.data.multipleLatency < b.data.multipleLatency)
+            return 1;
+          if (a.data.multipleLatency > b.data.multipleLatency)
+            return -1;
+          if (a.data.abandonedBugs < b.data.abandonedBugs)
+            return 1;
+          if (a.data.abandonedBugs > b.data.abandonedBugs)
+            return -1;
+          return 0;
       },
 
       attached: function() {
@@ -50,9 +102,7 @@
         // TODO: this probably only works for all-or-nothing changes to users right now.
         users.forEach(function(user, idx) {
           registerSource('cz-review-latency', {user: user.user, email: user.email}, function(data) {
-            this.set('users.' + idx + '.latency', data.latency);
-            this.set('users.' + idx + '.abandonedBugs', data.abandonedBugs);
-            this.set('users.' + idx + '.multipleOutstanding', data.multipleOutstanding);
+            this.set('users.' + idx + '.data', data);
           }.bind(this));
         }.bind(this));
       }
