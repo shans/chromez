@@ -10,7 +10,7 @@
       is: "cz-review-latency",
 
       registerQuery: function(query, callback) {
-        registerSource("cz-codereview", {user: query.user, type: 'search'}, function(data) {
+        registerSource("cz-codereview", {user: query.email, type: 'search'}, function(data) {
           console.log(query)
           var now = Date.now() + (new Date()).getTimezoneOffset() * 60 * 1000;
           var latency = 0;

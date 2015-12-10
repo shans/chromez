@@ -10,7 +10,7 @@
     </style>
 
     <template is="dom-repeat" items="{{users}}">
-      <div class='user'>{{item.user}} latency {{hourString(item.latency)}}</div>
+      <div class='user'>{{item.user}}: latency {{hourString(item.latency)}}, abandoned {{count(item.abandonedBugs)}}, multiple {{count(item.multipleOutstanding)}}</div>
     </template>
   </template>
 
@@ -21,13 +21,15 @@
       properties: {
         users: {
           type: 'Object',
-          value: function() { return [{user: 'Timothy Loh', email: 'timloh@chromium.org'},
-                                      {user: 'shans', email: 'shans@chromium.org'},
-                                      {user: 'dstockwell', email: 'dstockwell@chromium.org'},
-                                      {user: 'alancutter', email: 'alancutter@chromium.org'},
-                                      {user: 'mikelawther@chromium.org', email: 'mikelawther@chromium.org'}]; },
+          value: function() { return []; },
           observer: "usersChanged"
         }
+      },
+
+      attached: function() {
+        registerSource('cz-config', 'users', function(users) {
+          this.set('users', users);
+        }.bind(this));
       },
 
       hourString(hours) {
@@ -38,11 +40,19 @@
         return (days > 0 ? days + "d " : "") + hours + "h";
       },
 
+      count(list) {
+        if (list == undefined)
+          return "-"
+        return list.length;
+      },
+
       usersChanged: function(users) {
         // TODO: this probably only works for all-or-nothing changes to users right now.
         users.forEach(function(user, idx) {
           registerSource('cz-review-latency', {user: user.user, email: user.email}, function(data) {
             this.set('users.' + idx + '.latency', data.latency);
+            this.set('users.' + idx + '.abandonedBugs', data.abandonedBugs);
+            this.set('users.' + idx + '.multipleOutstanding', data.multipleOutstanding);
           }.bind(this));
         }.bind(this));
       }
