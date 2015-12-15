@@ -28,6 +28,12 @@
         }
       },
 
+      update: function() {
+        for (var i = 0; i < this.searchQueries.length; i++) {
+          this.searchQueries[i].element.generateRequest();
+        }
+      },
+
       handleResponse: function(data) {
         var query = this.searchQueries[data.model.index];
         var result = data.detail.response;

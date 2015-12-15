@@ -12,7 +12,7 @@
       is: "cz-registry",
 
       attached: function() {
-        this.async(this.update, 30000);
+        this.async(this.update, 300000);
       },
 
       update: function() {
@@ -20,7 +20,7 @@
         for (var i = 0; i < sources.length; i++) {
           sources[i].update && sources[i].update();
         }
-        this.async(this.update, 30000);
+        this.async(this.update, 300000);
       },
 
       registerSource: function(type, query, callback) {

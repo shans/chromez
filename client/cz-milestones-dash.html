@@ -22,6 +22,11 @@
       paper-item {
         max-width: 200px;
       }
+
+      .milestones {
+        display: flex;
+        flex-wrap: wrap;
+      }
     </style>
       <paper-card heading="Issue Milestone Targets" id='card'>
         <div class="card-content">
@@ -33,7 +38,7 @@
               <paper-item>
                 <paper-item-body two-line>
                   <div>{{item.user}}</div>
-                  <div secondary>{{milestones(item.data)}}</div>
+                  <div secondary inner-h-t-m-l="[[milestones(item.data)]]" class='milestones'></div>
                 </paper-item-body>
               </paper-item>
             </template>
@@ -95,9 +100,17 @@
       },
 
       milestones: function(data) {
+        var div = "<div class='milestone' style='border: solid 1px #757575; border-radius: 3px; padding: 1px 3px; margin-right: 1px'>"
         if (data == undefined)
           return "pending"
-        return data.map(a => a.M).filter(a => a != "").join()
+        var milestones = {};
+        data.filter(a => a.M !== "").forEach(a => milestones[a.M] ? milestones[a.M]++ : milestones[a.M] = 1);
+        var result = "";
+        var keys = Object.keys(milestones).sort();
+        for (var key of keys) {
+          result += div + "<span style='font-weight: bold'>" + key + "</span>: " + milestones[key] + "</div>";
+        }
+        return result;
       },
 
       usersChanged: function(users) {
