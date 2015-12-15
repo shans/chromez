@@ -1,6 +1,7 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
 <script src="../bower_components/papaparse/papaparse.min.js"></script>
+<script src="chromez-behaviors.js"></script>
 
 <dom-module id="cz-issues">
 
@@ -20,45 +21,17 @@
   <script>
     Polymer({
       is: "cz-issues",
+      behaviors: [ChromeZBehaviors.AJAXBehavior],
 
-      properties: {
-        searchQueries: {
-          type: Object,
-          value: function() { return []; }
-        }
-      },
-
-      update: function() {
-        for (var i = 0; i < this.searchQueries.length; i++) {
-          this.searchQueries[i].element.generateRequest();
-        }
-      },
-
-      handleResponse: function(data) {
-        var query = this.searchQueries[data.model.index];
-        var result = data.detail.response;
-        result = Papa.parse(result, {header: true}).data;
-        result = result.filter(a => a.ID !== "");
-        query.dataCache = data.detail.response;
-        query.element = data.target;
-        for (var i = 0; i < query.callbacks.length; i++)
-          query.callbacks[i](result);
+      onResponse: function(data) {
+        data = Papa.parse(data, {header: true}).data;
+        return data.filter(a => a.ID !== "");
       },
 
       registerQuery: function(query, callback) {
         if (query.type == 'open') {
-          for (var i = 0; i < this.searchQueries.length; i++) {
-            if (this.searchQueries[i].user == query.user) {
-              this.searchQueries[i].callbacks.push(callback);
-              if (this.searchQueries[i].dataCache)
-                callback(this.searchQueries[i].dataCache);
-              return;
-            }
-          }
-          this.push('searchQueries', {
-            callbacks: [callback],
-            user: query.user,
-            params: {
+          this.addCallbackToQuery(query, 'user', callback, 
+            {
               site: 'issues',
               can: 2,
               q: "owner:" + query.user,
@@ -66,8 +39,7 @@
               x: "m",
               y: "releaseblock",
               cells: "tiles"
-            }
-          });
+            });
         }
       }
     });

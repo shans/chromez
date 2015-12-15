@@ -38,7 +38,7 @@
               <paper-item>
                 <paper-item-body two-line>
                   <div>{{item.user}}</div>
-                  <div secondary inner-h-t-m-l="[[milestones(item.data)]]" class='milestones'></div>
+                  <div secondary inner-h-t-m-l="[[milestones(item.data, releases)]]" class='milestones'></div>
                 </paper-item-body>
               </paper-item>
             </template>
@@ -56,6 +56,10 @@
           type: 'Object',
           value: function() { return []; },
           observer: "usersChanged"
+        },
+        releases: {
+          type: 'Object',
+          value: function() { return {}; },
         }
       },
 
@@ -97,10 +101,21 @@
         registerSource('cz-config', 'users', function(users) {
           this.set('users', users);
         }.bind(this));
+        registerSource('cz-releases', {}, function(releases) {
+          var result = {}
+          releases.forEach(function(platform) {
+            if (platform.os == "linux") {
+              platform.versions.forEach(function(version) {
+                result[version.channel] = version.version.split('.')[0];
+              });
+            }
+          });
+          this.set('releases', result);
+        }.bind(this));
       },
 
-      milestones: function(data) {
-        var div = "<div class='milestone' style='border: solid 1px #757575; border-radius: 3px; padding: 1px 3px; margin-right: 1px'>"
+      milestones: function(data, releases) {
+        var div = "<div class='milestone' style='border: solid 1px #757575; border-radius: 3px; padding: 1px 3px; margin-right: 1px;"
         if (data == undefined)
           return "pending"
         var milestones = {};
@@ -108,7 +123,15 @@
         var result = "";
         var keys = Object.keys(milestones).sort();
         for (var key of keys) {
-          result += div + "<span style='font-weight: bold'>" + key + "</span>: " + milestones[key] + "</div>";
+          if (releases == {})
+            color = '';
+          else if (Number(releases.dev) <= Number(key))
+            color = 'background-color: #C8E6C9';
+          else if (Number(releases.beta) <= Number(key))
+            color = 'background-color: #FFECB3';
+          else
+            color = 'background-color: #FFCDD2';
+          result += div + color + "'><span style='font-weight: bold'>" + key + "</span>: " + milestones[key] + "</div>";
         }
         return result;
       },

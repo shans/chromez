@@ -26,9 +26,13 @@ ChromeZBehaviors.AJAXBehavior = {
   },
   handleResponse: function(data) {
     var query = this.searchQueries[data.model.index];
-    query.dataCache = data.detail.response;
+    var result = data.detail.response;
+    if (this.onResponse)
+      result = this.onResponse(result);
+
+    query.dataCache = result;
     query.element = data.target;
     for (var i = 0; i < query.callbacks.length; i++)
-      query.callbacks[i](data.detail.response);
+      query.callbacks[i](result);
   },
 }
