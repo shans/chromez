@@ -6,6 +6,7 @@
 <link rel="import" href="cz-issues.html">
 <link rel="import" href="cz-milestones-dash.html">
 <link rel="import" href="cz-releases.html">
+<link rel="import" href="cz-review-load-dash.html">
 
 <script src="chromez-api.js"></script>
 
@@ -18,7 +19,7 @@ body {
   background: #009688;
 }
 
-paper-material {
+paper-material, paper-card {
   margin-bottom: 20px;
   background: white;
 }
@@ -31,4 +32,5 @@ paper-material {
 <div class='distribute'>
 <cz-review-latency-dash></cz-review-latency-dash>
 <cz-milestones-dash></cz-milestones-dash>
+<cz-review-load-dash></cz-review-load-dash>
 </div>

@@ -1,0 +1,118 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-material/paper-material.html">
+<link rel="import" href="../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../bower_components/paper-item/paper-item-body.html">
+
+<dom-module id="cz-review-load-dash">
+
+  <template>
+    <style>
+
+      paper-material .card-flex {
+        display: flex;
+        flex-direction: column;
+        flex-wrap: wrap;
+        height: 400px;
+        align-content: flex-start;
+        padding-left: 32px;
+      }
+      paper-material {
+      }
+
+      paper-item {
+        max-width: 180px;
+        margin: 10px;
+      }
+
+      .title-text {
+        padding: 16px;
+        font-size: 24px;
+        font-weight: 400;
+      }
+
+      .green {
+        background: #C8E6C9;
+      }
+
+      .amber {
+        background: #FFECB3;
+      }
+
+      .red {
+        background: #FFCDD2;
+      }
+
+    </style>
+      <paper-material id='card'>
+        <div class="card-content">
+          <div class='title-text'>Code Review Load</div>
+          <div class='card-flex'>
+            <template is="dom-repeat" items="{{users}}"
+                      observe="data">
+              <paper-item class$="{{threshold(item.data, userCounts)}}">
+                <paper-item-body two-line>
+                  <div>{{item.user}}</div>
+                  <div secondary>{{count(item.data)}}</div>
+                </paper-item-body>
+              </paper-item>
+            </template>
+          </div>
+        </div>
+      </paper-material>
+  </template>
+  <script>
+    Polymer({
+      is: "cz-review-load-dash",
+
+      properties: {
+        users: {
+          type: 'Object',
+          value: function() { return []; },
+          observer: "usersChanged",
+        },
+        userCounts: {
+          type: 'Object',
+          value: function() { return []; },
+        }
+      },
+
+      threshold: function(data, users) {
+        var counts = users.map(user => this.count(user.data));
+        if (counts.length == 0)
+          return '';
+        counts = counts.sort();
+        if (counts[Math.floor(counts.length / 3)] >= this.count(data))
+          return 'green';
+        if (counts[Math.floor(counts.length * 2 / 3)] >= this.count(data))
+          return 'amber';
+        return 'red';
+      },
+
+      count: function(data) {
+        if (data == undefined)
+          return 'pending';
+        return data.latencyPerBug.length + data.multipleOutstanding.length;
+      },
+
+      attached: function() {
+        registerSource('cz-config', 'users', function(users) {
+          this.set('users', users);
+        }.bind(this));
+      },
+
+      usersChanged: function(users) {
+        // TODO: this probably only works for all-or-nothing changes to users right now.
+        var count = 0;
+        users.forEach(function(user, idx) {
+          registerSource('cz-review-latency', {user: user.user, email: user.email}, function(data) {
+            // this.users[idx].data = data;
+            this.set('users.' + idx + '.data', data);
+            if (++count == users.length)
+              this.set('userCounts', this.users);
+          }.bind(this));
+        }.bind(this));
+      }
+
+    });
+  </script>
+</dom-module>
