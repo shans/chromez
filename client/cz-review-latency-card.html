@@ -1,0 +1,42 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-card/paper-card.html">
+
+<dom-module id="cz-review-latency-card">
+
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+
+      paper-card {
+        width: 100%;
+      }
+    </style>
+
+    <paper-card heading="{{name}}'s Reviews">
+      <div class='card-content' id='cardview'>
+        <template is='dom-repeat' items='{{reviews}}'>
+          <div>{{item.creator}}'s been waiting {{item.duration}} on {{item.issue}}</div>
+        </template>
+      </div>
+    </paper-card>
+  </template>
+
+  <script>
+    Polymer({
+      is: "cz-review-latency-card",
+
+      properties: {
+        name: 'String',
+        reviews: {
+          type: 'Object',
+          value: function() { return []; }
+        }
+      }
+
+    });
+  </script>
+
+</dom-module>
+

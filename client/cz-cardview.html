@@ -1,0 +1,34 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-card/paper-card.html">
+
+<dom-module id="cz-cardview">
+
+  <template>
+    <style>
+
+    </style>
+
+    <paper-card heading='/chromez/feed.json'>
+      <div class='card-content' id='cardview'>
+      </div>
+    </paper-card>
+  </template>
+
+  <script>
+    Polymer({
+      is: "cz-cardview",
+
+      addCard: function(card) {
+        this.$.cardview.appendChild(card);
+      },
+
+      removeCard: function(card) {
+        if (card.parent == this.$.cardview) {
+          card.remove();
+        }
+      }
+    });
+  </script>
+
+</dom-module>
+

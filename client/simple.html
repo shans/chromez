@@ -7,6 +7,7 @@
 <link rel="import" href="cz-milestones-dash.html">
 <link rel="import" href="cz-releases.html">
 <link rel="import" href="cz-review-load-dash.html">
+<link rel="import" href="cz-cardview.html">
 
 <script src="chromez-api.js"></script>
 
@@ -29,12 +30,17 @@ paper-material, paper-card {
   display: flex;
   flex-wrap: wrap;
 }
+
+cz-cardview {
+  float: right;
+}
 </style>
 
 <cz-registry>
   <cz-config></cz-config>
 </cz-registry>
 
+<cz-cardview></cz-cardview>
 <div class='distribute'>
 <cz-review-latency-dash></cz-review-latency-dash>
 <cz-milestones-dash></cz-milestones-dash>

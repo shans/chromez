@@ -3,6 +3,8 @@
 <link rel="import" href="../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../bower_components/paper-item/paper-item-body.html">
 
+<link rel="import" href="cz-review-latency-card.html">
+
 <dom-module id="cz-review-latency-dash">
 
   <template>
@@ -100,6 +102,20 @@
         // TODO: this probably only works for all-or-nothing changes to users right now.
         users.forEach(function(user, idx) {
           registerSource('cz-review-latency', {user: user.user, email: user.email}, function(data) {
+            var card = this.users[idx].data ? this.users[idx].data.card : undefined;
+            if (card == undefined) {
+              var card = document.createElement('cz-review-latency-card');
+              card.name = user.user;
+              card.added = false;
+            }
+            card.reviews = data.latencyPerBug.map(function(bug) {
+              return { creator: bug.owner, issue: bug.issue, duration: this.hourString(bug.latency) }
+            }.bind(this));
+            if (data.latencyPerBug.length > 0 && !card.added)
+              addCard(card);
+            else if (data.latencyPerBug.length == 0 && card.added)
+              removeCard(card);
+            data.card = card;
             this.set('users.' + idx + '.data', data);
           }.bind(this));
         }.bind(this));

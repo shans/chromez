@@ -8,3 +8,19 @@ function registerSource(type, query, callback) {
   // TODO: manually construct source and register query on it
   // when no registry exists on the page.
 }
+
+var cardview = undefined;
+
+function addCard(card) {
+  if (cardview == undefined)
+    cardview = document.querySelector('cz-cardview');
+  if (cardview)
+    return cardview.addCard(card);
+}
+
+function removeCard(card) {
+  if (cardview == undefined)
+    cardview = document.querySelector('cz-cardview');
+  if (cardview)
+    return cardview.removeCard(card);
+}
