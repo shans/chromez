@@ -1,14 +1,18 @@
+application: chromez-app
 version: 1
 runtime: python27
 api_version: 1
 threadsafe: true
 
 handlers:
-- url: /client
-  static_dir: client
-- url: /bower_components
-  static_dir: bower_components
 - url: /redirect/.*
   script: redirect.app
-- url: /.*
-  script: redirect.app
+- url: /
+  upload: client/simple.html
+  static_files: client/simple.html
+- url: /bower_components/(.+\.(js|html))
+  static_files: bower_components/\1
+  upload: bower_components/.*
+- url: /(.+\.(js|html))
+  static_files: client/\1
+  upload: client/.*
