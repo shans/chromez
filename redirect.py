@@ -10,8 +10,6 @@ class MainPage(webapp2.RequestHandler):
                   url += item[0] +'=' + item[1] + '&'
           result = urlfetch.fetch(url[:-1]);
           self.response.write(result.content);
-      else:
-          self.response.write('no');
 app = webapp2.WSGIApplication([
-    ('/', MainPage),
+    ('/.*', MainPage),
 ], debug=True)
