@@ -8,26 +8,16 @@
   <template>
     <style>
 
-      paper-material .card-flex {
+      paper-card .card-flex {
         display: flex;
-        flex-direction: column;
         flex-wrap: wrap;
-        height: 400px;
+        width: 700px;
         align-content: flex-start;
-        padding-left: 32px;
-      }
-      paper-material {
       }
 
       paper-item {
-        max-width: 180px;
+        width: 80px;
         margin: 10px;
-      }
-
-      .title-text {
-        padding: 16px;
-        font-size: 24px;
-        font-weight: 400;
       }
 
       .green {
@@ -43,9 +33,8 @@
       }
 
     </style>
-      <paper-material id='card'>
+      <paper-card id='card' heading='Code Review Load'>
         <div class="card-content">
-          <div class='title-text'>Code Review Load</div>
           <div class='card-flex'>
             <template is="dom-repeat" items="{{users}}"
                       observe="data" sort="sortUsers">
@@ -58,7 +47,7 @@
             </template>
           </div>
         </div>
-      </paper-material>
+      </paper-card>
   </template>
   <script>
     Polymer({

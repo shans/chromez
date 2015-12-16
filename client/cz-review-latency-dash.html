@@ -1,5 +1,5 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
-<link rel="import" href="../bower_components/paper-material/paper-material.html">
+<link rel="import" href="../bower_components/paper-card/paper-card.html">
 <link rel="import" href="../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../bower_components/paper-item/paper-item-body.html">
 
@@ -8,31 +8,22 @@
   <template>
     <style>
 
-      paper-material .card-flex {
+      paper-card .card-flex {
         display: flex;
-        flex-direction: column;
         flex-wrap: wrap;
-        height: 400px;
+        width: 700px;
         align-content: flex-start;
-        padding-left: 32px;
       }
-      paper-material {
+      paper-card {
       }
 
       paper-item {
-        max-width: 200px;
-      }
-
-      .title-text {
-        padding: 16px;
-        font-size: 24px;
-        font-weight: 400;
+        width: 200px;
       }
 
     </style>
-      <paper-material id='card'>
+      <paper-card id='card' heading='Pending Code Review Latency'>
         <div class="card-content">
-          <div class='title-text'>Pending Code Review Latency</div>
           <div class='card-flex'>
             <template is="dom-repeat" items="{{users}}"
                       filter="filterUsers" sort="sortUsers"
@@ -46,7 +37,7 @@
             </template>
           </div>
         </div>
-      </paper-material>
+      </paper-card>
   </template>
 
   <script>
