@@ -12,12 +12,21 @@
       paper-card {
         width: 100%;
       }
+
+      .title {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: pre;
+        color: #757575;
+        margin-bottom: 5px;
+      }
     </style>
 
     <paper-card heading="{{name}}'s Reviews">
       <div class='card-content' id='cardview'>
         <template is='dom-repeat' items='{{reviews}}'>
           <div>{{item.creator}}'s been waiting {{item.duration}} on {{item.issue}}</div>
+          <div class='title'>{{item.title}}</div>
         </template>
       </div>
     </paper-card>
@@ -39,4 +48,3 @@
   </script>
 
 </dom-module>
-

@@ -112,7 +112,8 @@
               card.added = false;
             }
             card.reviews = data.latencyPerBug.map(function(bug) {
-              return { creator: bug.owner, issue: bug.issue, duration: this.hourString(bug.latency) }
+              return { title: bug.subject, creator: bug.owner,
+                       issue: bug.issue, duration: this.hourString(bug.latency) }
             }.bind(this));
             if (data.latencyPerBug.length > 0 && !card.added)
               addCard(card);
