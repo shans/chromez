@@ -25,7 +25,8 @@
     <paper-card heading="{{name}}'s Reviews">
       <div class='card-content' id='cardview'>
         <template is='dom-repeat' items='{{reviews}}'>
-          <div>{{item.creator}}'s been waiting {{item.duration}} on {{item.issue}}</div>
+          <div><b>{{item.creator}}</b> has been waiting {{item.duration}} on
+            <a href="{{issueLink(item.issue)}}" target="blank">{{item.issue}}</a></div>
           <div class='title'>{{item.title}}</div>
         </template>
       </div>
@@ -42,6 +43,10 @@
           type: 'Object',
           value: function() { return []; }
         }
+      },
+
+      issueLink(number) {
+        return "http://codereview.chromium.org/" + number;
       }
 
     });
