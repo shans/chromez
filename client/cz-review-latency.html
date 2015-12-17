@@ -23,48 +23,57 @@
             var reviewers = issue.reviewers;
             // console.log(issue.issue);
 
-            var foundAuthorComment = false;
-            var lastAuthorTimestamp = undefined;
-            var wasNonAuthorComment = true;
+            var timestamp = undefined;
+            var previousMessageWasAuthor = false;
+            var soleReviewOwed = reviewers.length == 1;
 
-            for (var j = issue.messages.length - 1; j >= 0; j--) {
+            for (var j = 0; j < issue.messages.length; j++) {
               var message = issue.messages[j];
+
+              // ignore automatic messages
+              // TODO: if the issue is on the commit queue 
+              // then no review is owed
+              // TODO: need per-reviewer latency start times
+              // corresponding to when the reviewer was added
+              // to the issue
               if (message.auto_generated)
                continue;
-              if (!foundAuthorComment && message.sender == issue.owner_email) {
-                foundAuthorComment = true;
-                wasNonAuthorComment = false;
-                if (!lastAuthorTimestamp)
-                  lastAuthorTimestamp = message.date;
-                continue;
-              }
-              // deal with multiple author comments in a row without a response.
-              if (!wasNonAuthorComment && message.sender == issue.owner_email) {
-                lastAuthorTimestamp = message.date;
-              } else {
-                wasNonAuthorComment = true;
-              }
-
-              if (!foundAuthorComment || message.approval) {
+            
+              // LGTM gets you off the review hook and
+              // resets the clock
+              if (message.approval) {
                 var idx = reviewers.indexOf(message.sender);
                 if (idx > -1)
                   reviewers.splice(idx, 1);
-                // author comments after an lgtm are likely to be
-                // responses to nits or pings for review, so should
-                // not reset the clock.
-                lastAuthorTimestamp = message.date;
+                timestamp = message.date;
+                soleReviewOwed = reviewers.length == 1;
               }
+
+              if (message.sender == issue.owner_email) {
+                // the first in a sequence of author messages resets the clock
+                if (!previousMessageWasAuthor)
+                  timestamp = message.date;
+                previousMessageWasAuthor = true;
+                // the author responding puts sole reviewers back on the hook
+                soleReviewOwed = reviewers.length == 1;
+              }
+              if (message.sender != issue.owner_email)
+                previousMessageWasAuthor = false;
+
+              // responding if you're the only reviewer gets you off the hook
+              if (soleReviewOwed && reviewers[0] == message.sender)
+                soleReviewOwed = false;
 
             }
 
-            if (lastAuthorTimestamp == undefined)
-              lastAuthorTimestamp = issue.created;
+            if (timestamp == undefined)
+              timestamp = issue.created;
 
-            var thisLatency = (now - Date.parse(lastAuthorTimestamp)) / 1000 / 60 / 60;
+            var thisLatency = (now - Date.parse(timestamp)) / 1000 / 60 / 60;
             if (thisLatency > 24 * 31) {
               abandonedBugs.push(issue.issue);
             } else {
-              if (reviewers.length == 1 && reviewers[0] == query.email) {
+              if (soleReviewOwed && reviewers[0] == query.email) {
                 latency += thisLatency;
                 latencyPerBug.push({subject: issue.subject, owner: issue.owner,
                                     issue: issue.issue, latency: thisLatency});

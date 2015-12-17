@@ -24,6 +24,18 @@
         margin: 5px 0px;
       }
 
+      .red {
+        color: var(--paper-red-500);
+      }
+
+      .amber {
+        color: var(--paper-amber-500);
+      }
+
+      .green {
+        color: var(--paper-green-500);
+      }
+
     </style>
       <paper-card id='card' heading='Pending Code Review Latency'>
         <div class="card-content">
@@ -34,8 +46,12 @@
               <paper-item>
                 <paper-item-body two-line>
                   <div>{{item.user}}</div>
-                  <div secondary>{{hourString(item.data.latency)}} - sole</div>
-                  <div secondary>{{hourString(item.data.multipleLatency)}} - shared</div>
+                  <div secondary>
+                    <span class$="{{hourColor(item.data.latency)}}">{{hourString(item.data.latency)}}</span>
+                      - sole</div>
+                  <div secondary>
+                    <span class$="{{hourColor(item.data.multipleLatency)}}">{{hourString(item.data.multipleLatency)}}</span>
+                      - shared</div>
                   <div secondary>{{count(item.data.latencyPerBug)}} sole - {{count(item.data.multipleOutstanding)}} shared - {{count(item.data.abandonedBugs)}} stale</div>
                 </paper-item-body>
               </paper-item>
@@ -87,7 +103,18 @@
         }.bind(this));
       },
 
+      hourColor(hours) {
+        if (hours == undefined)
+          return "";
+        if (hours < 1)
+          return "green";
+        if (hours < 24)
+          return "amber";
+        return "red";
+      },
+
       hourString(hours) {
+        if (hours < 0) hours = 0;
         if (hours == undefined)
           return "pending"
         var days = Math.floor(hours / 24);
