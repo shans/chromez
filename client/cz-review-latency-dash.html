@@ -13,14 +13,15 @@
       paper-card .card-flex {
         display: flex;
         flex-wrap: wrap;
-        width: 700px;
         align-content: flex-start;
       }
       paper-card {
       }
 
       paper-item {
-        width: 200px;
+        box-sizing: border-box;
+        width: 50%;
+        margin: 5px 0px;
       }
 
     </style>
@@ -33,7 +34,9 @@
               <paper-item>
                 <paper-item-body two-line>
                   <div>{{item.user}}</div>
-                  <div secondary>{{hourString(item.data.latency)}} ({{count(item.data.latencyPerBug)}}) // {{hourString(item.data.multipleLatency)}} ({{count(item.data.multipleOutstanding)}}) // {{count(item.data.abandonedBugs)}}</div>
+                  <div secondary>{{hourString(item.data.latency)}} - sole</div>
+                  <div secondary>{{hourString(item.data.multipleLatency)}} - shared</div>
+                  <div secondary>{{count(item.data.latencyPerBug)}} sole - {{count(item.data.multipleOutstanding)}} shared - {{count(item.data.abandonedBugs)}} stale</div>
                 </paper-item-body>
               </paper-item>
             </template>
@@ -89,7 +92,7 @@
           return "pending"
         var days = Math.floor(hours / 24);
         hours = Math.floor(hours % 24);
-        return (days > 0 ? days + "d " : "") + hours + "h";
+        return days > 0 ? days + " days" : hours + " hrs";
       },
 
       count(list) {

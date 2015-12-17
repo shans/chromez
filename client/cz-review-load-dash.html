@@ -2,6 +2,7 @@
 <link rel="import" href="../bower_components/paper-card/paper-card.html">
 <link rel="import" href="../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../bower_components/paper-item/paper-item-body.html">
+<link rel="import" href="../bower_components/paper-badge/paper-badge.html">
 
 <dom-module id="cz-review-load-dash">
 
@@ -11,37 +12,47 @@
       paper-card .card-flex {
         display: flex;
         flex-wrap: wrap;
-        width: 700px;
         align-content: flex-start;
       }
 
       paper-item {
-        width: 80px;
-        margin: 10px;
+        width: 50%;
+        box-sizing: border-box;
       }
 
-      .green {
-        background: #C8E6C9;
+      .avatar {
+        display: inline-block;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        margin-right: 10px;
+        overflow: hidden;
+        background: #ccc;
       }
 
-      .amber {
-        background: #FFECB3;
+      .avatar.red {
+        background-color: #e57373;
       }
 
-      .red {
-        background: #FFCDD2;
+      .avatar.amber {
+        background-color: #ffd54f;
       }
 
+      .avatar.green {
+        background-color: #81c784;
+      }
     </style>
       <paper-card id='card' heading='Code Review Load'>
         <div class="card-content">
           <div class='card-flex'>
             <template is="dom-repeat" items="{{users}}"
                       observe="data" sort="sortUsers">
-              <paper-item class$="{{threshold(item.data, userCounts)}}">
-                <paper-item-body two-line>
+              <paper-item>
+                <div class$="avatar {{threshold(item.data, userCounts)}}">
+                  <paper-badge label="{{count(item.data)}}"></paper-badge>
+                </div>
+                <paper-item-body>
                   <div>{{item.user}}</div>
-                  <div secondary>{{count(item.data)}}</div>
                 </paper-item-body>
               </paper-item>
             </template>

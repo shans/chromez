@@ -17,7 +17,7 @@
 }
 
 body {
-  background: #009688;
+  background: #ECEFF1;
 }
 
 paper-material, paper-card {
@@ -29,10 +29,15 @@ paper-material, paper-card {
 .distribute {
   display: flex;
   flex-wrap: wrap;
+  flex-direction: column;
+  max-height: 100%;
+  align-content: center;
+  padding: 10px;
 }
 
-cz-cardview {
-  float: right;
+.distribute > * {
+  width: calc(25% - 20px);
+  margin: 10px;
 }
 </style>
 
@@ -40,9 +45,9 @@ cz-cardview {
   <cz-config></cz-config>
 </cz-registry>
 
-<cz-cardview></cz-cardview>
 <div class='distribute'>
 <cz-review-latency-dash></cz-review-latency-dash>
 <cz-milestones-dash></cz-milestones-dash>
 <cz-review-load-dash></cz-review-load-dash>
+<cz-cardview></cz-cardview>
 </div>

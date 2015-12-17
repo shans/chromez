@@ -11,13 +11,17 @@
       paper-card .card-flex {
         display: flex;
         flex-wrap: wrap;
-        width: 700px;
         align-content: flex-start;
       }
 
       .milestones {
         display: flex;
         flex-wrap: wrap;
+      }
+
+      paper-item {
+        width: 50%;
+        box-sizing: border-box;
       }
     </style>
       <paper-card heading="Issue Milestone Targets" id='card'>
@@ -107,23 +111,25 @@
       },
 
       milestones: function(data, releases) {
-        var div = "<div style='border: solid 1px #757575; border-radius: 3px; padding: 1px 3px; margin-right: 1px;"
+        var div = "<div style='color: white; border-radius: 4px; padding: 0px 6px;";
         if (data == undefined)
           return "pending"
         var milestones = {};
-        data.filter(a => a.M !== "").forEach(a => milestones[a.M] ? milestones[a.M]++ : milestones[a.M] = 1);
+        data = data.filter(a => a.M);
+        data.forEach(a => a.M = Number(a.M) ? Math.max(Number(a.M), Number(releases.stable)) : a.M);
+        data.forEach(a => milestones[a.M] ? milestones[a.M]++ : milestones[a.M] = 1);
         var result = "";
         var keys = Object.keys(milestones).sort();
         for (var key of keys) {
           if (releases == {})
             color = '';
           else if (key == 'X' || Number(releases.dev) <= Number(key))
-            color = 'background-color: #C8E6C9';
+            color = 'background-color: #4CAF50';
           else if (Number(releases.beta) <= Number(key))
-            color = 'background-color: #FFECB3';
+            color = 'background-color: #FF9800';
           else
-            color = 'background-color: #FFCDD2';
-          result += div + color + "'><span style='font-weight: bold'>" + key + "</span>: " + milestones[key] + "</div>";
+            color = 'background-color: #F44336';
+          result += div + color + "'><span>" + key + "</span></div>" + "<span style='margin:0px 5px'>" + milestones[key] + "</span>";
         }
         return result;
       },
