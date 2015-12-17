@@ -49,7 +49,9 @@
                       observe="data" sort="sortUsers">
               <paper-item>
                 <div class$="avatar {{threshold(item.data, userCounts)}}">
-                  <paper-badge label="{{count(item.data)}}"></paper-badge>
+                  <template is="dom-if" if="{{count(item.data)}}">
+                    <paper-badge label="{{count(item.data)}}"></paper-badge>
+                  </template>
                 </div>
                 <paper-item-body>
                   <div>{{item.user}}</div>
