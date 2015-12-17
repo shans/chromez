@@ -24,7 +24,7 @@
 
     <paper-card heading="{{name}}'s Reviews">
       <div class='card-content' id='cardview'>
-        <template is='dom-repeat' items='{{reviews}}'>
+        <template is='dom-repeat' items='{{reviews}}' sort="compareReviews">
           <div><b>{{item.creator}}</b> has been waiting {{item.duration}} on
             <a href="{{issueLink(item.issue)}}" target="blank">{{item.issue}}</a></div>
           <div class='title'>{{item.title}}</div>
@@ -43,6 +43,14 @@
           type: 'Object',
           value: function() { return []; }
         }
+      },
+
+      compareReviews(a, b) {
+        if (a.numericDuration < b.numericDuration)
+          return 1;
+        if (a.numericDuration > b.numericDuration)
+          return -1;
+        return 0;
       },
 
       issueLink(number) {

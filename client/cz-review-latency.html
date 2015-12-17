@@ -31,14 +31,16 @@
               var message = issue.messages[j];
 
               // ignore automatic messages
-              // TODO: if the issue is on the commit queue 
+              // TODO: if the issue is on the commit queue
               // then no review is owed
               // TODO: need per-reviewer latency start times
               // corresponding to when the reviewer was added
               // to the issue
+              // TODO: Incorporate reviewer *removal* into
+              // latency start times too.
               if (message.auto_generated)
                continue;
-            
+
               // LGTM gets you off the review hook and
               // resets the clock
               if (message.approval) {
