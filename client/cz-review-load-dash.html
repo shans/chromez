@@ -90,7 +90,7 @@
         var counts = users.map(user => this.count(user.data));
         if (counts.length == 0)
           return '';
-        counts = counts.sort();
+        counts = counts.sort(function(a, b) { if (a < b) return -1; if (a > b) return 1; return 0;});
         if (counts[Math.floor(counts.length / 3)] >= this.count(data))
           return 'green';
         if (counts[Math.floor(counts.length * 2 / 3)] >= this.count(data))
@@ -100,7 +100,7 @@
 
       count: function(data) {
         if (data == undefined)
-          return 'pending';
+          return '-';
         return data.latencyPerBug.length + data.multipleOutstanding.length;
       },
 

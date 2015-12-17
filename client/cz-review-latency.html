@@ -66,7 +66,6 @@
             } else {
               if (reviewers.length == 1 && reviewers[0] == query.email) {
                 latency += thisLatency;
-                console.log(issue)
                 latencyPerBug.push({subject: issue.subject, owner: issue.owner,
                                     issue: issue.issue, latency: thisLatency});
               } else {
