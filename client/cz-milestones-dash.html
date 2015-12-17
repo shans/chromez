@@ -129,7 +129,8 @@
             color = 'background-color: #FF9800';
           else
             color = 'background-color: #F44336';
-          result += div + color + "'><span>" + key + "</span></div>" + "<span style='margin:0px 5px'>" + milestones[key] + "</span>";
+          var keyString = Number(key) == Number(releases.stable) ? "~" + key : key;
+          result += div + color + "'><span>" + keyString + "</span></div>" + "<span style='margin:0px 5px'>" + milestones[key] + "</span>";
         }
         return result;
       },
