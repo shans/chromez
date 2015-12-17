@@ -29,15 +29,20 @@
         for (var i = 0; i < existingSources.length; i++) {
           if (existingSources[i].nodeName.toLowerCase() == type) {
             source = existingSources[i];
-            break;
+            source.registerQuery(query, callback);
+            return;
           }
         }
         if (source == undefined) {
-          source = document.createElement(type);
-          Polymer.dom(this).appendChild(source);
+          this.importHref(type + '.html', function(e) {
+            source = document.createElement(type);
+            Polymer.dom(this).appendChild(source);
+            source.registerQuery(query, callback);
+          }, function(e) {
+            console.error("Couldn't load source for " + type);
+          });
         }
-        source.registerQuery(query, callback);
-        return source;
+        // TODO: return promise of source
       }
     });
   </script>
