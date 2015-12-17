@@ -61,7 +61,7 @@
 
       filterUsers(item) {
         if (item.data == undefined)
-          return true;
+          return false;
         return (item.data.filter(a => a.M != "").length > 0);
       },
 

@@ -59,7 +59,7 @@
 
       filterUsers(item) {
         if (item.data == undefined)
-          return true;
+          return false;
         return item.data.latency > 0 || item.data.multipleLatency > 0 || item.data.abandonedBugs > 0;
       },
 
