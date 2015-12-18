@@ -1,0 +1,51 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-card/paper-card.html">
+
+<dom-module id="cz-calendar-card">
+
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+
+      paper-card {
+        width: 100%;
+      }
+
+      .title {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: pre;
+        color: #757575;
+        margin-bottom: 5px;
+      }
+    </style>
+
+    <paper-card heading="{{event.summary}} {{timeString(event.start.dateTime)}}">
+      <div class='card-content' id='cardview'>
+        {{event.location}}
+      </div>
+    </paper-card>
+  </template>
+
+  <script>
+    Polymer({
+      is: "cz-calendar-card",
+
+      properties: {
+        event: {
+          type: 'Object',
+          value: function() { return {} }
+        }
+      },
+
+      timeString(dateTime) {
+        var date = new Date(dateTime);
+        return date.getHours() + ":" + date.getMinutes();
+      }
+
+    });
+  </script>
+
+</dom-module>

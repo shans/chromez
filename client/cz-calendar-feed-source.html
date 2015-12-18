@@ -1,0 +1,49 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../bower_components/paper-item/paper-item-body.html">
+
+<link rel="import" href="cz-calendar-card.html">
+
+<dom-module id="cz-calendar-feed-source">
+
+  <template>
+  </template>
+
+  <script>
+    Polymer({
+      is: "cz-calendar-feed-source",
+
+      created: function() {
+        this.cards = new Map();
+      },
+
+      attached: function() {
+
+        registerSource('cz-calendar', {}, function(response) {
+          var upcomingEvents = [];
+          for (var item of response.items) {
+            var minToStart = (new Date(item.start.dateTime) - new Date()) / 1000 / 60;
+            if (!this.cards.get(item.id) && minToStart < 120) {
+              var card = document.createElement("cz-calendar-card");
+              card.event = item;
+              addCard(card);
+              this.cards.set(item.id, card);
+            }
+
+            // Remove old cards.
+            for (var id of this.cards.keys()) {
+              var card = this.cards.get(id);
+              var minToStart = (new Date(card.event.start.dateTime) - new Date()) / 1000 / 60;
+              if (minToStart < -5) {
+                removeCard(card);
+                this.cards.delete(id);
+              }
+            }
+          }
+        }.bind(this));
+      },
+
+    });
+  </script>
+</dom-module>
