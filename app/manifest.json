@@ -1,0 +1,16 @@
+{
+  "name": "chromez",
+  "description": "chromez",
+  "version": "2",
+  "manifest_version": 2,
+  "app": {
+    "background": {
+      "scripts": ["background.js"]
+    }
+  },
+  "permissions": [
+    "power",
+    "webview"
+  ], 
+  "kiosk_enabled" : true
+}
