@@ -135,20 +135,36 @@
             var card = this.users[idx].data ? this.users[idx].data.card : undefined;
             if (card == undefined) {
               var card = document.createElement('cz-review-latency-card');
-              card.name = user.user;
+              card.name = user.user + "'s Reviews";
               card.added = false;
+              var sharedCard = document.createElement('cz-review-latency-card');
+              sharedCard.name = user.user + "'s Shared Reviews";
+              sharedCard.added = false;
             }
             card.reviews = data.latencyPerBug.map(function(bug) {
               return { title: bug.subject, creator: bug.owner,
                        issue: bug.issue, duration: this.hourString(bug.latency),
                        numericDuration: bug.latency}
             }.bind(this));
+            sharedCard.reviews = data.multipleOutstanding.map(function(bug) {
+              return { title: bug.subject, creator: bug.owner,
+                       issue: bug.issue, duration: this.hourString(bug.latency),
+                       numericDuration: bug.latency}
+            }.bind(this));
+
             if (data.latencyPerBug.length > 0 && !card.added) {
               card.added = true;
               addCard(card);
             } else if (data.latencyPerBug.length == 0 && card.added) {
               card.added = false;
               removeCard(card);
+            }
+            if (data.multipleOutstanding.length > 0 && !sharedCard.added) {
+              sharedCard.added = true;
+              addCard(sharedCard);
+            } else if (data.multipleOutstanding.length == 0 && sharedCard.added) {
+              sharedCard.added = false;
+              removeCard(sharedCard);
             }
             data.card = card;
             this.set('users.' + idx + '.data', data);
