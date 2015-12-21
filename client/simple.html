@@ -43,12 +43,26 @@ cz-cardview paper-card {
 </style>
 
 <cz-registry>
-  <cz-config></cz-config>
+  <cz-config id=config></cz-config>
 </cz-registry>
 
-<div class='distribute'>
-<cz-review-latency-dash></cz-review-latency-dash>
-<cz-milestones-dash></cz-milestones-dash>
-<cz-review-load-dash></cz-review-load-dash>
-<cz-cardview></cz-cardview>
+<div class='distribute' id='dashpoint'>
+<cz-cardview id='feed'></cz-cardview>
 </div>
+
+<script>
+function addDash(dash) {
+  if (dashpoint.querySelector(dash))
+    return;
+  Polymer.Base.importHref(dash + '.html',
+    function(e) {
+      dashpoint.insertBefore(document.createElement(dash), feed);
+    },
+    function(e) {
+      console.error("couldn't create dash " + dash);
+    });
+}
+
+config.url = document.location.search.substring(1);
+registerSource('cz-config', 'dashes', dashes => dashes.forEach(addDash));
+</script>

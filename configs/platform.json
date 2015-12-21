@@ -1,0 +1,17 @@
+{"users": [
+  {"user": "Ben", "email": "benwells@chromium.org"},
+  {"user": "Matt", "email": "mgiuca@chromium.org"},
+  {"user": "Anand", "email": "amistry@chromium.org"},
+  {"user": "Chris", "email": "calamity@chromium.org"},
+  {"user": "Dom", "email": "dominickn@chromium.org"},
+  {"user": "Jack", "email": "jackhou@chromium.org"},
+  {"user": "Karan", "email": "karandeepb@chromium.org"},
+  {"user": "Kendra", "email": "kcarattini@chromium.org"},
+  {"user": "Liu", "email": "lshang@chromium.org"},
+  {"user": "Sam", "email": "sammc@chromium.org"},
+  {"user": "Tim", "email": "tsergeant@chromium.org"},
+  {"user": "Trent", "email": "tapted@chromium.org"},
+  {"user": "Raymes", "email": "raymes@chromium.org"}
+],
+"dashes": ["cz-milestones-dash", "cz-review-load-dash"]
+}

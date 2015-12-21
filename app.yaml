@@ -13,6 +13,9 @@ handlers:
 - url: /bower_components/(.+\.(js|html))
   static_files: bower_components/\1
   upload: bower_components/.*
+- url: /configs/(.+\.json)
+  static_files: configs/\1
+  upload: configs/.*
 - url: /(.+\.(js|html))
   static_files: client/\1
   upload: client/.*

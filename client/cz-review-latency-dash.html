@@ -143,10 +143,13 @@
                        issue: bug.issue, duration: this.hourString(bug.latency),
                        numericDuration: bug.latency}
             }.bind(this));
-            if (data.latencyPerBug.length > 0 && !card.added)
+            if (data.latencyPerBug.length > 0 && !card.added) {
+              card.added = true;
               addCard(card);
-            else if (data.latencyPerBug.length == 0 && card.added)
+            } else if (data.latencyPerBug.length == 0 && card.added) {
+              card.added = false;
               removeCard(card);
+            }
             data.card = card;
             this.set('users.' + idx + '.data', data);
           }.bind(this));
