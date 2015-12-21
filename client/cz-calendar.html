@@ -1,0 +1,34 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+<script src="chromez-behaviors.js"></script>
+
+<dom-module id="cz-calendar">
+
+  <template>
+    <template is="dom-repeat" items="{{searchQueries}}">
+      <iron-ajax
+        auto
+        params="{{item.params}}"
+        url="https://www.googleapis.com/calendar/v3/calendars/sam.li_ms50scjtv3pv33eee1kqtmlp10@group.calendar.google.com/events"
+        on-response="handleResponse"></iron-ajax>
+    </template>
+  </template>
+
+  <script>
+    Polymer({
+      is: "cz-calendar",
+      behaviors: [ChromeZBehaviors.AJAXBehavior],
+
+      registerQuery: function(query, callback) {
+        this.addCallbackToQuery({"*": "*"}, '*', callback,
+            {
+              timeMin: (new Date()).toISOString(),
+              showDeleted: false,
+              maxResults: 10,
+              key: "AIzaSyAd9MrlMvXO_U2Mfl1C8LF8Lvy8qtxruHQ"
+            });
+      }
+    });
+  </script>
+
+</dom-module>

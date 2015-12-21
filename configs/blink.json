@@ -16,5 +16,5 @@
   {"user": "Sasha", "email": "sashab@chromium.org"},
   {"user": "Tim Ansell", "email": "mithro@mithis.com"}
 ],
-"dashes": ["cz-review-latency-dash", "cz-milestones-dash", "cz-review-load-dash"]
+"dashes": ["cz-review-latency-dash", "cz-milestones-dash", "cz-review-load-dash", "calendar-feed-source"]
 }
