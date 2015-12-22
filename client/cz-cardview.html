@@ -12,16 +12,34 @@
 
     <paper-card heading='/chromez/feed.json'>
     </paper-card>
-    <div class='card-content' id='cardview'>
-    </div>
+    <template is='dom-repeat' items={{views}}>
+      <div class='card-content' id$='content{{index}}'>
+      </div>
+    </template>
   </template>
 
   <script>
     Polymer({
       is: "cz-cardview",
 
+      properties: {
+        columns: { value: 1, observer: 'columnsChanged' },
+        views: { type: 'Object', value: function() { return [[]]; }}
+      },
+
+      columnsChanged: function() {
+        if (!this.views)
+          return;
+        while (this.views.length < this.columns)
+          this.views.push([]);
+        // TODO: Reassign cards that were on removed columns
+        if (this.views.length > this.columns)
+          this.views = this.splice(this.views, this.columns, this.views.length - this.columns);
+      },
+
       addCard: function(card) {
-        this.$.cardview.appendChild(card);
+
+        this.querySelector("#content0").appendChild(card);
       },
 
       removeCard: function(card) {

@@ -140,6 +140,8 @@
               var sharedCard = document.createElement('cz-review-latency-card');
               sharedCard.name = user.user + "'s Shared Reviews";
               sharedCard.added = false;
+            } else {
+              var sharedCard = this.users[idx].data.sharedCard;
             }
             card.reviews = data.latencyPerBug.map(function(bug) {
               return { title: bug.subject, creator: bug.owner,
@@ -167,6 +169,7 @@
               removeCard(sharedCard);
             }
             data.card = card;
+            data.sharedCard = sharedCard;
             this.set('users.' + idx + '.data', data);
           }.bind(this));
         }.bind(this));
