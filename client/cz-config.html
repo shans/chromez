@@ -13,6 +13,7 @@
         on-response="handleResponse"
         verbose=true></iron-ajax>
     </template>
+    <input id=input placeholder="config.json" on-keyup=updateUrl></input>
   </template>
 
   <script>
@@ -25,8 +26,17 @@
       },
 
       registerQuery: function(query, callback) {
-        this.addCallbackToQuery({"*":"*"}, "*", data => callback(data[query]), {});
-      }
+        this.addCallbackToQuery({"*":"*"}, "*", data => {
+          if (data) {
+            this.$.input.hidden = true;
+            callback(data[query]);
+          }
+        }, {});
+      },
+
+      updateUrl: function() {
+        this.url = this.$.input.value;
+      },
     });
   </script>
 
