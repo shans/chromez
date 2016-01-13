@@ -18,8 +18,10 @@
           var multipleOutstanding = [];
           var multipleLatency = 0;
 
+
           for (var i = 0; i < data.results.length; i++) {
             var issue = data.results[i];
+
             var reviewers = issue.reviewers;
             // console.log(issue.issue);
 
@@ -65,7 +67,6 @@
               // responding if you're the only reviewer gets you off the hook
               if (soleReviewOwed && reviewers[0] == message.sender)
                 soleReviewOwed = false;
-
             }
 
             if (timestamp == undefined)
@@ -79,7 +80,7 @@
                 latency += thisLatency;
                 latencyPerBug.push({subject: issue.subject, owner: issue.owner,
                                     issue: issue.issue, latency: thisLatency});
-              } else {
+              } else if (reviewers.length > 1) {
                 multipleOutstanding.push({subject: issue.subject, owner: issue.owner,
                                           issue: issue.issue, latency: thisLatency});
                 multipleLatency += thisLatency;
