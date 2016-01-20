@@ -15,12 +15,12 @@ function addCard(card) {
   if (cardview == undefined)
     cardview = document.querySelector('cz-cardview');
   if (cardview)
-    return cardview.addCard(card);
+    return Polymer.Base.async(function() { cardview.addCard(card) });
 }
 
 function removeCard(card) {
   if (cardview == undefined)
     cardview = document.querySelector('cz-cardview');
   if (cardview)
-    return cardview.removeCard(card);
+    return Polymer.Base.async(function() { cardview.removeCard(card); });
 }

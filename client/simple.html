@@ -41,6 +41,10 @@ cz-cardview paper-card {
   margin-bottom: 5px;
 }
 
+cz-cardview {
+  width: calc(50% - 40px) !important;
+}
+
 </style>
 
 <cz-registry>
@@ -48,7 +52,7 @@ cz-cardview paper-card {
 </cz-registry>
 
 <div class='distribute' id='dashpoint'>
-<cz-cardview id='feed'></cz-cardview>
+<cz-cardview id='feed' columns=2></cz-cardview>
 </div>
 
 <script>

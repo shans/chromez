@@ -8,14 +8,26 @@
       paper-card {
         width: 100%;
       }
+
+      #container {
+        display: flex;
+        justify-content: space-between;
+      }
+
+      .column {
+        width: calc(var(--column-percent, 100%) - 20px);
+      }
+
     </style>
 
     <paper-card heading='/chromez/feed.json'>
     </paper-card>
-    <template is='dom-repeat' items={{views}}>
-      <div class='card-content' id$='content{{index}}'>
-      </div>
-    </template>
+    <div id='container'>
+      <template is='dom-repeat' items={{views}}>
+        <div class='card-content column' id$='content{{index}}'>
+        </div>
+      </template>
+    </div>
   </template>
 
   <script>
@@ -24,22 +36,40 @@
 
       properties: {
         columns: { value: 1, observer: 'columnsChanged' },
-        views: { type: 'Object', value: function() { return [[]]; }}
+        views: { type: 'Object', value: function() { return [{cards: [], height: 0}]; }}
       },
 
       columnsChanged: function() {
-        if (!this.views)
-          return;
-        while (this.views.length < this.columns)
-          this.views.push([]);
+        var views = this.views;
+        if (!views)
+          views = [];
+        while (views.length < this.columns)
+          views.push({cards:[], height: 0});
         // TODO: Reassign cards that were on removed columns
-        if (this.views.length > this.columns)
-          this.views = this.splice(this.views, this.columns, this.views.length - this.columns);
+        if (views.length > this.columns)
+          views.splice(this.columns, views.length - this.columns);
+        this.set('views', views);
+        this.customStyle['--column-percent'] = (100/this.columns) + '%';
+        this.updateStyles();
       },
 
       addCard: function(card) {
+        var column0 = this.querySelector("#content0");
+        var height = document.querySelector('body').offsetHeight - 100;
+        column0.appendChild(card);
+        card._height = card.offsetHeight;
+        if (this.views[0].height + card._height <= height) {
+          this.views[0].height += card._height;
+          return;
+        }
+        card.remove();
 
-        this.querySelector("#content0").appendChild(card);
+        for (var i = 1; i < this.views.length; i++) {
+          if (this.views[i].height + card._height <= height) {
+            this.querySelector("#content1").appendChild(card);
+            this.views[i].height += card._height;
+          }
+        }
       },
 
       removeCard: function(card) {

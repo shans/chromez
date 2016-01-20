@@ -26,6 +26,7 @@
             var minToStart = (new Date(item.start.dateTime) - new Date()) / 1000 / 60;
             if (!this.cards.get(item.id) && minToStart < 120) {
               var card = document.createElement("cz-calendar-card");
+              item.location = item.location.replace("https://plus.google.com/hangouts/_/google.com/", "go/meet/");
               card.event = item;
               addCard(card);
               this.cards.set(item.id, card);
@@ -36,6 +37,7 @@
               var card = this.cards.get(id);
               var minToStart = (new Date(card.event.start.dateTime) - new Date()) / 1000 / 60;
               if (minToStart < -5) {
+                console.log('removing!');
                 removeCard(card);
                 this.cards.delete(id);
               }
