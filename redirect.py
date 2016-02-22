@@ -4,7 +4,7 @@ from google.appengine.api import urlfetch
 class MainPage(webapp2.RequestHandler):
   def get(self):
       if self.request.get('site') == 'issues':
-          url = "http://code.google.com/p/chromium/issues/csv?"
+          url = "http://bugs.chromium.org/p/chromium/issues/csv?"
           for item in self.request.GET.items():
               if item[0] != 'site':
                   url += item[0] +'=' + item[1] + '&'
