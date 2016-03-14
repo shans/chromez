@@ -1,0 +1,75 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../bower_components/paper-item/paper-item-body.html">
+
+<link rel="import" href="cz-review-latency-card.html">
+
+<dom-module id="cz-clock-dash">
+
+  <template>
+    <style>
+
+      paper-card .card-flex {
+        display: flex;
+        flex-wrap: wrap;
+        align-content: flex-start;
+      }
+      paper-card {
+      }
+
+      paper-item {
+        box-sizing: border-box;
+        width: 50%;
+        margin: 5px 0px;
+      }
+
+    </style>
+      <paper-card id='card' heading='Test time'>
+        <div class="card-content">
+          <div class='card-flex'>
+            <template is="dom-repeat" items="{{timezones}}">
+              <paper-item>
+                <div id="timer" onload="startTime()"></div>
+                <div id="city">{{item.city}}</div>
+              </paper-item>
+            </template>
+          </div>
+        </div>
+      </paper-card>
+  </template>
+
+  <script>
+    Polymer({
+      is: "cz-clock-dash",
+
+      properties: {
+        timezones: {
+          type: 'Object',
+          value: function() { return []; }
+        }
+      },
+
+      attached: function() {
+        registerSource('cz-config', 'timezones', function(timezones) {
+          this.set('timezones', timezones);
+        }.bind(this));
+      },
+      startTime: function() {
+        var today = new Date();
+        var h = today.getHours();
+        var m = today.getMinutes();
+        var s = today.getSeconds();
+        m = checkTime(m);
+        s = checkTime(s);
+        document.getElementById('timer').innerHTML =
+        h + ":" + m + ":" + s;
+        var t = setTimeout(startTime, 500);
+      }
+      checkTime: function(i) {
+        if (i < 10) {i = "0" + i};  // add zero in front of numbers < 10
+        return i;
+      }
+    });
+  </script>
+</dom-module>

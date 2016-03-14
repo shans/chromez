@@ -16,5 +16,10 @@
   {"user": "Sasha", "email": "sashab@chromium.org"},
   {"user": "Tim Ansell", "email": "mithro@mithis.com"}
 ],
+"timezones": [
+  { zone: "SYD", city: "Sydney"},
+  { zone: "MTV", city: "Mountain View"},
+  { zone: "TOK", city: "Tokyo"}
+  ],
 "dashes": ["cz-review-latency-dash", "cz-milestones-dash", "cz-review-load-dash", "cz-calendar-feed-source"]
 }
