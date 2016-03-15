@@ -1,42 +1,36 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/paper-card/paper-card.html">
 <link rel="import" href="../bower_components/paper-item/paper-item.html">
-<link rel="import" href="../bower_components/paper-item/paper-item-body.html">
-
-<link rel="import" href="cz-review-latency-card.html">
 
 <dom-module id="cz-clock-dash">
 
   <template>
     <style>
-
       paper-card .card-flex {
         display: flex;
-        flex-wrap: wrap;
-        align-content: flex-start;
+        align-content: center;
       }
-      paper-card {
-      }
-
       paper-item {
         box-sizing: border-box;
-        width: 50%;
-        margin: 5px 0px;
+        width: 80%;
       }
-
+      div {
+        width: 300px;
+      }
     </style>
-      <paper-card id='card' heading='Test time'>
-        <div class="card-content">
-          <div class='card-flex'>
-            <template is="dom-repeat" items="{{timezones}}">
-              <paper-item>
-                <div id="timer" onload="startTime()"></div>
-                <div id="city">{{item.city}}</div>
-              </paper-item>
-            </template>
-          </div>
+
+    <paper-card id='card' heading='Time around the world'>
+      <div class="card-content">
+        <div class='card-flex'>
+          <template is="dom-repeat" items="{{timezones}}">
+            <paper-item-body two-line>
+              <div id="timer" inner-h-t-m-l=[[item.data]]></div>
+              <div id="city" secondary>{{item.city}}</div>
+            </paper-item-body>
+          </template>
         </div>
-      </paper-card>
+      </div>
+    </paper-card>
   </template>
 
   <script>
@@ -46,29 +40,68 @@
       properties: {
         timezones: {
           type: 'Object',
-          value: function() { return []; }
+          notify: true,
+          value: function() { return []; },
+          observer: "timezonesChanged"
         }
       },
-
       attached: function() {
         registerSource('cz-config', 'timezones', function(timezones) {
           this.set('timezones', timezones);
         }.bind(this));
       },
-      startTime: function() {
+      currentTimeDay: function(timezone) {
         var today = new Date();
-        var h = today.getHours();
-        var m = today.getMinutes();
-        var s = today.getSeconds();
-        m = checkTime(m);
-        s = checkTime(s);
-        document.getElementById('timer').innerHTML =
-        h + ":" + m + ":" + s;
-        var t = setTimeout(startTime, 500);
-      }
-      checkTime: function(i) {
-        if (i < 10) {i = "0" + i};  // add zero in front of numbers < 10
-        return i;
+        var day = today.getUTCDay();
+        // FIXME: The UTC is accurate as of 15 March - what about daylightsavings causing these to change?
+        var hours = today.getUTCHours() + parseFloat(timezone.utc);
+        var minutes = today.getUTCMinutes();
+        var seconds = today.getUTCSeconds();
+
+        if (hours < 0) {
+          hours = 24 + hours;
+          day = day > 0 ? (day - 1) %  7 : 6;
+        } else if (hours >= 24) {
+          hours = hours - 24;
+          day = (day + 1) %  7;
+        }
+
+        var meridian = "am";
+        if (hours >= 12) {
+          hours = hours > 12 ? hours - 12 : hours;
+          meridian = "pm";
+        }
+        hours = (hours < 10) ? "0" + hours : hours;
+        minutes = (minutes < 10) ? "0" + minutes : minutes;
+        seconds = (seconds < 10) ? "0" + seconds : seconds;
+
+        if (day != 0 && day != 6)
+          return this.formattedTime(hours, minutes, seconds, meridian);
+        else
+          return "<span style='color: red'>" + this.intToDay(day) + "</span>";
+      },
+      mutateTimeDay: function(timezone, idx) {
+        this.set('timezones.' + idx + '.data', this.currentTimeDay(timezone));
+        this.async(()=>this.mutateTimeDay(timezone, idx), 500);
+      },
+      timezonesChanged: function(timezones) {
+        timezones.forEach(function(timezone, idx) {
+          registerSource('cz-config', {zone: timezone.zone, city: timezone.city}, function(data) {
+            this.mutateTimeDay(timezone, idx);
+          }.bind(this));
+        }.bind(this));
+      },
+      intToDay: function(day) { // Sunday is 0, Monday is 1, etc
+        return day ? "Saturday" : "Sunday";
+      },
+      formattedTime: function(hours, minutes, seconds, meridian) {
+        var time = hours + ":" + minutes + ":" + seconds + " " + meridian;
+        if ((hours < 9 && meridian == "am") || (hours >= 5 && hours < 12 && meridian == "pm")) {
+          return "<span style='color: red'>" + time + "</span>";
+        }
+        else {
+          return "<span style='color: green'>" + time + "</span>";
+        }
       }
     });
   </script>
