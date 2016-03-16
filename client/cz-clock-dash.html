@@ -49,8 +49,7 @@
         timezones: {
           type: 'Object',
           notify: true,
-          value: function() { return []; },
-          observer: 'timezonesChanged'
+          value: function() { return []; }
         }
       },
       attached: function() {
@@ -63,7 +62,6 @@
         // FIXME: The UTC is accurate as of 15 March - what about daylightsavings causing these to change?
         var hours = today.getUTCHours() + parseFloat(timezone.utc);
         var minutes = today.getUTCMinutes();
-        var seconds = today.getUTCSeconds();
 
         if (hours < 0) {
           hours = 24 + hours;
@@ -73,19 +71,13 @@
           day = (day + 1) %  7;
         }
 
-        var meridian = 'am';
-        if (hours >= 12) {
-          hours = hours > 12 ? hours - 12 : hours;
-          meridian = 'pm';
-        }
         hours = (hours < 10) ? '0' + hours : hours;
         minutes = (minutes < 10) ? '0' + minutes : minutes;
-        seconds = (seconds < 10) ? '0' + seconds : seconds;
 
-        var time = hours + ':' + minutes + ':' + seconds + ' ' + meridian;
+        var time = hours + ':' + minutes;
         var data;
         if (day != 0 && day != 6) {
-          data = {timeString: time, class: this.formattedTime(hours, minutes, seconds, meridian)};
+          data = {timeString: time, class: this.formattedTime(hours, minutes)};
         }
         else {
           data = {timeString: this.intToDay(day), class: 'notWorkingHours'};
@@ -95,13 +87,13 @@
       },
       mutateTimeString: function() {
         this.timezones.forEach((timezone, idx) => this.set('timezones.' + idx + '.data', this.currentTimeDay(timezone)));
-        this.async(()=>this.mutateTimeString(), 1000);
+        this.async(() => this.mutateTimeString(), 1000);
       },
       intToDay: function(day) { // Sunday is 0, Monday is 1, etc
         return day ? 'Saturday' : 'Sunday';
       },
-      formattedTime: function(hours, minutes, seconds, meridian) {
-        if ((hours < 9 && meridian == "am") || (hours >= 5 && hours < 12 && meridian == "pm"))
+      formattedTime: function(hours, minutes) {
+        if (hours < 9 || hours >= 17)
           return "notWorkingHours";
         else
           return "workingHours";
