@@ -20,7 +20,7 @@
 
     </style>
 
-    <paper-card heading='🍻🍕🍑🍔🍟🍦🍫🍰🍩🍪🍗🍝🍣🍱🍙🍘🍡🍠🍨🍵🍖🍯🌽🍜🍥🍤🍳🍻'>
+    <paper-card id='header' heading='🍻🍕🍑🍔🍟🍦🍫🍰🍩🍪🍗🍝🍣🍱🍙🍘🍡🍠🍨🍵🍖🍯🌽🍜🍥🍤🍳🍻'>
     </paper-card>
     <div id='container'>
       <template is='dom-repeat' items={{views}}>
@@ -31,12 +31,128 @@
   </template>
 
   <script>
+    'use strict';
+
+    class CardSpeculation {
+      constructor(columns, height) {
+        this.columns = columns;
+        this.height = height;
+        this.edits = [];
+      }
+
+      insert(column, card, nextCard) {
+        column.height += card._height;
+        var idx = column.cards.indexOf(nextCard);
+        if (idx < 0) // nextCard not found
+          idx = column.cards.length;
+        column.cards.splice(idx, 0, card);
+        this.edits.push({action: 'insert', column: column, card: card, idx: idx});
+      }
+
+      remove(column, card) {
+        column.height -= card._height;
+        var idx = column.cards.indexOf(card);
+        column.cards.splice(idx, 1);
+        this.edits.push({action: 'remove', column: column, card: card});
+      }
+
+      priorities() {
+
+      }
+
+      insertCardBefore(card, nextCard) {
+        var idx = 0;
+        var column = this.columns[idx];
+
+        this.insert(column, card, nextCard);
+        while (idx < this.columns.length) {
+          while (column.height > this.height) {
+            var removedCard = column.cards[column.cards.length - 1];
+            this.remove(column, removedCard);
+            if (idx < this.columns.length - 1) {
+              this.insert(this.columns[idx + 1], removedCard, this.columns[idx + 1][0]);
+            }
+          }
+          idx ++;
+        }
+      }
+    }
+
+    class CardModel {
+      constructor(columns, height) {
+        this.columns = [];
+        for (var i = 0; i < columns.length; i++)
+          this.columns.push({column: columns[i], idx: i, height: 0, cards: []});
+        this.height = height;
+        this.first = {};
+      }
+
+      addCard(card, cardPriority) {
+        if (card._height == undefined) {
+          this.columns[0].column.appendChild(card);
+          card._height = card.offsetHeight;
+          card.remove();
+        }
+        var speculation = this.speculate();
+        var nextCard = this.first[cardPriority];
+        this.first[cardPriority] = card;
+        speculation.insertCardBefore(card, nextCard);
+        var priorities = speculation.priorities();
+        // check priorities
+        this.commit(speculation);
+      }
+
+      removeCard(card) {
+        this.remove(card);
+        var idx = card.column.cards.indexOf(card);
+        card.column.cards.splice(idx, 1);
+        card.column.height -= card._height;
+      }
+
+      insert(column, card, nextCard) {
+        column.column.insertBefore(card, nextCard);
+        card.column = column;
+      }
+
+      remove(card) {
+        card.remove();
+      }
+
+      commit(speculation) {
+        for (var edit of speculation.edits) {
+          if (edit.action == 'insert') {
+            this.insert(edit.column, edit.card, this.columns[edit.column.idx].cards[edit.idx]);
+          } else if (edit.action == 'remove') {
+            this.remove(edit.card);
+          }
+        }
+        this.columns = speculation.columns;
+      }
+
+      speculate() {
+        var specColumns = [];
+        for (var i = 0; i < this.columns.length; i++) {
+          specColumns.push({
+            column: this.columns[i].column,
+            idx: i,
+            height: this.columns[i].height,
+            cards: this.columns[i].cards.slice()
+          });
+        }
+        return new CardSpeculation(specColumns, this.height);
+      }
+    }
+
     Polymer({
       is: "cz-cardview",
 
       properties: {
         columns: { value: 1, observer: 'columnsChanged' },
         views: { type: 'Object', value: function() { return [{cards: [], height: 0}]; }}
+      },
+
+      attached: function() {
+        this.last = {};
       },
 
       columnsChanged: function() {
@@ -51,29 +167,22 @@
         this.set('views', views);
         this.customStyle['--column-percent'] = (100/this.columns) + '%';
         this.updateStyles();
+        this.async(function() {
+          var columns = this.querySelectorAll('.column');
+          for (var i = 0; i < this.views.length; i++) {
+            this.views[i].column = columns[i];
+            columns[i].view = this.views[i];
+          }
+          this.model = new CardModel(columns, this.offsetHeight - this.$.header.offsetHeight);
+        });
       },
 
       addCard: function(card) {
-        var column0 = this.querySelector("#content0");
-        var height = document.querySelector('body').offsetHeight - 100;
-        column0.appendChild(card);
-        card._height = card.offsetHeight;
-        if (this.views[0].height + card._height <= height) {
-          this.views[0].height += card._height;
-          return;
-        }
-        card.remove();
-
-        for (var i = 1; i < this.views.length; i++) {
-          if (this.views[i].height + card._height <= height) {
-            this.querySelector("#content1").appendChild(card);
-            this.views[i].height += card._height;
-          }
-        }
+        this.model.addCard(card, card.priority || 'low');
       },
 
       removeCard: function(card) {
-        card.remove();
+        this.model.removeCard(card);
       }
     });
   </script>

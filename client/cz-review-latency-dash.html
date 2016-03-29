@@ -156,11 +156,13 @@
                        issue: bug.issue, duration: this.hourString(bug.latency),
                        numericDuration: bug.latency}
             }.bind(this));
+            card.priority = 'high';
             sharedCard.reviews = data.multipleOutstanding.map(function(bug) {
               return { title: bug.subject, creator: bug.owner,
                        issue: bug.issue, duration: this.hourString(bug.latency),
                        numericDuration: bug.latency}
             }.bind(this));
+            sharedCard.priority = 'medium';
 
             if (data.latencyPerBug.length > 0 && !card.added) {
               card.added = true;

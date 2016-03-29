@@ -11,7 +11,7 @@
         auto
         params="{{item.params}}"
         handle-as="text"
-        url="/redirect/?"
+        url="http://chromez-app.appspot.com/redirect/?"
         on-response="handleResponse"
         content-type='text/plain'
         verbose=true></iron-ajax>
@@ -24,13 +24,15 @@
       behaviors: [ChromeZBehaviors.AJAXBehavior],
 
       onResponse: function(data) {
-        data = Papa.parse(data, {header: true}).data;
-        return data.filter(a => a.ID !== "");
+        data = JSON.parse(data);
+        if (data.items == undefined)
+          return [];
+        return data.items.filter(a => a.ID !== "");
       },
 
       registerQuery: function(query, callback) {
         if (query.type == 'open') {
-          this.addCallbackToQuery(query, 'user', callback, 
+          this.addCallbackToQuery(query, 'user', callback,
             {
               site: 'issues',
               can: 2,

@@ -80,7 +80,7 @@
                 latency += thisLatency;
                 latencyPerBug.push({subject: issue.subject, owner: issue.owner,
                                     issue: issue.issue, latency: thisLatency});
-              } else if (reviewers.length > 1) {
+              } else if (reviewers.length > 1 && reviewers.indexOf(query.email) > -1) {
                 multipleOutstanding.push({subject: issue.subject, owner: issue.owner,
                                           issue: issue.issue, latency: thisLatency});
                 multipleLatency += thisLatency;
