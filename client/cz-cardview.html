@@ -20,7 +20,7 @@
 
     </style>
 
-    <paper-card heading='🍻🍕🍑🍔🍟🍦🍫🍰🍩🍪🍗🍝🍣🍱🍙🍘🍡🍠🍨🍵🍖🍯🌽🍜🍥🍤🍳🍻'>
+    <paper-card id='header' heading='🍻🍕🍑🍔🍟🍦🍫🍰🍩🍪🍗🍝🍣🍱🍙🍘🍡🍠🍨🍵🍖🍯🌽🍜🍥🍤🍳🍻'>
     </paper-card>
     <div id='container'>
       <template is='dom-repeat' items={{views}}>
@@ -70,7 +70,7 @@
             var removedCard = column.cards[column.cards.length - 1];
             this.remove(column, removedCard);
             if (idx < this.columns.length - 1) {
-              this.insert(this.columns[idx + 1], removedCard);
+              this.insert(this.columns[idx + 1], removedCard, this.columns[idx + 1][0]);
             }
           }
           idx ++;
@@ -173,7 +173,7 @@
             this.views[i].column = columns[i];
             columns[i].view = this.views[i];
           }
-          this.model = new CardModel(columns, document.querySelector('body').offsetHeight - 100);
+          this.model = new CardModel(columns, this.offsetHeight - this.$.header.offsetHeight);
         });
       },
 
