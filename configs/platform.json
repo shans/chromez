@@ -13,5 +13,12 @@
   {"user": "Trent", "email": "tapted@chromium.org"},
   {"user": "Raymes", "email": "raymes@chromium.org"}
 ],
+"timezones": [
+  {"city": "MTV", "utc": "-7"},
+  {"city": "New York", "utc": "-4"},
+  {"city": "London", "utc": "0"},
+  {"city": "Munich", "utc": "+1"},
+  {"city": "Sydney", "utc": "+11"}
+  ],
 "dashes": ["cz-milestones-dash", "cz-review-load-dash"]
 }
