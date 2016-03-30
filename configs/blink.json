@@ -16,10 +16,10 @@
   {"user": "Sasha", "email": "sashab@chromium.org"},
   {"user": "Tim Ansell", "email": "mithro@mithis.com"}
 ],
-"dashes": ["cz-clock-dash", "cz-review-latency-dash", "cz-review-load-dash", "cz-milestones-dash", "cz-calendar-feed-source"],
+"dashes": ["cz-clock-dash", "cz-review-latency-dash", "cz-milestones-dash", "cz-review-load-dash", "cz-calendar-feed-source"],
 "timezones": [
   {"city": "MTV", "utc": "-7"},
   {"city": "Tokyo", "utc": "+9"},
   {"city": "Sydney", "utc": "+11"}
-  ],
+  ]
 }
