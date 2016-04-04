@@ -20,6 +20,6 @@
 "timezones": [
   {"city": "MTV", "utc": "-7"},
   {"city": "Tokyo", "utc": "+9"},
-  {"city": "Sydney", "utc": "+11"}
+  {"city": "Sydney", "utc": "+10"}
   ]
 }
