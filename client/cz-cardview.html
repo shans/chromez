@@ -152,7 +152,7 @@
       },
 
       attached: function() {
-        registerSource('cz-config', 'cardview-heading', cvHeading => this.set('cardview-heading', cvHeading));
+        registerSource('cz-config', 'cardview-heading', cvHeading => this.set('cardview-heading', (cvHeading ? cvHeading : '')));
         this.last = {};
       },
 
