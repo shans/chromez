@@ -20,7 +20,7 @@
 
     </style>
 
-    <paper-card id='header' heading='🍻🍕🍑🍔🍟🍦🍫🍰🍩🍪🍗🍝🍣🍱🍙🍘🍡🍠🍨🍵🍖🍯🌽🍜🍥🍤🍳🍻'>
+    <paper-card id='header' heading='{{cardview-heading}}'>
     </paper-card>
     <div id='container'>
       <template is='dom-repeat' items={{views}}>
@@ -152,6 +152,7 @@
       },
 
       attached: function() {
+        registerSource('cz-config', 'cardview-heading', cvHeading => this.set('cardview-heading', (cvHeading ? cvHeading : 'Card Feed')));
         this.last = {};
       },
 
