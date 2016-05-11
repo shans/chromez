@@ -10,10 +10,6 @@ import json
 class MainPage(webapp2.RequestHandler):
   def get(self):
       if self.request.get('site') == 'issues':
-          url = "https://bugs.chromium.org/p/chromium/issues/csv?"
-          for item in self.request.GET.items():
-              if item[0] != 'site':
-                  url += item[0] +'=' + item[1] + '&'
           scope = 'https://www.googleapis.com/auth/userinfo.email'
           credentials = AppAssertionCredentials(scope)
           http = credentials.authorize(Http())
@@ -31,7 +27,7 @@ class MainPage(webapp2.RequestHandler):
 
           urlfetch.set_default_fetch_deadline(10)
           self.response.headers.add_header("Access-Control-Allow-Origin", "*")
-          result = monorail.issues().list(projectId='chromium', owner=self.request.get('q')[6:], can='open').execute()
+          result = monorail.issues().list(projectId='chromium', q=self.request.get('q'), can='open').execute()
           self.response.write(json.dumps(result))
 
 app = webapp2.WSGIApplication([
