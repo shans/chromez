@@ -1,11 +1,21 @@
-{"cardview-heading": "Welcome to Animations Ave",
+{"cardview-heading": "Welcome to Animations Avenue",
 "users": [
   {"user": "Eric", "email": "ericwilligers@chromium.org"},
   {"user": "Alan", "email": "alancutter@chromium.org"},
   {"user": "Suzy", "email": "suzyh@chromium.org"},
   {"user": "Alexey", "email": "loyso@chromium.org"}
 ],
-"dashes": ["cz-review-latency-dash", "cz-review-load-dash"],
+"components": [
+  {"name": "Blink>Animation", "cardHeading": "Blink Tickets"},
+  {"name": "Internals>Compositing>Animation", "cardHeading": "Compositor Tickets"}
+],
+"updateSLO": {
+  "0": "1",
+  "1": "7",
+  "2": "14",
+  "3": "180"
+},
+"dashes": ["cz-review-load-dash", "cz-review-latency-dash", "cz-issue-priority-dash", "cz-component-dash"],
 "timezones": [
   {"city": "MTV", "utc": "-7"},
   {"city": "Tokyo", "utc": "+9"},
