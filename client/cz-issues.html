@@ -37,6 +37,12 @@
               site: 'issues',
               q: "owner:" + query.user,
             });
+        } else if (query.type == 'component') {
+          this.addCallbackToQuery(query, 'component', callback,
+            {
+              site: 'issues',
+              q: "component:" + query.component,
+            });
         }
       }
     });

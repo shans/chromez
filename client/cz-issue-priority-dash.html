@@ -1,0 +1,126 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../bower_components/paper-item/paper-item-body.html">
+
+<dom-module id="cz-issue-priority-dash">
+
+  <template>
+    <style>
+
+      paper-card .card-flex {
+        display: flex;
+        flex-wrap: wrap;
+        align-content: flex-start;
+      }
+
+      .priorities {
+        display: flex;
+        flex-wrap: wrap;
+      }
+
+      paper-item {
+        width: 50%;
+        box-sizing: border-box;
+      }
+    </style>
+      <paper-card heading="Issue Priorities" id='card'>
+        <div class="card-content">
+
+          <div class='card-flex'>
+            <template is="dom-repeat" items="{{users}}"
+                      filter="filterUsers" sort="sortUsers"
+                      observe="issues">
+              <paper-item>
+                <paper-item-body two-line>
+                  <div>{{item.user}}</div>
+                  <!-- TODO(suzyh): convert to templatized HTML -->
+                  <div secondary inner-h-t-m-l="[[priorities(item.issues, updateSLO)]]" class='priorities'></div>
+                </paper-item-body>
+              </paper-item>
+            </template>
+          </div>
+        </div>
+      </paper-card>
+  </template>
+
+  <script>
+    Polymer({
+      is: "cz-issue-priority-dash",
+
+      properties: {
+        users: {
+          type: 'Object',
+          value: function() { return []; },
+          observer: "usersChanged"
+        },
+        updateSLO: {
+          type: 'Object',
+          value: function() { return {}; },
+        }
+      },
+
+      filterUsers(item) {
+        if (item.issues == undefined)
+          return false;
+        return item.issues.length() > 0;
+      },
+
+      sortUsers(a, b) {
+        if (a.issues == undefined || b.issues == undefined)
+          return 0;
+        var minPriorityA = a.issues.minPriority();
+        var minPriorityB = b.issues.minPriority();
+        if (minPriorityA < minPriorityB)
+          return -1;
+        if (minPriorityA > minPriorityB)
+          return 1;
+        return 0;
+      },
+
+      attached: function() {
+        registerSource('cz-config', 'users', function(users) {
+          this.set('users', users);
+        }.bind(this));
+        registerSource('cz-config', 'updateSLO', function(updateSLO) {
+          this.set('updateSLO', updateSLO);
+        }.bind(this));
+      },
+
+      priorities: function(issues, updateSLO) {
+        var div = "<div><span style='color: white; border-radius: 4px; padding: 0px 6px;";
+        if (issues == undefined)
+          return "pending"
+        var priorityCounts = issues.priorityCounts();
+        var outOfUpdateSLOCounts = issues.outOfUpdateSLOCounts(updateSLO);
+
+        var result = "";
+        var keys = Object.keys(priorityCounts).sort();
+        for (var key of keys) {
+          result += div + " background-color: " + priorityColor(key) + "'>" +
+            priorityString(key) + "</span>" +
+            "<span style='margin:0px 5px'>" + priorityCounts[key];
+          if (key in outOfUpdateSLOCounts && outOfUpdateSLOCounts[key] > 0) {
+            result += " (" + outOfUpdateSLOCounts[key] + " out of SLO)";
+          }
+          result += "</span></div>";
+        }
+        return result;
+      },
+
+      usersChanged: function(users) {
+        // TODO: this probably only works for all-or-nothing changes to users right now.
+        users.forEach(function(user, idx) {
+          registerSource('cz-issues', {user: user.email, type: 'open'}, function(data) {
+            var issueList = new IssueList();
+            for (var i = 0; i < data.length; i++) {
+              issueList.append(new Issue(data[i]));
+            }
+            this.set('users.' + idx + '.issues', issueList);
+          }.bind(this));
+        }.bind(this));
+      }
+
+    });
+  </script>
+</dom-module>

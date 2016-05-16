@@ -1,0 +1,103 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../bower_components/paper-item/paper-item-body.html">
+<script src="issues-lib.js"></script>
+
+<dom-module id="cz-component-dash">
+
+  <template>
+    <style>
+
+      paper-card .card-flex {
+        display: flex;
+        flex-wrap: wrap;
+        align-content: flex-start;
+      }
+
+      .component {
+        display: flex;
+        flex-wrap: wrap;
+      }
+
+      paper-item {
+        box-sizing: border-box;
+      }
+    </style>
+    <template is="dom-repeat" items="{{components}}">
+      <paper-card heading="{{item.cardHeading}}" id='card'>
+        <div class="card-content">
+          <div class='card-flex'>
+            <paper-item>
+              <paper-item-body>
+                <!-- TODO(suzyh): convert to templatized HTML -->
+                <div secondary inner-h-t-m-l="[[issues(item.issues, updateSLO)]]" class='component'></div>
+              </paper-item-body>
+            </paper-item>
+          </div>
+        </div>
+      </paper-card>
+    </template>
+  </template>
+
+  <script>
+    Polymer({
+      is: "cz-component-dash",
+
+      properties: {
+        components: {
+          type: 'Object',
+          value: function() { return []; },
+          observer: "componentsChanged"
+        },
+        updateSLO: {
+          type: 'Object',
+          value: function() { return {}; },
+        }
+      },
+
+      attached: function() {
+        registerSource('cz-config', 'components', function(components) {
+          this.set('components', components);
+        }.bind(this));
+        registerSource('cz-config', 'updateSLO', function(updateSLO) {
+          this.set('updateSLO', updateSLO);
+        }.bind(this));
+      },
+
+      issues: function(issues, updateSLO) {
+        var div = "<div><span style='color: white; border-radius: 4px; padding: 0px 6px;";
+        if (issues == undefined)
+          return "pending";
+        var priorityCounts = issues.priorityCounts();
+        var outOfUpdateSLOCounts = issues.outOfUpdateSLOCounts(updateSLO);
+
+        var result = "";
+        var keys = Object.keys(priorityCounts).sort();
+        for (var key of keys) {
+          result += div + ' background-color: ' + priorityColor(key) + "'>" +
+            priorityString(key) + "</span>" +
+            "<span style='margin:0px 5px'>" + priorityCounts[key];
+          if (key in outOfUpdateSLOCounts && outOfUpdateSLOCounts[key] > 0) {
+            result += " (" + outOfUpdateSLOCounts[key] + " out of SLO)";
+          }
+          result += "</span></div>";
+        }
+        return result;
+      },
+
+      componentsChanged: function(components) {
+        components.forEach(function(component, idx) {
+          registerSource('cz-issues', {component: component.name, type: 'component'}, function(data) {
+            var issueList = new IssueList();
+            for (var i = 0; i < data.length; i++) {
+              issueList.append(new Issue(data[i]));
+            }
+            this.set('components.' + idx + '.issues', issueList);
+          }.bind(this));
+        }.bind(this));
+      }
+
+    });
+  </script>
+</dom-module>
