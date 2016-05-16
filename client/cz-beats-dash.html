@@ -1,0 +1,37 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-card/paper-card.html">
+<link rel="import" href="beat-time.html">
+
+<dom-module id="cz-beats-dash">
+  <template>
+    <style>
+      title-text {
+        font-size: 24px;
+        font-weight: 400;
+        display: block;
+      }
+      
+      paper-card {
+        padding: 16px;
+        font-size: 20px;
+        font-family: sans-serif;
+        display: block !important;
+      }
+      
+      beat-time {
+        font-size: 48px;
+        color: #2979FF;
+      }
+    </style>
+
+    <paper-card>
+      <title-text>Time around the internet</title-text>
+      <beat-time>{{beats}}</beat-time>
+    </paper-card>
+  </template>
+
+  <script>
+    Polymer({is: 'cz-beats-dash'});
+  </script>
+</dom-module>
+

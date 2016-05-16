@@ -1,0 +1,18 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+
+<dom-module id="beat-time"></dom-module>
+<script>
+Polymer({
+  is: 'beat-time',
+  attached: function() {
+    this._update();
+  },
+  detached: function() {
+    cancelAnimationFrame(this._key);
+  },
+  _update: function() {
+    this.textContent = Math.floor((Date.now() / 1000 + 3600) / 86.4 % 1000);
+    this._key = requestAnimationFrame(() => this._update());
+  }
+});
+</script>
