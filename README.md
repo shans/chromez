@@ -20,7 +20,7 @@ npm install -g bower
 
 Install [Polymer](https://www.polymer-project.org/1.0/docs/start/getting-the-code.html)
 ```shell
-bower install --save Polymer/polymer
+bower install
 ```
 
 ## Running
