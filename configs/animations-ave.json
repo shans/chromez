@@ -20,6 +20,6 @@
   {"city": "MTV", "utc": "-7"},
   {"city": "Waterloo", "utc": "-5"},
   {"city": "Tokyo", "utc": "+9"},
-  {"city": "Sydney", "utc": "+10"}
+  {"city": "Sydney", "utc": "+10", "local": true}
   ]
 }

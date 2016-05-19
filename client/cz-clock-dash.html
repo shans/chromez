@@ -18,7 +18,10 @@
         width: 80%;
       }
       div {
-        width: 300px;
+        font-size: 25pt;
+      }
+      .localTime {
+        font-size: 60pt;
       }
       .workingHours {
         color: green;
@@ -31,7 +34,19 @@
     <paper-card id='card' heading='&#127758; Time'>
       <div class="card-content">
         <div class='card-flex'>
-          <template is='dom-repeat' items='{{timezones}}'>
+          <template is='dom-repeat' items='{{timezones}}' filter="isLocal">
+            <paper-item-body two-line>
+              <div class="localTime">
+                <span class$='{{item.data.class}}'>{{item.data.timeString}}</span>
+              </div>
+              <div id='city' secondary>{{item.city}}</div>
+            </paper-item-body>
+          </template>
+        </div>
+      </div>
+      <div class="card-content">
+        <div class='card-flex'>
+          <template is='dom-repeat' items='{{timezones}}' filter="isNotLocal">
             <paper-item-body two-line>
               <div>
                 <span class$='{{item.data.class}}'>{{item.data.timeString}}</span>
@@ -100,6 +115,12 @@
           return "notWorkingHours";
         else
           return "workingHours";
+      },
+      isLocal: function(item) {
+        return item.local;
+      },
+      isNotLocal: function(item) {
+        return !(item.local);
       }
     });
   </script>
