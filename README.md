@@ -2,6 +2,16 @@
 
 Dashboard for displaying status for Chrome developers.
 
+## Website
+
+FIXME(shans): Add section on chromez-app.appspot.com
+
+## Config
+
+FIXME(shans): Add section on the config file format.
+
+# Developer Instructions
+
 ## Setup
 
 Install [Google App Engine SDK for Python](https://cloud.google.com/appengine/downloads#Google_App_Engine_SDK_for_Python)
