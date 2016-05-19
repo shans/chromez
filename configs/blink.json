@@ -19,8 +19,9 @@
 ],
 "dashes": ["cz-clock-dash", "cz-review-latency-dash", "cz-milestones-dash", "cz-review-load-dash", "cz-calendar-feed-source"],
 "timezones": [
-  {"city": "MTV", "utc": "-7"},
-  {"city": "Tokyo", "utc": "+9"},
-  {"city": "Sydney", "utc": "+10"}
+  {"city": "MTV", "timezone": "US/Pacific"},
+  {"city": "Waterloo", "timezone": "America/Nipigon"},
+  {"city": "Tokyo", "timezone": "Asia/Tokyo"},
+  {"city": "Sydney", "timezone": "Australia/Sydney", "local": true}
   ]
 }
