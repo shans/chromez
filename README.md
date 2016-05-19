@@ -54,6 +54,11 @@ Make changes, commit, push to origin, create pull request to
 
 To upload to [App Engine](https://cloud.google.com/appengine/):
 
+ * Pull in google-api-python-client library;
+   ```shell
+pip install -t lib google-api-python-client
+```
+
  * From the checked out directory run:
    ```shell
 appcfg.py update -A [you project name] .
