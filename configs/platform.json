@@ -14,11 +14,11 @@
   {"user": "Raymes", "email": "raymes@chromium.org"}
 ],
 "timezones": [
-  {"city": "MTV", "utc": "-7"},
-  {"city": "New York", "utc": "-4"},
-  {"city": "London", "utc": "0"},
-  {"city": "Munich", "utc": "+1"},
-  {"city": "Sydney", "utc": "+11"}
+  {"city": "MTV", "timezone": "US/Pacific"},
+  {"city": "New York", "timezone": "America/New_York"},
+  {"city": "London", "timezone": "Europe/London"},
+  {"city": "Munich", "timezone": "Europe/Berlin"},
+  {"city": "Sydney", "timezone": "Australia/Sydney", "local": true}
   ],
 "dashes": ["cz-milestones-dash", "cz-review-load-dash"]
 }

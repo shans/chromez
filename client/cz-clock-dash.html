@@ -18,7 +18,10 @@
         width: 80%;
       }
       div {
-        width: 300px;
+        font-size: 25pt;
+      }
+      .localTime {
+        font-size: 60pt;
       }
       .workingHours {
         color: green;
@@ -28,10 +31,22 @@
       }
     </style>
 
-    <paper-card id='card' heading='Time around the world'>
+    <paper-card id='card' heading='&#127758; Time'>
       <div class="card-content">
         <div class='card-flex'>
-          <template is='dom-repeat' items='{{timezones}}'>
+          <template is='dom-repeat' items='{{timezones}}' filter="isLocal">
+            <paper-item-body two-line>
+              <div class="localTime">
+                <span class$='{{item.data.class}}'>{{item.data.timeString}}</span>
+              </div>
+              <div id='city' secondary>{{item.city}}</div>
+            </paper-item-body>
+          </template>
+        </div>
+      </div>
+      <div class="card-content">
+        <div class='card-flex'>
+          <template is='dom-repeat' items='{{timezones}}' filter="isNotLocal">
             <paper-item-body two-line>
               <div>
                 <span class$='{{item.data.class}}'>{{item.data.timeString}}</span>
@@ -43,6 +58,9 @@
       </div>
     </paper-card>
   </template>
+
+  <script src="../bower_components/moment/moment.js"></script>
+  <script src="../bower_components/moment-timezone/builds/moment-timezone-with-data.js"></script>
 
   <script>
     Polymer({
@@ -60,31 +78,8 @@
         this.mutateTimeString();
       },
       currentTimeDay: function(timezone) {
-        var today = new Date();
-        var day = today.getUTCDay();
-        // FIXME: The UTC is accurate as of 15 March - what about daylightsavings causing these to change?
-        var hours = today.getUTCHours() + parseFloat(timezone.utc);
-        var minutes = today.getUTCMinutes();
-
-        if (hours < 0) {
-          hours = 24 + hours;
-          day = day > 0 ? (day - 1) %  7 : 6;
-        } else if (hours >= 24) {
-          hours = hours - 24;
-          day = (day + 1) %  7;
-        }
-
-        hours = (hours < 10) ? '0' + hours : hours;
-        minutes = (minutes < 10) ? '0' + minutes : minutes;
-
-        var time = hours + ':' + minutes;
-        var data;
-        if (day != 0 && day != 6) {
-          data = {timeString: time, class: this.formattedTime(hours, minutes)};
-        }
-        else {
-          data = {timeString: this.intToDay(day), class: 'notWorkingHours'};
-        }
+        var d = moment(new Date()).tz(timezone.timezone);
+        var data = {timeString: d.format("h:ma"), class: this.workingHours(d)};
         console.log(data.timeString, data.class);
         return data;
       },
@@ -92,14 +87,19 @@
         this.timezones.forEach((timezone, idx) => this.set('timezones.' + idx + '.data', this.currentTimeDay(timezone)));
         this.async(() => this.mutateTimeString(), 1000);
       },
-      intToDay: function(day) { // Sunday is 0, Monday is 1, etc
-        return day ? 'Saturday' : 'Sunday';
-      },
-      formattedTime: function(hours, minutes) {
-        if (hours < 9 || hours >= 17)
+      workingHours: function(d) {
+        if (d.hour() < 9 || d.hour() >= 17) // 9am->5pm
+          return "notWorkingHours";
+        else if (d.day() == 0 || d.day() == 6) // 0==Sunday, 6==Saturday
           return "notWorkingHours";
         else
           return "workingHours";
+      },
+      isLocal: function(item) {
+        return item.local;
+      },
+      isNotLocal: function(item) {
+        return !(item.local);
       }
     });
   </script>

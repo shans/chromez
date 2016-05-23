@@ -15,11 +15,11 @@
   "2": "14",
   "3": "180"
 },
-"dashes": ["cz-review-load-dash", "cz-review-latency-dash", "cz-issue-priority-dash", "cz-component-dash"],
+"dashes": ["cz-review-load-dash", "cz-review-latency-dash", "cz-issue-priority-dash", "cz-component-dash", "cz-clock-dash"],
 "timezones": [
-  {"city": "MTV", "utc": "-7"},
-  {"city": "Tokyo", "utc": "+9"},
-  {"city": "Sydney", "utc": "+10"},
-  {"city": "Waterloo", "utc": "-5"}
+  {"city": "MTV", "timezone": "US/Pacific"},
+  {"city": "Waterloo", "timezone": "America/Nipigon"},
+  {"city": "Tokyo", "timezone": "Asia/Tokyo"},
+  {"city": "Sydney", "timezone": "Australia/Sydney", "local": true}
   ]
 }
