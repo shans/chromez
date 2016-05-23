@@ -39,7 +39,7 @@
               <div class="localTime">
                 <span class$='{{item.data.class}}'>{{item.data.timeString}}</span>
               </div>
-              <div id='city' secondary>{{item.city}}</div>
+              <div id='city' secondary>{{item.city}} <small id='offset'>({{item.data.offset}})</small></div>
             </paper-item-body>
           </template>
         </div>
@@ -51,7 +51,7 @@
               <div>
                 <span class$='{{item.data.class}}'>{{item.data.timeString}}</span>
               </div>
-              <div id='city' secondary>{{item.city}}</div>
+              <div id='city' secondary>{{item.city}} <small id='offset'>({{item.data.offset}})</small></div>
             </paper-item-body>
           </template>
         </div>
@@ -79,7 +79,7 @@
       },
       currentTimeDay: function(timezone) {
         var d = moment(new Date()).tz(timezone.timezone);
-        var data = {timeString: d.format("HH:mm"), class: this.workingHours(d)};
+        var data = {timeString: d.format("HH:mm"), class: this.workingHours(d), offset: d.format("Z")};
         console.log(data.timeString, data.class);
         return data;
       },
