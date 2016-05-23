@@ -79,7 +79,7 @@
       },
       currentTimeDay: function(timezone) {
         var d = moment(new Date()).tz(timezone.timezone);
-        var data = {timeString: d.format("h:ma"), class: this.workingHours(d)};
+        var data = {timeString: d.format("h:mma"), class: this.workingHours(d)};
         console.log(data.timeString, data.class);
         return data;
       },
