@@ -33,6 +33,11 @@ class MainPage(webapp2.RequestHandler):
           self.response.headers.add_header("Access-Control-Allow-Origin", "*")
           result = monorail.issues().get(projectId='chromium', issueId=self.request.get('issueId')).execute()
           self.response.write(json.dumps(result))
+      elif self.request.get('site') == 'comments':
+          urlfetch.set_default_fetch_deadline(10)
+          self.response.headers.add_header("Access-Control-Allow-Origin", "*")
+          result = monorail.issues().comments().list(projectId='chromium', issueId=self.request.get('issueId')).execute()
+          self.response.write(json.dumps(result))
 
 app = webapp2.WSGIApplication([
     ('/.*', MainPage),
