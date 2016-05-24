@@ -11,8 +11,18 @@
     Polymer({
       is: "cz-registry",
 
+      properties: {
+        registeredSources: {
+          type: 'Object',
+          value: function() { return {}; },
+        },
+      },
+
       attached: function() {
         this.async(this.update, 300000);
+        for (var source of Polymer.dom(this).children) {
+          this.registeredSources[source.nodeName.toLowerCase()] = Promise.resolve(source);
+        }
       },
 
       update: function() {
@@ -24,26 +34,20 @@
       },
 
       registerSource: function(type, query, callback) {
-        var existingSources = Polymer.dom(this).children;
-        var source = undefined;
-        for (var i = 0; i < existingSources.length; i++) {
-          if (existingSources[i].nodeName.toLowerCase() == type) {
-            source = existingSources[i];
-            source.registerQuery(query, callback);
-            return;
-          }
+        if (!(type in this.registeredSources)) {
+          this.registeredSources[type] = new Promise(function(resolve, reject) {
+            this.importHref(type + '.html', function(e) {
+              source = document.createElement(type);
+              Polymer.dom(this).appendChild(source);
+              resolve(source);
+            }.bind(this), function(e) {
+              console.error("Couldn't load source for " + type);
+              reject(e);
+            });
+          }.bind(this));
         }
-        if (source == undefined) {
-          this.importHref(type + '.html', function(e) {
-            source = document.createElement(type);
-            Polymer.dom(this).appendChild(source);
-            source.registerQuery(query, callback);
-          }, function(e) {
-            console.error("Couldn't load source for " + type);
-          });
-        }
-        // TODO: return promise of source
-      }
+        return this.registeredSources[type].then(source => source.registerQuery(query, callback));
+      },
     });
   </script>
 
