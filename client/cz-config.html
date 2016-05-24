@@ -31,7 +31,7 @@
       },
 
       registerQuery: function(query, callback) {
-        this.addCallbackToQuery({"*":"*"}, "*", data => {
+        this.addCallbackToQuery(null, data => {
           if (data) {
             this.$.input.hidden = true;
             callback(data[query]);

@@ -21,7 +21,7 @@
 
       registerQuery: function(query, callback) {
         if (query.type == 'search') {
-          this.addCallbackToQuery(query, 'user', callback,
+          this.addCallbackToQuery(query, callback,
               {
                 reviewer: query.user,
                 closed: 3,

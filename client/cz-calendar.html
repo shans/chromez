@@ -20,7 +20,7 @@
       behaviors: [ChromeZBehaviors.AJAXBehavior],
 
       registerQuery: function(query, callback) {
-        this.addCallbackToQuery({"*": "*"}, '*', callback,
+        this.addCallbackToQuery(null, callback,
             {
               timeMin: (new Date()).toISOString(),
               showDeleted: false,
