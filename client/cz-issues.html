@@ -31,19 +31,21 @@
       },
 
       registerQuery: function(query, callback) {
-        if (query.type == 'open') {
-          this.addCallbackToQuery(query, 'user', callback,
-            {
-              site: 'issues',
-              q: "owner:" + query.user,
-            });
-        } else if (query.type == 'component') {
-          this.addCallbackToQuery(query, 'component', callback,
-            {
-              site: 'issues',
-              q: "component:" + query.component,
-            });
+        var queryParts = [];
+        if ('user' in query) {
+          queryParts.push('owner:' + query.user);
         }
+        if ('type' in query) {
+          queryParts.push('Type=' + query.type);
+        }
+        if ('components' in query) {
+          queryParts.push('component:' + query.components.join(','));
+        }
+        var params = {
+          site: 'issues',
+          q: queryParts.join(' '),
+        };
+        this.addCallbackToQuery(query, callback, params);
       }
     });
   </script>

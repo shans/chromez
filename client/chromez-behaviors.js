@@ -5,18 +5,21 @@ ChromeZBehaviors.AJAXBehavior = {
       this.searchQueries[i].element.generateRequest();
     }
   },
-  addCallbackToQuery: function(query, key, callback, defaults) {
+  addCallbackToQuery: function(query, callback, params) {
+    var queryKey = JSON.stringify(query);
     for (var i = 0; i < this.searchQueries.length; i++) {
-      if (this.searchQueries[i][key] == query[key]) {
+      if (this.searchQueries[i].key == queryKey) {
         this.searchQueries[i].callbacks.push(callback);
         if (this.searchQueries[i].dataCache)
           callback(clone(this.searchQueries[i].dataCache));
         return true;
       }
     }
-    searchQuery = {callbacks: [callback], params: defaults};
-    searchQuery[key] = query[key];
-    this.push('searchQueries', searchQuery);
+    this.push('searchQueries', {
+      callbacks: [callback],
+      params: params,
+      key: queryKey,
+    });
   },
   properties: {
     searchQueries: {

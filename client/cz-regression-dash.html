@@ -1,0 +1,131 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../bower_components/paper-item/paper-item-body.html">
+
+<dom-module id="cz-regression-dash">
+
+  <template>
+    <style>
+      paper-card .card-flex {
+        display: flex;
+        flex-wrap: wrap;
+        align-content: flex-start;
+      }
+
+      paper-item {
+        width: 50%;
+        box-sizing: border-box;
+      }
+
+      a {
+        font-size: 12px;
+        color: #888;
+        text-decoration: none;
+      }
+
+      .version {
+        color: white;
+        border-radius: 4px;
+        padding: 0px 6px;
+      }
+    </style>
+      <a href="https://bugs.chromium.org/p/chromium/issues/list?can=2&q=Type%3DBug-Regression+component:{{joinComma(components)}}" target="_blank">
+        <paper-card heading="Regression Bugs" id="card">
+          <div class="card-content">
+            <div class='card-flex'>
+              {{joinSpace(components)}}
+              <template is="dom-repeat" items="{{regressionCounts(releases, regressionVersions)}}">
+                <paper-item>
+                  <paper-item-body one-line>
+                    <div>
+                      <span class="version" style="background-color: {{item.color}}">{{item.version}}</span> {{item.count}}
+                    </div>
+                  </paper-item-body>
+                </paper-item>
+              </template>
+            </div>
+          </div>
+        </paper-card>
+      </a>
+  </template>
+
+  <script>
+  (function() {
+    Polymer({
+      is: "cz-regression-dash",
+
+      properties: {
+        releases: {
+          type: 'Object',
+          value: function() { return {}; },
+        },
+        components: {
+          type: 'Object',
+          value: function() { return []; },
+          observer: "componentsChanged"
+        },
+        regressionVersions: {
+          type: 'Object',
+          value: function() { return []; },
+        },
+      },
+
+      attached: function() {
+        registerSource('cz-releases', {}, function(releases) {
+          this.set('releases', releases);
+        }.bind(this));
+        registerSource('cz-config', 'components', function(components) {
+          this.set('components', components.map(component => component.name));
+        }.bind(this));
+      },
+
+      componentsChanged: function() {
+        if (this.components.length == 0) {
+          return;
+        }
+        registerSource('cz-issues', {type: 'Bug-Regression', components: this.components}, function(issues) {
+          var regressionVersions = [];
+          for (var issue of issues) {
+            var version = null;
+            for (var label of issue.labels) {
+              if (label.indexOf('M-') == 0) {
+                version = Number(label.substring(2));
+              }
+            }
+            regressionVersions.push(version);
+          }
+          this.set('regressionVersions', regressionVersions);
+        }.bind(this));
+      },
+
+      joinComma: list => list.join(','),
+      joinSpace: list => list.join(' '),
+
+      regressionCounts: function(releases, regressionVersions) {
+        return [{
+          version: '\u2264' + (releases.stable - 1),
+          color: '#B90D00',
+          count: regressionVersions.filter(version => version < releases.stable).length,
+        }, {
+          version: releases.stable,
+          color: '#F44336',
+          count: regressionVersions.filter(version => version == releases.stable).length,
+        }, {
+          version: releases.beta,
+          color: '#FF9800',
+          count: regressionVersions.filter(version => version == releases.beta).length,
+        }, {
+          version: releases.dev,
+          color: '#4CAF50',
+          count: regressionVersions.filter(version => version >= releases.dev).length,
+        }, {
+          version: '?',
+          color: '#757575',
+          count: regressionVersions.filter(version => version == null).length,
+        }].filter(item => item.count > 0);
+      },
+    });
+  })();
+  </script>
+</dom-module>
