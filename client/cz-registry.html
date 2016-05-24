@@ -16,13 +16,14 @@
           type: 'Object',
           value: function() { return {}; },
         },
+        scannedContentSources: {
+          type: 'boolean',
+          value: function() { return false; },
+        },
       },
 
       attached: function() {
         this.async(this.update, 300000);
-        for (var source of Polymer.dom(this).children) {
-          this.registeredSources[source.nodeName.toLowerCase()] = Promise.resolve(source);
-        }
       },
 
       update: function() {
@@ -34,6 +35,13 @@
       },
 
       registerSource: function(type, query, callback) {
+        if (!this.scannedContentSources) {
+          for (var source of Polymer.dom(this).children) {
+            this.registeredSources[source.nodeName.toLowerCase()] = Promise.resolve(source);
+          }
+          this.scannedContentSources = true;
+        }
+
         if (!(type in this.registeredSources)) {
           this.registeredSources[type] = new Promise(function(resolve, reject) {
             this.importHref(type + '.html', function(e) {
@@ -46,6 +54,7 @@
             });
           }.bind(this));
         }
+
         return this.registeredSources[type].then(source => source.registerQuery(query, callback));
       },
     });
