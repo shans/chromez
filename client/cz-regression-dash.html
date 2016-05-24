@@ -30,22 +30,24 @@
         padding: 0px 6px;
       }
     </style>
-      <paper-card heading="Regression Bugs" id="card">
-        <div class="card-content">
-          <div class='card-flex'>
-            <a href="https://bugs.chromium.org/p/chromium/issues/list?can=2&q=Type%3DBug-Regression+component:{{joinComma(components)}}">{{joinSpace(components)}}</a>
-            <template is="dom-repeat" items="{{regressionCounts(releases, regressionVersions)}}">
-              <paper-item>
-                <paper-item-body one-line>
-                  <div>
-                    <span class="version" style="background-color: {{item.color}}">{{item.version}}</span> {{item.count}}
-                  </div>
-                </paper-item-body>
-              </paper-item>
-            </template>
+      <a href="https://bugs.chromium.org/p/chromium/issues/list?can=2&q=Type%3DBug-Regression+component:{{joinComma(components)}}" target="_blank">
+        <paper-card heading="Regression Bugs" id="card">
+          <div class="card-content">
+            <div class='card-flex'>
+              {{joinSpace(components)}}
+              <template is="dom-repeat" items="{{regressionCounts(releases, regressionVersions)}}">
+                <paper-item>
+                  <paper-item-body one-line>
+                    <div>
+                      <span class="version" style="background-color: {{item.color}}">{{item.version}}</span> {{item.count}}
+                    </div>
+                  </paper-item-body>
+                </paper-item>
+              </template>
+            </div>
           </div>
-        </div>
-      </paper-card>
+        </paper-card>
+      </a>
   </template>
 
   <script>
