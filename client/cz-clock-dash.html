@@ -80,7 +80,6 @@
       currentTimeDay: function(timezone) {
         var d = moment(new Date()).tz(timezone.timezone);
         var data = {timeString: d.format("HH:mm"), class: this.workingHours(d), offset: d.format("Z")};
-        console.log(data.timeString, data.class);
         return data;
       },
       mutateTimeString: function() {
