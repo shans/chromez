@@ -1,7 +1,7 @@
 {
   "name": "chromez",
   "description": "chromez",
-  "version": "3",
+  "version": "4",
   "manifest_version": 2,
   "app": {
     "background": {
