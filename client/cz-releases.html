@@ -21,7 +21,22 @@
       behaviors: [ChromeZBehaviors.AJAXBehavior],
 
       registerQuery: function(query, callback) {
-        this.addCallbackToQuery(null, callback, {});
+        this.addCallbackToQuery(null, function(omahaData) {
+          var releases = {}
+          for (var platform of omahaData) {
+            if (platform.os == "linux") {
+              for (var version of platform.versions) {
+                releases[version.channel] = Number(version.version.split('.')[0]);
+              }
+            }
+          }
+          for (var channel of ['dev', 'beta', 'stable']) {
+            if (!(channel in releases)) {
+              console.warn(channel + ' channel data missing from omahaproxy');
+            }
+          }
+          callback(releases);
+        }, {});
       }
     });
   </script>
