@@ -69,18 +69,14 @@
         var div = "<div><span style='color: white; border-radius: 4px; padding: 0px 6px;";
         if (issues == undefined)
           return "pending";
-        var priorityCounts = issues.priorityCounts();
-        var outOfUpdateSLOCounts = issues.outOfUpdateSLOCounts(updateSLO);
 
         var result = "";
-        var keys = Object.keys(priorityCounts).sort();
-        for (var key of keys) {
-          result += div + ' background-color: ' + priorityColor(key) + "'>" +
-            priorityString(key) + "</span>" +
-            "<span style='margin:0px 5px'>" + priorityCounts[key];
-          if (key in outOfUpdateSLOCounts && outOfUpdateSLOCounts[key] > 0) {
-            result += " (" + outOfUpdateSLOCounts[key] + " out of SLO)";
-          }
+        for (var summaryItem of issues.summary(updateSLO)) {
+          var level = summaryItem.level;
+          var color = summaryItem.color;
+          var summary = summaryItem.summary;
+          result += div + ' background-color: ' + color + "'>" + level + "</span>" +
+            "<span style='margin:0px 5px'>" + summary;
           result += "</span></div>";
         }
         return result;

@@ -10,10 +10,10 @@
   {"name": "Internals>Compositing>Animation", "cardHeading": "Compositor Tickets"}
 ],
 "updateSLO": {
-  "0": "1",
-  "1": "7",
-  "2": "14",
-  "3": "180"
+  "daily": "1",
+  "weekly": "7",
+  "fortnightly": "14",
+  "monthly": "30"
 },
 "dashes": [
   "cz-clock-dash",

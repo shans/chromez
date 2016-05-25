@@ -1,16 +1,12 @@
-var priorityString = function(priority) {
-  return 'P' + priority;
-}
-
-var priorityColor = function(priority) {
-  if (priority == 0)
-    return '#F44336';
-  if (priority == 1)
-    return '#FF9800';
-  if (priority == 2)
-    return '#FFD54F';
-  return '#4CAF50';
-}
+var _reviewLevelColors = {
+  'daily': '#F44336',  // red
+  'weekly': '#FF9800',  // orange
+  'fortnightly': '#FFD54F',  // yellow
+  'monthly': '#4CAF50',  // green
+  'quarterly': '#999999'  // gray
+};
+var _defaultReviewLevel = 'none';
+var _defaultReviewLevelColor = '#999999';  // gray
 
 var Issue = function(monorailIssue) {
   this._rawData = monorailIssue;
@@ -18,6 +14,7 @@ var Issue = function(monorailIssue) {
   this.id = monorailIssue.id;
   this.summary = monorailIssue.summary;
   this.priority = undefined;
+  this._reviewLevel = _defaultReviewLevel;
 
   this._lastUpdatedString = monorailIssue.updated;
   this._lastUpdatedMS = Date.parse(this._lastUpdatedString);
@@ -26,19 +23,32 @@ var Issue = function(monorailIssue) {
     var label = monorailIssue.labels[i];
     if (label.substring(0, 4) == 'Pri-') {
       this.priority = Number(label.substring(4));
-      break;
+    }
+    if (label.substring(0, 7) == 'Update-') {
+      var reviewLevel = label.substring(7);
+      if (reviewLevel in _reviewLevelColors) {
+        this._reviewLevel = reviewLevel;
+      }
     }
   }
 };
 
 Issue.prototype = {
   daysSinceUpdate: function() {
-    return Math.round((Date.now() - this._lastUpdatedMS) / (1000 * 60 * 60 * 24));
+    return Math.floor((Date.now() - this._lastUpdatedMS) / (1000 * 60 * 60 * 24));
   },
 
   lastUpdated: function() {
     var result = new Date(this._lastUpdatedMS);
     return result.toDateString();
+  },
+
+  reviewLevelWithBackoff: function() {
+    var result = this._reviewLevel;
+    if (result == _defaultReviewLevel) {
+      result += ' (P' + this.priority + ')';
+    }
+    return result;
   },
 };
 
@@ -55,41 +65,54 @@ IssueList.prototype = {
     return this._data.length;
   },
 
-  minPriority: function() {
-    var minPriority = undefined;
-    for (var i = 0; i < this._data.length; i++) {
-      var priority = this._data[i].priority;
-      if (minPriority == undefined || priority < minPriority) {
-        minPriority = priority;
-      }
-    }
-    return minPriority;
-  },
-
-  priorityCounts: function() {
+  _reviewLevelCounts: function() {
     var result = {};
     for (var i = 0; i < this._data.length; i++) {
-      var priority = this._data[i].priority
-      if (priority in result) {
-        result[priority]++;
+      var reviewLevel = this._data[i].reviewLevelWithBackoff();
+      if (reviewLevel in result) {
+        result[reviewLevel]++;
       } else {
-        result[priority] = 1;
+        result[reviewLevel] = 1;
       }
     }
     return result;
   },
 
-  outOfUpdateSLOCounts: function(updateSLO) {
+  _outOfUpdateSLOCounts: function(updateSLO) {
     var result = {};
-    for (var priority in updateSLO) {
-      result[priority] = 0;
+    for (var reviewLevel in updateSLO) {
+      result[reviewLevel] = 0;
     }
     for (var i = 0; i < this._data.length; i++) {
       var issue = this._data[i];
-      if (issue.priority in updateSLO && issue.daysSinceUpdate() > updateSLO[issue.priority]) {
-        result[issue.priority]++;
+      var reviewLevel = issue.reviewLevelWithBackoff();
+      if (reviewLevel in updateSLO && issue.daysSinceUpdate() >= updateSLO[reviewLevel]) {
+        result[reviewLevel]++;
       }
     }
     return result;
+  },
+
+  summary: function(updateSLO) {
+    var orderedReviewLevels = ['daily', 'weekly', 'fortnightly', 'monthly',
+        'quarterly', 'none (P0)', 'none (P1)', 'none (P2)', 'none (P3)'];
+
+    var totals = this._reviewLevelCounts();
+    var outOfSLO = this._outOfUpdateSLOCounts(updateSLO);
+    var results = [];
+    for (var level of orderedReviewLevels) {
+      var levelColor = _defaultReviewLevelColor;
+      if (level in _reviewLevelColors) {
+        levelColor = _reviewLevelColors[level];
+      }
+      if (level in totals) {
+        var levelSummary = totals[level];
+        if (level in outOfSLO && outOfSLO[level] > 0) {
+          levelSummary += ' (' + outOfSLO[level] + ' out of SLO)';
+        }
+        results.push({'level': level, 'color': levelColor, 'summary': levelSummary});
+      }
+    }
+    return results;
   },
 };
