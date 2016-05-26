@@ -25,7 +25,7 @@ var Issue = function(monorailIssue) {
       this.priority = Number(label.substring(4));
     }
     if (label.substring(0, 7) == 'Update-') {
-      var reviewLevel = label.substring(7);
+      var reviewLevel = label.substring(7).toLowerCase();
       if (reviewLevel in _reviewLevelColors) {
         this._reviewLevel = reviewLevel;
       }
