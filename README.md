@@ -49,22 +49,3 @@ dev_appserver.py .
 
 Make changes, commit, push to origin, create pull request to
 [shans/chromez](https://github.com/shans/chromez) and get it merged.
-
-## Deploying
-
-To upload to [App Engine](https://cloud.google.com/appengine/):
-
- * Pull in google-api-python-client library;
-   ```shell
-pip install -t lib google-api-python-client
-```
-
- * From the checked out directory run:
-   ```shell
-appcfg.py update -A [you project name] .
-```
-
- * Consoles
-   - Project - http://console.developers.google.com/
-   - Dashboard - https://console.cloud.google.com/home/dashboard?project=[your project name]
-
