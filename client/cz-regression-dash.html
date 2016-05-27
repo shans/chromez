@@ -89,7 +89,7 @@
           for (var issue of issues) {
             var version = null;
             for (var label of issue.labels) {
-              if (label.indexOf('M-') == 0) {
+              if (label.substring(0, 2).toLowerCase() == 'm-') {
                 version = Number(label.substring(2));
               }
             }
