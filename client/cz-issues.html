@@ -2,6 +2,7 @@
 <link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
 <script src="../bower_components/papaparse/papaparse.min.js"></script>
 <script src="chromez-behaviors.js"></script>
+<script src="crbug-lib.js"></script>
 
 <dom-module id="cz-issues">
 
@@ -31,19 +32,9 @@
       },
 
       registerQuery: function(query, callback) {
-        var queryParts = [];
-        if ('user' in query) {
-          queryParts.push('owner:' + query.user);
-        }
-        if ('type' in query) {
-          queryParts.push('Type=' + query.type);
-        }
-        if ('components' in query) {
-          queryParts.push('component:' + query.components.join(','));
-        }
         var params = {
           site: 'issues',
-          q: queryParts.join(' '),
+          q: CrBug.queryString(query),
         };
         this.addCallbackToQuery(query, callback, params);
       }
