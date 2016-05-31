@@ -150,4 +150,5 @@ IssueList.prototype = {
 
 window.Issue = Issue;
 window.IssueList = IssueList;
+
 })();

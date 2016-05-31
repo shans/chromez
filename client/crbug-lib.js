@@ -6,7 +6,7 @@ if (window.CrBug) {
 
 function queryString(query) {
   var queryParts = [];
-  // TODO(alancutter): Make this function just pass through the key values pairs in the right format.
+  // TODO(alancutter): Make this function just pass through the key value pairs in the right format.
   if ('user' in query) {
     queryParts.push('owner:' + query.user);
   }
