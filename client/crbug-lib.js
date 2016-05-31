@@ -6,6 +6,7 @@ if (window.CrBug) {
 
 function queryString(query) {
   var queryParts = [];
+  // TODO(alancutter): Make this function just pass through the key values pairs in the right format.
   if ('user' in query) {
     queryParts.push('owner:' + query.user);
   }
@@ -14,6 +15,12 @@ function queryString(query) {
   }
   if ('components' in query) {
     queryParts.push('component:' + query.components.join(','));
+  }
+  if ('label' in query) {
+    queryParts.push('label:' + query.label);
+  }
+  if ('-has' in query) {
+    queryParts.push('-has:' + query['-has']);
   }
   return queryParts.join(' ');
 }
