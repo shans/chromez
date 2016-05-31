@@ -2,6 +2,8 @@
 <link rel="import" href="../bower_components/paper-card/paper-card.html">
 <link rel="import" href="../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../bower_components/paper-item/paper-item-body.html">
+<script src="crbug-lib.js"></script>
+<script src="issues-lib.js"></script>
 
 <dom-module id="cz-issue-priority-dash">
 
@@ -32,23 +34,30 @@
       .summary {
         margin: 0px 5px;
       }
+
+      a {
+        color: black;
+        text-decoration: none;
+      }
     </style>
       <paper-card heading="Assigned Issues" id='card'>
         <div class="card-content">
 
           <div class='card-flex'>
-            <template is="dom-repeat" items="{{users}}"
+            <template is="dom-repeat"
+                      items="{{users}}"
+                      as="user"
                       filter="filterUsers"
                       observe="issues">
               <paper-item>
                 <paper-item-body two-line>
-                  <div>{{item.user}}</div>
+                  <div>{{user.user}}</div>
                   <div secondary class='priorities'>
-                    <template is="dom-repeat" items="{{priorities(item.issues, updateSLO)}}">
-                      <div>
+                    <template is="dom-repeat" items="{{priorities(user.issues, updateSLO)}}">
+                      <a href="{{crbugLink(user.email, item.query)}}">
                         <span class="bubble" style="background-color: {{item.color}}">{{item.level}}</span>
                         <span class="summary">{{item.summary}}</span>
-                      </div>
+                      </a>
                     </template>
                   </div>
                 </paper-item-body>
@@ -92,6 +101,12 @@
 
       priorities: function(issues, updateSLO) {
         return issues.summary(updateSLO);
+      },
+
+      crbugLink: function(email, query) {
+        var userQuery = clone(query);
+        userQuery.user = email;
+        return CrBug.queryURL(userQuery);
       },
 
       usersChanged: function(users) {

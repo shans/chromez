@@ -1,9 +1,41 @@
-var _reviewLevelColors = {
-  'daily': '#F44336',  // red
-  'weekly': '#FF9800',  // orange
-  'fortnightly': '#FFD54F',  // yellow
-  'monthly': '#4CAF50',  // green
-  'quarterly': '#999999'  // gray
+(function() {
+
+if (window.Issue && window.IssueList) {
+  return;
+}
+
+var _reviewLevelMetadata = {
+  'daily': {
+    query: {label: 'Update-daily'},
+    color: '#F44336',  // red
+  },
+  'weekly': {
+    query: {label: 'Update-weekly'},
+    color: '#FF9800',  // orange
+  },
+  'fortnightly': {
+    query: {label: 'Update-fortnightly'},
+    color: '#FFD54F',  // yellow
+  },
+  'monthly': {
+    query: {label: 'Update-monthly'},
+    color: '#4CAF50',  // green
+  },
+  'quarterly': {
+    query: {label: 'Update-quarterly'},
+  },
+  'none (P0)': {
+    query: {label: 'Pri-0', '-has': 'update'},
+  },
+  'none (P1)': {
+    query: {label: 'Pri-1', '-has': 'update'},
+  },
+  'none (P2)': {
+    query: {label: 'Pri-2', '-has': 'update'},
+  },
+  'none (P3)': {
+    query: {label: 'Pri-3', '-has': 'update'},
+  },
 };
 var _defaultReviewLevel = 'none';
 var _defaultReviewLevelColor = '#999999';  // gray
@@ -26,7 +58,7 @@ var Issue = function(monorailIssue) {
     }
     if (label.substring(0, 7) == 'Update-') {
       var reviewLevel = label.substring(7).toLowerCase();
-      if (reviewLevel in _reviewLevelColors) {
+      if (reviewLevel in _reviewLevelMetadata) {
         this._reviewLevel = reviewLevel;
       }
     }
@@ -94,25 +126,29 @@ IssueList.prototype = {
   },
 
   summary: function(updateSLO) {
-    var orderedReviewLevels = ['daily', 'weekly', 'fortnightly', 'monthly',
-        'quarterly', 'none (P0)', 'none (P1)', 'none (P2)', 'none (P3)'];
-
     var totals = this._reviewLevelCounts();
     var outOfSLO = this._outOfUpdateSLOCounts(updateSLO);
     var results = [];
-    for (var level of orderedReviewLevels) {
-      var levelColor = _defaultReviewLevelColor;
-      if (level in _reviewLevelColors) {
-        levelColor = _reviewLevelColors[level];
-      }
+    for (var level in _reviewLevelMetadata) {
+      var metadata = _reviewLevelMetadata[level];
       if (level in totals) {
-        var levelSummary = totals[level];
+        var levelSummary = totals[level].toString();
         if (level in outOfSLO && outOfSLO[level] > 0) {
           levelSummary += ' (' + outOfSLO[level] + ' out of SLO)';
         }
-        results.push({'level': level, 'color': levelColor, 'summary': levelSummary});
+        results.push({
+          level: level,
+          color: metadata.color || _defaultReviewLevelColor,
+          query: metadata.query,
+          summary: levelSummary,
+        });
       }
     }
     return results;
   },
 };
+
+window.Issue = Issue;
+window.IssueList = IssueList;
+
+})();

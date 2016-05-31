@@ -2,6 +2,7 @@
 <link rel="import" href="../bower_components/paper-card/paper-card.html">
 <link rel="import" href="../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../bower_components/paper-item/paper-item-body.html">
+<script src="crbug-lib.js"></script>
 
 <dom-module id="cz-regression-dash">
 
@@ -30,7 +31,7 @@
         padding: 0px 6px;
       }
     </style>
-      <a href="https://bugs.chromium.org/p/chromium/issues/list?can=2&q=Type%3DBug-Regression+component:{{joinComma(components)}}" target="_blank">
+      <a href="{{crbugLink(components)}}" target="_blank">
         <paper-card heading="Regression Bugs" id="card">
           <div class="card-content">
             <div class='card-flex'>
@@ -99,7 +100,10 @@
         }.bind(this));
       },
 
-      joinComma: list => list.join(','),
+      crbugLink: function(components) {
+        return CrBug.queryURL({type: 'Bug-Regression', components: components});
+      },
+
       joinSpace: list => list.join(' '),
 
       regressionCounts: function(releases, regressionVersions) {
