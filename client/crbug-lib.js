@@ -5,24 +5,7 @@ if (window.CrBug) {
 }
 
 function queryString(query) {
-  var queryParts = [];
-  // TODO(alancutter): Make this function just pass through the key value pairs in the right format.
-  if ('user' in query) {
-    queryParts.push('owner:' + query.user);
-  }
-  if ('type' in query) {
-    queryParts.push('Type=' + query.type);
-  }
-  if ('components' in query) {
-    queryParts.push('component:' + query.components.join(','));
-  }
-  if ('label' in query) {
-    queryParts.push('label:' + query.label);
-  }
-  if ('-has' in query) {
-    queryParts.push('-has:' + query['-has']);
-  }
-  return queryParts.join(' ');
+  return Object.keys(query).map(key => key + '=' + query[key]).join(' ');
 }
 
 function queryURL(query) {

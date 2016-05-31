@@ -84,7 +84,7 @@
 
       componentsChanged: function(components) {
         components.forEach(function(component, idx) {
-          registerSource('cz-issues', {components: [component.name]}, function(data) {
+          registerSource('cz-issues', {component: component.name}, function(data) {
             var issueList = new IssueList();
             for (var i = 0; i < data.length; i++) {
               issueList.append(new Issue(data[i]));
