@@ -105,14 +105,14 @@
 
       crbugLink: function(email, query) {
         var userQuery = clone(query);
-        userQuery.user = email;
+        userQuery.owner = email;
         return CrBug.queryURL(userQuery);
       },
 
       usersChanged: function(users) {
         // TODO: this probably only works for all-or-nothing changes to users right now.
         users.forEach(function(user, idx) {
-          registerSource('cz-issues', {user: user.email}, function(data) {
+          registerSource('cz-issues', {owner: user.email}, function(data) {
             var issueList = new IssueList();
             for (var i = 0; i < data.length; i++) {
               issueList.append(new Issue(data[i]));
