@@ -25,7 +25,7 @@
         text-decoration: none;
       }
 
-      .version {
+      .label {
         color: white;
         border-radius: 4px;
         padding: 0px 6px;
@@ -40,7 +40,7 @@
                 <paper-item>
                   <paper-item-body one-line>
                     <div>
-                      <span class="version" style="background-color: {{item.color}}">{{item.version}}</span> {{item.count}}
+                      <span class="label" style="background-color: {{item.color}}">{{item.label}}</span> {{item.count}}
                     </div>
                   </paper-item-body>
                 </paper-item>
@@ -108,23 +108,23 @@
 
       regressionCounts: function(releases, regressionVersions) {
         return [{
-          version: '\u2264' + (releases.stable - 1),
+          label: 'pre-stable \u2264' + (releases.stable - 1),
           color: '#B90D00',
           count: regressionVersions.filter(version => version < releases.stable).length,
         }, {
-          version: releases.stable,
+          label: 'stable ' + releases.stable,
           color: '#F44336',
           count: regressionVersions.filter(version => version == releases.stable).length,
         }, {
-          version: releases.beta,
+          label: 'beta ' + releases.beta,
           color: '#FF9800',
           count: regressionVersions.filter(version => version == releases.beta).length,
         }, {
-          version: releases.dev,
+          label: 'dev ' + releases.dev,
           color: '#4CAF50',
           count: regressionVersions.filter(version => version >= releases.dev).length,
         }, {
-          version: '?',
+          label: 'unknown',
           color: '#757575',
           count: regressionVersions.filter(version => version == null).length,
         }].filter(item => item.count > 0);
