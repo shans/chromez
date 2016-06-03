@@ -135,7 +135,7 @@
             for (var i = 0; i < data.length; i++) {
               for (var j = 0; j < data[i].labels.length; j++) {
                 var label = data[i].labels[j];
-                if (label.substring(0, 2) == 'M-') {
+                if (label.substring(0, 2).toLowerCase() == 'm-') {
                   data[i].M = label.substring(2);
                   break;
                 }
