@@ -35,7 +35,7 @@
     </style>
     <template is="dom-repeat" items="{{components}}">
       <a href="{{crbugLink(item.name)}}">
-        <paper-card heading="{{item.cardHeading}}" id='card'>
+        <paper-card heading="{{item.name}}" id='card'>
           <div class="card-content">
             {{item.name}}
             <div class='card-flex'>

@@ -6,8 +6,8 @@
   {"user": "Alexey", "email": "loyso@chromium.org"}
 ],
 "components": [
-  {"name": "Blink>Animation", "cardHeading": "Blink Tickets"},
-  {"name": "Internals>Compositing>Animation", "cardHeading": "Compositor Tickets"}
+  {"name": "Blink>Animation"},
+  {"name": "Internals>Compositing>Animation"}
 ],
 "updateSLO": {
   "daily": "1",
