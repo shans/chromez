@@ -112,7 +112,7 @@
 
       regressionCounts: function(releases, regressionVersions) {
         return [{
-          label: 'pre-stable \u2264' + (releases.stable - 1),
+          label: 'old \u2264' + (releases.stable - 1),
           color: '#B90D00',
           count: regressionVersions.filter(version => version < releases.stable).length,
         }, {
