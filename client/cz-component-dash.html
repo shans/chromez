@@ -3,6 +3,7 @@
 <link rel="import" href="../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../bower_components/paper-item/paper-item-body.html">
 <script src="issues-lib.js"></script>
+<script src="crbug-lib.js"></script>
 
 <dom-module id="cz-component-dash">
 
@@ -26,19 +27,27 @@
       paper-item {
         box-sizing: border-box;
       }
+
+      a {
+        color: grey;
+        text-decoration: none;
+      }
     </style>
     <template is="dom-repeat" items="{{components}}">
       <paper-card heading="{{item.cardHeading}}" id='card'>
-        <div class="card-content">
-          <div class='card-flex'>
-            <paper-item>
-              <paper-item-body>
-                <!-- TODO(suzyh): convert to templatized HTML -->
-                <div secondary inner-h-t-m-l="[[issues(item.issues, updateSLO)]]" class='component'></div>
-              </paper-item-body>
-            </paper-item>
+        <a href="{{crbugLink(component.name)">
+          <div class="card-content">
+            {{item.name}}
+            <div class='card-flex'>
+              <paper-item>
+                <paper-item-body>
+                  <!-- TODO(suzyh): convert to templatized HTML -->
+                  <div secondary inner-h-t-m-l="[[issues(item.issues, updateSLO)]]" class='component'></div>
+                </paper-item-body>
+              </paper-item>
+            </div>
           </div>
-        </div>
+        </a>
       </paper-card>
     </template>
   </template>
@@ -95,8 +104,11 @@
             this.set('components.' + idx + '.issues', issueList);
           }.bind(this));
         }.bind(this));
-      }
+      },
 
+      crbugLink: function(component) {
+        return CrBug.queryURL({component});
+      },
     });
   </script>
 </dom-module>
