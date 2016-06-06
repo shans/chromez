@@ -4,25 +4,28 @@ if (window.Issue && window.IssueList) {
   return;
 }
 
+// Colours are copied from:
+// https://www.google.com/design/spec/style/color.html#color-color-palette
 var _reviewLevelMetadata = {
   'daily': {
     query: {label: 'Update-daily'},
-    color: '#F44336',  // red
+    outOfSLOColor: '#B71C1C',  // Red 900
   },
   'weekly': {
     query: {label: 'Update-weekly'},
-    color: '#FF9800',  // orange
+    outOfSLOColor: '#C62828',  // Red 800
   },
   'fortnightly': {
     query: {label: 'Update-fortnightly'},
-    color: '#FFD54F',  // yellow
+    outOfSLOColor: '#D32F2F',  // Red 700
   },
   'monthly': {
     query: {label: 'Update-monthly'},
-    color: '#4CAF50',  // green
+    outOfSLOColor: '#E53935',  // Red 600
   },
   'quarterly': {
     query: {label: 'Update-quarterly'},
+    outOfSLOColor: '#F44336',  // Red 500
   },
   'none (P0)': {
     query: {label: 'Pri-0', '-has': 'update'},
@@ -38,7 +41,8 @@ var _reviewLevelMetadata = {
   },
 };
 var _defaultReviewLevel = 'none';
-var _defaultReviewLevelColor = '#999999';  // gray
+var _inSLOColor = '#4CAF50';  // Green 500
+var _noSLOColor = '#757575';  // Grey 600
 
 var Issue = function(monorailIssue) {
   this._rawData = monorailIssue;
@@ -132,13 +136,15 @@ IssueList.prototype = {
     for (var level in _reviewLevelMetadata) {
       var metadata = _reviewLevelMetadata[level];
       if (level in totals) {
+        var color = (level in updateSLO) ? _inSLOColor : _noSLOColor;
         var levelSummary = totals[level].toString();
         if (level in outOfSLO && outOfSLO[level] > 0) {
+          color = metadata.outOfSLOColor;
           levelSummary += ' (' + outOfSLO[level] + ' out of SLO)';
         }
         results.push({
           level: level,
-          color: metadata.color || _defaultReviewLevelColor,
+          color: color,
           query: metadata.query,
           summary: levelSummary,
         });
