@@ -33,22 +33,20 @@
         text-decoration: none;
       }
     </style>
-    <template is="dom-repeat" items="{{components}}">
-      <a href="{{crbugLink(item.name)}}">
-        <paper-card heading="{{item.name}}" id='card'>
-          <div class="card-content">
-            <div class='card-flex'>
-              <paper-item>
-                <paper-item-body>
-                  <!-- TODO(suzyh): convert to templatized HTML -->
-                  <div secondary inner-h-t-m-l="[[issues(item.issues, updateSLO)]]" class='component'></div>
-                </paper-item-body>
-              </paper-item>
-            </div>
+    <a href="{{crbugLink(component.name)}}">
+      <paper-card heading="{{component.name}}" id='card'>
+        <div class="card-content">
+          <div class='card-flex'>
+            <paper-item>
+              <paper-item-body>
+                <!-- TODO(suzyh): convert to templatized HTML -->
+                <div secondary inner-h-t-m-l="[[issues(component.issues, updateSLO)]]" class='component'></div>
+              </paper-item-body>
+            </paper-item>
           </div>
-        </paper-card>
-      </a>
-    </template>
+        </div>
+      </paper-card>
+    </a>
   </template>
 
   <script>
@@ -56,10 +54,9 @@
       is: "cz-component-dash",
 
       properties: {
-        components: {
+        component: {
           type: 'Object',
-          value: function() { return []; },
-          observer: "componentsChanged"
+          value: function() { return {}; },
         },
         updateSLO: {
           type: 'Object',
@@ -69,7 +66,8 @@
 
       attached: function() {
         registerSource('cz-config', 'components', function(components) {
-          this.set('components', components);
+          this.set('component', {name: components[this.key]});
+          this.updateComponentIssues(this.component)
         }.bind(this));
         registerSource('cz-config', 'updateSLO', function(updateSLO) {
           this.set('updateSLO', updateSLO);
@@ -93,15 +91,13 @@
         return result;
       },
 
-      componentsChanged: function(components) {
-        components.forEach(function(component, idx) {
-          registerSource('cz-issues', {component: component.name}, function(data) {
-            var issueList = new IssueList();
-            for (var i = 0; i < data.length; i++) {
-              issueList.append(new Issue(data[i]));
-            }
-            this.set('components.' + idx + '.issues', issueList);
-          }.bind(this));
+      updateComponentIssues: function(component) {
+        registerSource('cz-issues', {component: component.name}, function(data) {
+          var issueList = new IssueList();
+          for (var i = 0; i < data.length; i++) {
+            issueList.append(new Issue(data[i]));
+          }
+          this.set('component.issues', issueList);
         }.bind(this));
       },
 
