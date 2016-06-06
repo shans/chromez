@@ -34,8 +34,8 @@
       }
     </style>
     <template is="dom-repeat" items="{{components}}">
-      <paper-card heading="{{item.cardHeading}}" id='card'>
-        <a href="{{crbugLink(component.name)">
+      <a href="{{crbugLink(item.name)}}">
+        <paper-card heading="{{item.cardHeading}}" id='card'>
           <div class="card-content">
             {{item.name}}
             <div class='card-flex'>
@@ -47,8 +47,8 @@
               </paper-item>
             </div>
           </div>
-        </a>
-      </paper-card>
+        </paper-card>
+      </a>
     </template>
   </template>
 
