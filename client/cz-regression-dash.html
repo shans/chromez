@@ -81,7 +81,7 @@
           this.set('releases', releases);
         }.bind(this));
         registerSource('cz-config', 'components', function(components) {
-          this.set('components', components.map(component => component.name));
+          this.set('components', Object.values(components));
         }.bind(this));
       },
 

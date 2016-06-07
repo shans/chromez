@@ -5,10 +5,10 @@
   {"user": "Suzy", "email": "suzyh@chromium.org"},
   {"user": "Alexey", "email": "loyso@chromium.org"}
 ],
-"components": [
-  {"name": "Blink>Animation"},
-  {"name": "Internals>Compositing>Animation"}
-],
+"components": {
+  "animation": "Blink>Animation",
+  "compositing": "Internals>Compositing>Animation"
+},
 "updateSLO": {
   "daily": "1",
   "weekly": "7",
@@ -17,7 +17,8 @@
 },
 "dashes": [
   "cz-clock-dash",
-  "cz-component-dash",
+  "cz-component-dash(animation)",
+  "cz-component-dash(compositing)",
   "cz-issue-priority-dash",
   "cz-regression-dash",
   "cz-review-latency-dash",

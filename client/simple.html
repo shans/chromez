@@ -60,22 +60,10 @@ cz-cardview {
   <cz-config id=config></cz-config>
 </cz-registry>
 
-<div class='distribute' id='dashpoint'>
+<div class='distribute'>
 <cz-cardview id='feed' columns=2></cz-cardview>
 </div>
 
 <script>
-function addDash(dash) {
-  if (dashpoint.querySelector(dash))
-    return;
-  Polymer.Base.importHref(dash + '.html',
-    function(e) {
-      dashpoint.insertBefore(document.createElement(dash), feed);
-    },
-    function(e) {
-      console.error("couldn't create dash " + dash);
-    });
-}
-
-registerSource('cz-config', 'dashes', dashes => dashes.forEach(addDash));
+registerSource('cz-config', 'dashes', dashes => dashes.forEach(a => addDash(a, feed)));
 </script>
