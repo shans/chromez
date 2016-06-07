@@ -18,7 +18,7 @@
 "dashes": [
   "cz-clock-dash",
   "cz-component-dash(animation)",
-  {"name": "cz-component-dash", "key": "compositing"},
+  "cz-component-dash(compositing)",
   "cz-issue-priority-dash",
   "cz-regression-dash",
   "cz-review-latency-dash",
