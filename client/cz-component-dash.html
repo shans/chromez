@@ -28,6 +28,16 @@
         box-sizing: border-box;
       }
 
+      .bubble {
+        color: white;
+        border-radius: 4px;
+        padding: 0px 6px;
+      }
+
+      .summary {
+        margin: 0px 5px;
+      }
+
       a {
         color: grey;
         text-decoration: none;
@@ -39,8 +49,12 @@
           <div class='card-flex'>
             <paper-item>
               <paper-item-body>
-                <!-- TODO(suzyh): convert to templatized HTML -->
-                <div secondary inner-h-t-m-l="[[issues(component.issues, updateSLO)]]" class='component'></div>
+                <template is="dom-repeat" items="{{issues(component.issues, updateSLO)}}">
+                  <a href="{{crbugLink(component.name, item.query)}}">
+                    <span class="bubble" style="background-color: {{item.color}}">{{item.level}}</span>
+                    <span class="summary">{{item.summary}}</span>
+                  </a>
+                </template>
               </paper-item-body>
             </paper-item>
           </div>
@@ -75,20 +89,7 @@
       },
 
       issues: function(issues, updateSLO) {
-        var div = "<div><span style='color: white; border-radius: 4px; padding: 0px 6px;";
-        if (issues == undefined)
-          return "pending";
-
-        var result = "";
-        for (var summaryItem of issues.summary(updateSLO)) {
-          var level = summaryItem.level;
-          var color = summaryItem.color;
-          var summary = summaryItem.summary;
-          result += div + ' background-color: ' + color + "'>" + level + "</span>" +
-            "<span style='margin:0px 5px'>" + summary;
-          result += "</span></div>";
-        }
-        return result;
+        return issues.summary(updateSLO);
       },
 
       updateComponentIssues: function(component) {
@@ -101,8 +102,10 @@
         }.bind(this));
       },
 
-      crbugLink: function(component) {
-        return CrBug.queryURL({component});
+      crbugLink: function(component, query) {
+        var componentQuery = clone(query || {});
+        componentQuery.component = component;
+        return CrBug.queryURL(componentQuery);
       },
     });
   </script>
