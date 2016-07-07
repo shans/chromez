@@ -94,8 +94,9 @@
           for (var issue of issues) {
             var version = null;
             for (var label of issue.labels) {
-              if (label.substring(0, 2).toLowerCase() == 'm-') {
-                version = Number(label.substring(2));
+              var match = /regressed-(.*)/i.exec(label);
+              if (match) {
+                version = Number(match[1]) || null;
               }
             }
             regressionVersions.push(version);
@@ -114,7 +115,7 @@
         return [{
           label: 'old \u2264' + (releases.stable - 1),
           color: '#B90D00',
-          count: regressionVersions.filter(version => version < releases.stable).length,
+          count: regressionVersions.filter(version => version != null && version < releases.stable).length,
         }, {
           label: 'stable ' + releases.stable,
           color: '#F44336',
