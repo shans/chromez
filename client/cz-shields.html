@@ -1,0 +1,32 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+<script src="chromez-behaviors.js"></script>
+
+<dom-module id="cz-shields">
+
+  <template>
+    <template is="dom-repeat" items="{{searchQueries}}">
+      <iron-ajax
+        auto
+        handle-as="json"
+        url="https://img.shields.io/[[item.params.type]]/[[item.params.repo]].json"
+        on-response="handleResponse"></iron-ajax>
+    </template>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'cz-shields',
+
+      behaviors: [ChromeZBehaviors.AJAXBehavior],
+
+      registerQuery: function(query, callback) {
+        var params = {
+          type: query.type,
+          repo: query.repo
+        };
+        this.addCallbackToQuery(query, callback, params);
+      }
+    });
+  </script>
+</dom-module>
