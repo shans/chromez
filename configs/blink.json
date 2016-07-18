@@ -17,11 +17,14 @@
   {"user": "Sasha", "email": "sashab@chromium.org"},
   {"user": "Tim Ansell", "email": "mithro@mithis.com"}
 ],
-"dashes": ["cz-clock-dash", "cz-review-latency-dash", "cz-milestones-dash", "cz-review-load-dash", "cz-calendar-feed-source"],
+"dashes": ["cz-clock-dash", "cz-shields-dash(customelements)", "cz-review-latency-dash", "cz-milestones-dash", "cz-review-load-dash", "cz-calendar-feed-source"],
 "timezones": [
   {"city": "MTV", "timezone": "US/Pacific"},
   {"city": "Waterloo", "timezone": "America/Nipigon"},
   {"city": "Tokyo", "timezone": "Asia/Tokyo"},
   {"city": "Sydney", "timezone": "Australia/Sydney", "local": true}
-  ]
+  ],
+"github": {
+  "customelements": { "repo": "customelements/v2", "shields": ["travis", "github/issues-pr", "github/issues"] }
+}
 }

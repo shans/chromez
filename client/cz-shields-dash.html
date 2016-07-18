@@ -1,0 +1,71 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-card/paper-card.html">
+
+<dom-module id="cz-shields-dash">
+
+  <template>
+    <style>
+      paper-card {
+        display: block;
+      }
+
+      paper-card .card-flex {
+        display: flex;
+        flex-wrap: wrap;
+        align-content: flex-start;
+      }
+
+      img {
+        height: 30px;
+        margin: 8px 8px 8px 0;
+      }
+    </style>
+      <paper-card heading="[[repo]]" id="card">
+        <div class="card-content">
+          <div class='card-flex'>
+            <template is="dom-repeat" items="{{data}}">
+              <img src="https://img.shields.io/[[item.type]]/[[item.repo]].svg">
+            </template>
+          </div>
+        </div>
+      </paper-card>
+  </template>
+
+  <script>
+  (function() {
+    Polymer({
+      is: 'cz-shields-dash',
+
+      properties: {
+        repo: String,
+
+        shields: Object,
+      },
+
+      observers: [
+        'updateRepos(repo, shields)'
+      ],
+
+      attached: function() {
+        this.data = [];
+        registerSource('cz-config', 'github', github => {
+          this.set('shields', github[this.key].shields);
+          this.set('repo', github[this.key].repo);
+        });
+      },
+
+      updateRepos: function(repo, shields) {
+        for (var shield of shields)
+          registerSource('cz-shields', { type: shield, repo: repo }, this.addShield.bind(this, repo, shield));
+      },
+
+      addShield: function(repo, type, result) {
+        var tmp = this.data.filter(x => !(x.repo == repo && x.type == type));
+        tmp.push({ type: type, repo: repo, data: result });
+        this.set('data', tmp);
+      },
+
+    });
+  })();
+  </script>
+</dom-module>
