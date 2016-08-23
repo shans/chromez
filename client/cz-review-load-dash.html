@@ -103,7 +103,7 @@
       },
 
       count: function(data) {
-        if (data == undefined)
+        if (data == undefined || data.error)
           return '-';
         return data.latencyPerBug.length + data.multipleOutstanding.length;
       },
