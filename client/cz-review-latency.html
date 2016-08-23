@@ -18,6 +18,11 @@
           var multipleOutstanding = [];
           var multipleLatency = 0;
 
+          if (data == null) {
+            // invalid user
+            callback({error: "user not found"});
+            return;
+          }
 
           for (var i = 0; i < data.results.length; i++) {
             var issue = data.results[i];

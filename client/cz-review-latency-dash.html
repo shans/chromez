@@ -46,13 +46,18 @@
               <paper-item>
                 <paper-item-body two-line>
                   <div>{{item.user}}</div>
-                  <div secondary>
-                    <span class$="{{hourColor(item.data.latency)}}">{{hourString(item.data.latency)}}</span>
-                      - sole</div>
-                  <div secondary>
-                    <span class$="{{hourColor(item.data.multipleLatency)}}">{{hourString(item.data.multipleLatency)}}</span>
-                      - shared</div>
-                  <div secondary>{{count(item.data.latencyPerBug)}} sole - {{count(item.data.multipleOutstanding)}} shared - {{count(item.data.abandonedBugs)}} stale</div>
+                  <div hidden$="{{item.data.error}}">
+                    <div secondary>
+                      <span class$="{{hourColor(item.data.latency)}}">{{hourString(item.data.latency)}}</span>
+                        - sole</div>
+                    <div secondary>
+                      <span class$="{{hourColor(item.data.multipleLatency)}}">{{hourString(item.data.multipleLatency)}}</span>
+                        - shared</div>
+                    <div secondary>{{count(item.data.latencyPerBug)}} sole - {{count(item.data.multipleOutstanding)}} shared - {{count(item.data.abandonedBugs)}} stale</div>
+                  </div>
+                  <div hidden$="{{!item.data.error}}" class="red">
+                    {{item.data.error}}
+                  </div>
                 </paper-item-body>
               </paper-item>
             </template>
@@ -76,6 +81,8 @@
       filterUsers(item) {
         if (item.data == undefined)
           return false;
+        if (item.data.error)
+          return true;
         return item.data.latency > 0 || item.data.multipleLatency > 0 || item.data.abandonedBugs > 0;
       },
 
@@ -140,6 +147,11 @@
         // TODO: this probably only works for all-or-nothing changes to users right now.
         users.forEach(function(user, idx) {
           registerSource('cz-review-latency', {user: user.user, email: user.email}, function(data) {
+            if (data.error) {
+              this.set('users.' + idx + '.data', data);
+              return;
+            }
+
             var card = this.users[idx].data ? this.users[idx].data.card : undefined;
             if (card == undefined) {
               var card = document.createElement('cz-review-latency-card');
