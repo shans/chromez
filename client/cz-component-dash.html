@@ -22,6 +22,7 @@
       .component {
         display: flex;
         flex-wrap: wrap;
+        padding: 6px;
       }
 
       paper-item {
@@ -39,22 +40,53 @@
       }
 
       a {
-        color: grey;
+        color: black;
         text-decoration: none;
       }
     </style>
     <a href="{{crbugLink(component.name)}}">
-      <paper-card heading="{{component.name}}" id='card'>
+      <paper-card heading="{{component.name}} Issues" id='card'>
         <div class="card-content">
           <div class='card-flex'>
             <paper-item>
-              <paper-item-body>
-                <template is="dom-repeat" items="{{issues(component.issues, updateSLO)}}">
-                  <a href="{{crbugLink(component.name, item.query)}}">
-                    <span class="bubble" style="background-color: {{item.color}}">{{item.level}}</span>
-                    <span class="summary">{{item.summary}}</span>
-                  </a>
-                </template>
+              <paper-item-body two-line>
+                <div>Owned by us</div>
+                <div secondary class='component'>
+                  <template is="dom-repeat" items="{{issues(component.teamsIssues, updateSLO)}}">
+                    <a href="{{crbugLink(component.name, item.query)}}">
+                      <span class="bubble" style="background-color: {{item.color}}">{{item.level}}</span>
+                      <span class="summary">{{item.summary}}</span>
+                    </a>
+                  </template>
+                </div>
+              </paper-item-body>
+            </paper-item>
+
+            <paper-item>
+              <paper-item-body two-line>
+                <div>Owned by others</div>
+                <div secondary class='component'>
+                  <template is="dom-repeat" items="{{issues(component.othersIssues, updateSLO)}}">
+                    <a href="{{crbugLink(component.name, item.query)}}">
+                      <span class="bubble" style="background-color: {{item.color}}">{{item.level}}</span>
+                      <span class="summary">{{item.summary}}</span>
+                    </a>
+                  </template>
+                </div>
+              </paper-item-body>
+            </paper-item>
+
+            <paper-item>
+              <paper-item-body two-line>
+                <div>Unowned</div>
+                <div secondary class='component'>
+                  <template is="dom-repeat" items="{{issues(component.unownedIssues, updateSLO)}}">
+                    <a href="{{crbugLink(component.name, item.query)}}">
+                      <span class="bubble" style="background-color: {{item.color}}">{{item.level}}</span>
+                      <span class="summary">{{item.summary}}</span>
+                    </a>
+                  </template>
+                </div>
               </paper-item-body>
             </paper-item>
           </div>
@@ -68,6 +100,10 @@
       is: "cz-component-dash",
 
       properties: {
+        users: {
+          type: 'Object',
+          value: function() { return []; },
+        },
         component: {
           type: 'Object',
           value: function() { return {}; },
@@ -79,6 +115,9 @@
       },
 
       attached: function() {
+        registerSource('cz-config', 'users', function(users) {
+          this.set('users', users.map(userData => userData['email']));
+        }.bind(this));
         registerSource('cz-config', 'components', function(components) {
           this.set('component', {name: components[this.key]});
           this.updateComponentIssues(this.component)
@@ -94,11 +133,22 @@
 
       updateComponentIssues: function(component) {
         registerSource('cz-issues', {component: component.name}, function(data) {
-          var issueList = new IssueList();
+          var teamsIssueList = new IssueList();
+          var othersIssueList = new IssueList();
+          var unownedIssueList = new IssueList();
           for (var i = 0; i < data.length; i++) {
-            issueList.append(new Issue(data[i]));
+            var issue = new Issue(data[i]);
+            if (issue.owner == null) {
+              unownedIssueList.append(issue);
+            } else if (this.users.indexOf(issue.owner) === -1) {
+              othersIssueList.append(issue);
+            } else {
+              teamsIssueList.append(issue);
+            }
           }
-          this.set('component.issues', issueList);
+          this.set('component.teamsIssues', teamsIssueList);
+          this.set('component.othersIssues', othersIssueList);
+          this.set('component.unownedIssues', unownedIssueList);
         }.bind(this));
       },
 

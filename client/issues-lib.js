@@ -48,6 +48,11 @@ var Issue = function(monorailIssue) {
   this._rawData = monorailIssue;
 
   this.id = monorailIssue.id;
+  if (monorailIssue.owner) {
+    this.owner = monorailIssue.owner.name;
+  } else {
+    this.owner = null;
+  }
   this.summary = monorailIssue.summary;
   this.priority = undefined;
   this._reviewLevel = _defaultReviewLevel;
