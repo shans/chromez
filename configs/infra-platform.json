@@ -1,0 +1,20 @@
+{"cardview-heading": "Chrome Infra Platform",
+"users": [
+  {"user": "Dan", "email": "dnj@chromium.org"},
+  {"user": "Erik", "email": "estaab@chromium.org"},
+  {"user": "Marc-Antoine", "email": "maruel@chromium.org"},
+  {"user": "Nodir", "email": "nodir@chromium.org"},
+  {"user": "Pawel", "email": "phajdan.jr@chromium.org"},
+  {"user": "Robbie", "email": "iannucci@chromium.org"},
+  {"user": "Ryan", "email": "hinoka@chromium.org"},
+  {"user": "Smut", "email": "smut@chromium.org"},
+  {"user": "Stephen", "email": "martiniss@chromium.org"},
+  {"user": "Vadim", "email": "vadimsh@chromium.org"}
+],
+"dashes": ["cz-clock-dash", "cz-review-latency-dash", "cz-review-load-dash"],
+"timezones": [
+  {"city": "MTV/SFO", "timezone": "US/Pacific", "local": true},
+  {"city": "Montreal", "timezone": "America/Nipigon"},
+  {"city": "EMEA", "timezone": "Europe/Zurich"}
+  ]
+}
