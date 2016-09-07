@@ -34,20 +34,33 @@
         border-radius: 4px;
         padding: 0px 6px;
       }
+
+      .count {
+        padding: 0px 6px;
+      }
     </style>
       <a href="{{crbugLink(components)}}" target="_blank">
         <paper-card heading="Regression Bugs" id="card">
           <div class="card-content">
             <div class='card-flex'>
-              {{joinSpace(components)}}
-              <template is="dom-repeat" items="{{regressionCounts(releases, regressionVersions)}}">
+              <template is="dom-if" if="{{!hasRegressions}}">
                 <paper-item>
-                  <paper-item-body one-line>
-                    <div>
-                      <span class="label" style="background-color: {{item.color}}">{{item.label}}</span> {{item.count}}
-                    </div>
+                  <paper-item-body>
+                    <div style="color: #4CAF50; font-size: 2em">&#x0950;</div>
                   </paper-item-body>
                 </paper-item>
+              </template>
+              <template is="dom-if" if="{{hasRegressions}}">
+                <template is="dom-repeat" items="{{regressionCounts(releases, regressionVersions)}}">
+                  <paper-item>
+                    <paper-item-body one-line>
+                      <div>
+                        <span class="label" style="background-color: {{item.color}}">{{item.label}}</span>
+                        <span class="count">{{item.count}}</span>
+                      </div>
+                    </paper-item-body>
+                  </paper-item>
+                </template>
               </template>
             </div>
           </div>
@@ -102,6 +115,7 @@
             regressionVersions.push(version);
           }
           this.set('regressionVersions', regressionVersions);
+          this.set('hasRegressions', regressionVersions.length > 0);
         }.bind(this));
       },
 
