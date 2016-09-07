@@ -21,7 +21,7 @@
   "cz-component-dash(compositing)",
   "cz-issue-priority-dash",
   "cz-regression-dash",
-  "cz-review-latency-dash",
+  "cz-review-latency-dash(false)",
   "cz-review-load-dash"
 ],
 "timezones": [

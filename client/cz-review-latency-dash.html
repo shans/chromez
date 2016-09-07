@@ -37,6 +37,7 @@
       }
 
     </style>
+    <template is="dom-if" if="{{showSummary}}">
       <paper-card id='card' heading='Pending Code Review Latency'>
         <div class="card-content">
           <div class='card-flex'>
@@ -64,6 +65,7 @@
           </div>
         </div>
       </paper-card>
+    </template>
   </template>
 
   <script>
@@ -105,6 +107,7 @@
       },
 
       attached: function() {
+        this.set('showSummary', this.key == 'true');
         registerSource('cz-config', 'users', function(users) {
           this.set('users', users);
         }.bind(this));
