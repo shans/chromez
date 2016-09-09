@@ -31,6 +31,6 @@
   {"city": "Sydney", "timezone": "Australia/Sydney", "local": true}
   ],
 "github": {
-  "customelements": { "repo": "customelements/v2", "shields": ["travis", "github/issues-pr", "github/issues"] }
+  "customelements": { "name": "customelements/v2", "repo": "customelements/v2", "shields": ["travis", "github/issues-pr", "github/issues"] }
 }
 }

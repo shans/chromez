@@ -20,7 +20,7 @@
         margin: 8px 8px 8px 0;
       }
     </style>
-      <paper-card heading="[[repo]]" id="card">
+      <paper-card heading="[[name]]" id="card">
         <div class="card-content">
           <div class='card-flex'>
             <template is="dom-repeat" items="{{data}}">
@@ -51,6 +51,7 @@
         registerSource('cz-config', 'github', github => {
           this.set('shields', github[this.key].shields);
           this.set('repo', github[this.key].repo);
+          this.set('name', github[this.key].name);
         });
       },
 
