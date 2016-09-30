@@ -38,6 +38,12 @@
       .count {
         padding: 0px 6px;
       }
+
+      #no-regressions {
+        color: #4CAF50;
+        font-size: 2em;
+        overflow: visible;
+      }
     </style>
       <a href="{{crbugLink(components)}}" target="_blank">
         <paper-card heading="Regression Bugs" id="card">
@@ -45,9 +51,7 @@
             <div class='card-flex'>
               <template is="dom-if" if="{{!hasRegressions}}">
                 <paper-item>
-                  <paper-item-body>
-                    <div style="color: #4CAF50; font-size: 2em">&#x0950;</div>
-                  </paper-item-body>
+                  <paper-item-body id="no-regressions">&#x0950;</paper-item-body>
                 </paper-item>
               </template>
               <template is="dom-if" if="{{hasRegressions}}">
