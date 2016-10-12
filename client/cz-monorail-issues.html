@@ -2,9 +2,9 @@
 <link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
 <script src="../bower_components/papaparse/papaparse.min.js"></script>
 <script src="chromez-behaviors.js"></script>
-<script src="crbug-lib.js"></script>
+<script src="monorail-lib.js"></script>
 
-<dom-module id="cz-issues">
+<dom-module id="cz-monorail-issues">
 
   <template>
     <template is="dom-repeat" items="{{searchQueries}}">
@@ -21,7 +21,7 @@
 
   <script>
     Polymer({
-      is: "cz-issues",
+      is: "cz-monorail-issues",
       behaviors: [ChromeZBehaviors.AJAXBehavior],
 
       onResponse: function(data) {
@@ -34,7 +34,7 @@
       registerQuery: function(query, callback) {
         var params = {
           site: 'issues',
-          q: CrBug.queryString(query),
+          q: Monorail.queryString(query),
         };
         this.addCallbackToQuery(query, callback, params);
       }
