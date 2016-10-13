@@ -60,6 +60,8 @@ class Issue {
       _reviewLevel: _defaultReviewLevel,
     };
 
+    console.assert(!isNaN(issue._lastUpdatedMS), lastUpdatedString + ' invalid format');
+
     for (var label of labels) {
       if (label.substring(0, 4) == 'Pri-') {
         issue.priority = Number(label.substring(4));
@@ -82,7 +84,7 @@ class Issue {
   static reviewLevelWithBackoff(issue) {
     var result = issue._reviewLevel;
     if (result == _defaultReviewLevel) {
-      result += ' (P' + this.priority + ')';
+      result += ' (P' + issue.priority + ')';
     }
     return result;
   }
