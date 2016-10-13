@@ -1,0 +1,42 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+<script src="chromez-behaviors.js"></script>
+<script src="issue-lib.js"></script>
+
+<dom-module id="cz-github-issues">
+
+  <template>
+    <template is="dom-repeat" items="{{searchQueries}}">
+      <iron-ajax
+        auto
+        handle-as="json"
+        url="https://api.github.com/repos/web-animations/[[item.params.repo]]/issues"
+        on-response="handleResponse"></iron-ajax>
+    </template>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'cz-github-issues',
+
+      behaviors: [ChromeZBehaviors.AJAXBehavior],
+
+      onResponse: function(items) {
+        return data.items.map(item => {
+          return Issue.create({
+            id: item.id,
+            owner: item.assignee,
+            summary: item.title,
+            lastUpdatedString: item.updated_at,
+            labels: item.labels.map(label => label.name),
+          });
+        });
+      },
+
+      registerQuery: function(query, callback) {
+        var params = {repo: query.repo};
+        this.addCallbackToQuery(query, callback, params);
+      }
+    });
+  </script>
+</dom-module>
