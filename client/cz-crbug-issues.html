@@ -3,7 +3,7 @@
 <script src="../bower_components/papaparse/papaparse.min.js"></script>
 <script src="chromez-behaviors.js"></script>
 
-<dom-module id="cz-monorail-issues">
+<dom-module id="cz-crbug-issues">
 
   <template>
     <template is="dom-repeat" items="{{searchQueries}}">
@@ -20,7 +20,7 @@
 
   <script>
     Polymer({
-      is: "cz-monorail-issues",
+      is: "cz-crbug-issues",
       behaviors: [ChromeZBehaviors.AJAXBehavior],
 
       onResponse: function(data) {
@@ -33,7 +33,7 @@
       registerQuery: function(query, callback) {
         var params = {
           site: 'issues',
-          q: Monorail.queryString(query),
+          q: Crbug.queryString(query),
         };
         this.addCallbackToQuery(query, callback, params);
       }

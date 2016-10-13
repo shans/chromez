@@ -2,7 +2,7 @@
 <link rel="import" href="../bower_components/paper-card/paper-card.html">
 <link rel="import" href="../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../bower_components/paper-item/paper-item-body.html">
-<script src="monorail-lib.js"></script>
+<script src="crbug-lib.js"></script>
 
 <dom-module id="cz-regression-dash">
 
@@ -45,7 +45,7 @@
         overflow: visible;
       }
     </style>
-      <a href="{{monorailLink(components)}}" target="_blank">
+      <a href="{{crbugLink(components)}}" target="_blank">
         <paper-card heading="Regression Bugs" id="card">
           <div class="card-content">
             <div class='card-flex'>
@@ -106,7 +106,7 @@
         if (this.components.length == 0) {
           return;
         }
-        registerSource('cz-monorail-issues', {type: 'Bug-Regression', component: this.components}, function(issues) {
+        registerSource('cz-crbug-issues', {type: 'Bug-Regression', component: this.components}, function(issues) {
           var regressionVersions = [];
           for (var issue of issues) {
             var version = null;
@@ -123,8 +123,8 @@
         }.bind(this));
       },
 
-      monorailLink: function(components) {
-        return Monorail.queryURL({type: 'Bug-Regression', component: components});
+      crbugLink: function(components) {
+        return Crbug.queryURL({type: 'Bug-Regression', component: components});
       },
 
       joinSpace: list => list.join(' '),

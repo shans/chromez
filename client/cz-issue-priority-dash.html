@@ -2,7 +2,7 @@
 <link rel="import" href="../bower_components/paper-card/paper-card.html">
 <link rel="import" href="../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../bower_components/paper-item/paper-item-body.html">
-<script src="monorail-lib.js"></script>
+<script src="crbug-lib.js"></script>
 <script src="issues-lib.js"></script>
 
 <dom-module id="cz-issue-priority-dash">
@@ -58,7 +58,7 @@
                   <div>{{user.user}}</div>
                   <div secondary class='priorities'>
                     <template is="dom-repeat" items="{{priorities(user.issues, updateSLO)}}">
-                      <a href="{{monorailLink(user.email, item.query)}}">
+                      <a href="{{crbugLink(user.email, item.query)}}">
                         <span class="bubble" style="background-color: {{item.color}}">{{item.level}}</span>
                         <span class="summary">{{item.summary}}</span>
                       </a>
@@ -107,16 +107,16 @@
         return issues.summary(updateSLO);
       },
 
-      monorailLink: function(email, query) {
+      crbugLink: function(email, query) {
         var userQuery = clone(query);
         userQuery.owner = email;
-        return Monorail.queryURL(userQuery);
+        return Crbug.queryURL(userQuery);
       },
 
       usersChanged: function(users) {
         // TODO: this probably only works for all-or-nothing changes to users right now.
         users.forEach(function(user, idx) {
-          registerSource('cz-monorail-issues', {owner: user.email}, function(data) {
+          registerSource('cz-crbug-issues', {owner: user.email}, function(data) {
             var issueList = new IssueList();
             for (var i = 0; i < data.length; i++) {
               issueList.append(new Issue(data[i]));

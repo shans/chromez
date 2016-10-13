@@ -3,7 +3,7 @@
 <link rel="import" href="../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../bower_components/paper-item/paper-item-body.html">
 <script src="issues-lib.js"></script>
-<script src="monorail-lib.js"></script>
+<script src="crbug-lib.js"></script>
 
 <dom-module id="cz-component-dash">
 
@@ -44,7 +44,7 @@
         text-decoration: none;
       }
     </style>
-    <a href="{{monorailLink(component.name)}}">
+    <a href="{{crbugLink(component.name)}}">
       <paper-card heading="{{component.name}} Issues" id='card'>
         <div class="card-content">
           <div class='card-flex'>
@@ -53,7 +53,7 @@
                 <div>Owned by us</div>
                 <div secondary class='component'>
                   <template is="dom-repeat" items="{{issues(component.teamsIssues, updateSLO)}}">
-                    <a href="{{monorailLink(component.name, item.query)}}">
+                    <a href="{{crbugLink(component.name, item.query)}}">
                       <span class="bubble" style="background-color: {{item.color}}">{{item.level}}</span>
                       <span class="summary">{{item.summary}}</span>
                     </a>
@@ -67,7 +67,7 @@
                 <div>Owned by others</div>
                 <div secondary class='component'>
                   <template is="dom-repeat" items="{{issues(component.othersIssues, updateSLO)}}">
-                    <a href="{{monorailLink(component.name, item.query)}}">
+                    <a href="{{crbugLink(component.name, item.query)}}">
                       <span class="bubble" style="background-color: {{item.color}}">{{item.level}}</span>
                       <span class="summary">{{item.summary}}</span>
                     </a>
@@ -81,7 +81,7 @@
                 <div>Unowned</div>
                 <div secondary class='component'>
                   <template is="dom-repeat" items="{{issues(component.unownedIssues, updateSLO)}}">
-                    <a href="{{monorailLink(component.name, item.query)}}">
+                    <a href="{{crbugLink(component.name, item.query)}}">
                       <span class="bubble" style="background-color: {{item.color}}">{{item.level}}</span>
                       <span class="summary">{{item.summary}}</span>
                     </a>
@@ -132,7 +132,7 @@
       },
 
       updateComponentIssues: function(component) {
-        registerSource('cz-monorail-issues', {component: component.name}, function(data) {
+        registerSource('cz-crbug-issues', {component: component.name}, function(data) {
           var teamsIssueList = new IssueList();
           var othersIssueList = new IssueList();
           var unownedIssueList = new IssueList();
@@ -152,10 +152,10 @@
         }.bind(this));
       },
 
-      monorailLink: function(component, query) {
+      crbugLink: function(component, query) {
         var componentQuery = clone(query || {});
         componentQuery.component = component;
-        return Monorail.queryURL(componentQuery);
+        return Crbug.queryURL(componentQuery);
       },
     });
   </script>
