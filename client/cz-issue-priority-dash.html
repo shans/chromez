@@ -3,7 +3,7 @@
 <link rel="import" href="../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../bower_components/paper-item/paper-item-body.html">
 <script src="crbug-lib.js"></script>
-<script src="issues-lib.js"></script>
+<script src="issue-lib.js"></script>
 
 <dom-module id="cz-issue-priority-dash">
 
@@ -91,7 +91,7 @@
       filterUsers(item) {
         if (item.issues == undefined)
           return false;
-        return item.issues.length() > 0;
+        return item.issues.length > 0;
       },
 
       attached: function() {
@@ -104,7 +104,7 @@
       },
 
       priorities: function(issues, updateSLO) {
-        return issues.summary(updateSLO);
+        return Issue.summarizeList(issues, updateSLO);
       },
 
       crbugLink: function(email, query) {
@@ -116,12 +116,8 @@
       usersChanged: function(users) {
         // TODO: this probably only works for all-or-nothing changes to users right now.
         users.forEach(function(user, idx) {
-          registerSource('cz-crbug-issues', {owner: user.email}, function(data) {
-            var issueList = new IssueList();
-            for (var i = 0; i < data.length; i++) {
-              issueList.append(new Issue(data[i]));
-            }
-            this.set('users.' + idx + '.issues', issueList);
+          registerSource('cz-crbug-issues', {owner: user.email}, function(issues) {
+            this.set('users.' + idx + '.issues', issues);
           }.bind(this));
         }.bind(this));
       }

@@ -2,8 +2,8 @@
 <link rel="import" href="../bower_components/paper-card/paper-card.html">
 <link rel="import" href="../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../bower_components/paper-item/paper-item-body.html">
-<script src="issues-lib.js"></script>
 <script src="crbug-lib.js"></script>
+<script src="issue-lib.js"></script>
 
 <dom-module id="cz-component-dash">
 
@@ -128,22 +128,21 @@
       },
 
       issues: function(issues, updateSLO) {
-        return issues.summary(updateSLO);
+        return Issue.summarizeList(issues, updateSLO);
       },
 
       updateComponentIssues: function(component) {
-        registerSource('cz-crbug-issues', {component: component.name}, function(data) {
-          var teamsIssueList = new IssueList();
-          var othersIssueList = new IssueList();
-          var unownedIssueList = new IssueList();
-          for (var i = 0; i < data.length; i++) {
-            var issue = new Issue(data[i]);
+        registerSource('cz-crbug-issues', {component: component.name}, function(issues) {
+          var teamsIssueList = [];
+          var othersIssueList = [];
+          var unownedIssueList = [];
+          for (var issue of issues) {
             if (issue.owner == null) {
-              unownedIssueList.append(issue);
+              unownedIssueList.push(issue);
             } else if (this.users.indexOf(issue.owner) === -1) {
-              othersIssueList.append(issue);
+              othersIssueList.push(issue);
             } else {
-              teamsIssueList.append(issue);
+              teamsIssueList.push(issue);
             }
           }
           this.set('component.teamsIssues', teamsIssueList);
