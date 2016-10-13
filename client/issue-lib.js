@@ -9,23 +9,23 @@ if (window.Issue) {
 // https://www.google.com/design/spec/style/color.html#color-color-palette
 var _reviewLevelMetadata = {
   'daily': {
-    query: {label: 'Update-daily'},
+    query: {label: 'Update-Daily'},
     outOfSLOColor: '#B71C1C',  // Red 900
   },
   'weekly': {
-    query: {label: 'Update-weekly'},
+    query: {label: 'Update-Weekly'},
     outOfSLOColor: '#C62828',  // Red 800
   },
   'fortnightly': {
-    query: {label: 'Update-fortnightly'},
+    query: {label: 'Update-Fortnightly'},
     outOfSLOColor: '#D32F2F',  // Red 700
   },
   'monthly': {
-    query: {label: 'Update-monthly'},
+    query: {label: 'Update-Monthly'},
     outOfSLOColor: '#E53935',  // Red 600
   },
   'quarterly': {
-    query: {label: 'Update-quarterly'},
+    query: {label: 'Update-Quarterly'},
     outOfSLOColor: '#F44336',  // Red 500
   },
   'none (P0)': {
