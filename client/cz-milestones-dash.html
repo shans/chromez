@@ -133,7 +133,7 @@
         users.forEach(function(user, idx) {
           registerSource('cz-crbug-issues', {owner: user.email}, function(issues) {
             for (var issue of issues) {
-              for (var label of issue.label) {
+              for (var label of issue.labels) {
                 if (label.substring(0, 2).toLowerCase() == 'm-') {
                   issue.M = label.substring(2);
                   break;
