@@ -46,7 +46,7 @@ var _inSLOColor = '#4CAF50';  // Green 500
 var _noSLOColor = '#757575';  // Grey 600
 
 // This class uses C style programming with JSON objects (representing issues)
-// and static functions.
+// and static methods.
 // This is to maintain the ability to clone the object in chromez-behaviours.js.
 class Issue {
   static create({id, owner, summary, lastUpdatedString, labels}) {
