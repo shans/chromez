@@ -29,16 +29,19 @@ var _reviewLevelMetadata = {
     outOfSLOColor: '#F44336',  // Red 500
   },
   'none (P0)': {
-    query: {label: 'Pri-0', '-has': 'update'},
+    query: {label: 'Pri-0', '-has': 'Update'},
   },
   'none (P1)': {
-    query: {label: 'Pri-1', '-has': 'update'},
+    query: {label: 'Pri-1', '-has': 'Update'},
   },
   'none (P2)': {
-    query: {label: 'Pri-2', '-has': 'update'},
+    query: {label: 'Pri-2', '-has': 'Update'},
   },
   'none (P3)': {
-    query: {label: 'Pri-3', '-has': 'update'},
+    query: {label: 'Pri-3', '-has': 'Update'},
+  },
+  'none': {
+    query: {'-has': 'Update'},
   },
 };
 var _defaultReviewLevel = 'none';
@@ -55,7 +58,7 @@ class Issue {
       owner,
       summary,
       labels,
-      priority: undefined,
+      priority: null,
       _lastUpdatedMS: Date.parse(lastUpdatedString),
       _reviewLevel: _defaultReviewLevel,
     };
@@ -83,7 +86,7 @@ class Issue {
 
   static reviewLevelWithBackoff(issue) {
     var result = issue._reviewLevel;
-    if (result == _defaultReviewLevel) {
+    if (result == _defaultReviewLevel && issue.priority != null) {
       result += ' (P' + issue.priority + ')';
     }
     return result;

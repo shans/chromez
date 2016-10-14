@@ -22,10 +22,10 @@
       behaviors: [ChromeZBehaviors.AJAXBehavior],
 
       onResponse: function(items) {
-        return data.items.map(item => {
+        return items.map(item => {
           return Issue.create({
             id: item.id,
-            owner: item.assignee,
+            owner: item.assignee ? item.assignee.login : null,
             summary: item.title,
             lastUpdatedString: item.updated_at,
             labels: item.labels.map(label => label.name),
@@ -36,7 +36,15 @@
       registerQuery: function(query, callback) {
         var params = {repo: query.repo};
         this.addCallbackToQuery(query, callback, params);
-      }
+      },
+
+      queryURL: function(query) {
+        return 'https://www.github.com/' + query.repo + '/issues';
+      },
+
+      getUsername: function(user) {
+        return /(.+)@/.exec(user.email)[1];
+      },
     });
   </script>
 </dom-module>

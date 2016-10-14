@@ -18,6 +18,7 @@
   "cz-clock-dash",
   "cz-component-dash(Blink Animations)",
   "cz-issue-priority-dash",
+  "cz-component-dash(Web Animations Polyfill)",
   "cz-regression-dash",
   "cz-review-latency-dash(false)",
   "cz-review-load-dash",
@@ -46,6 +47,10 @@
   "Blink Animations": {
     "tag": "cz-crbug-issues",
     "query": {"component": "Blink>Animation"}
+  },
+  "Web Animations Polyfill": {
+    "tag": "cz-github-issues",
+    "query": {"repo": "web-animations/web-animations-js"}
   }
 }
 }

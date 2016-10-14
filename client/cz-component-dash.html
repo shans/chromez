@@ -101,7 +101,7 @@
       properties: {
         users: {
           type: 'Object',
-          value: function() { return new Set(); },
+          value: function() { return []; },
         },
         updateSLO: {
           type: 'Object',
@@ -115,20 +115,28 @@
           type: 'Object',
           value: function() { return null; },
         },
+        usernames: {
+          type: 'Object',
+          value: function() { return new Set(); },
+        },
+        issues: {
+          type: 'Object',
+          value: function() { return []; },
+        },
         issueBreakdown: {
           type: 'Object',
           value: function() { return {}; }
-        }
+        },
       },
+
+      observers: [
+        'updateUsernames(users, issueSource)',
+        'updateIssueBreakdown(usernames, issues)',
+      ],
 
       attached: function() {
         registerSource('cz-config', 'users', users => {
-          var userSet = new Set();
-          for (user of users) {
-            userSet.add(user.email);
-            userSet.add(this.getUsername(user.email));
-          }
-          this.set('users', userSet);
+          this.set('users', users);
         });
         registerSource('cz-config', 'updateSLO', updateSLO => {
           this.set('updateSLO', updateSLO);
@@ -136,10 +144,6 @@
         registerSource('cz-config', 'issue-sources', issueSources => {
           this.updateIssueSource(issueSources[this.key]);
         });
-      },
-
-      getUsername: function(email) {
-        return /(.+)@/.exec(email)[1];
       },
 
       summarize: function(issues, updateSLO) {
@@ -151,21 +155,28 @@
 
       updateIssueSource: function({tag, query}) {
         registerSource(tag, query, issues => {
-          this.updateIssues(issues);
+          this.set('issues', issues);
         }).then(sourceElement => {
           this.set('issueSource', sourceElement);
           this.set('sourceQuery', query);
         });
       },
 
-      updateIssues: function(issues) {
+      updateUsernames: function(users, issueSource) {
+        if (!issueSource) {
+          return;
+        }
+        this.set('usernames', new Set(users.map(user => issueSource.getUsername(user))));
+      },
+
+      updateIssueBreakdown: function(usernames, issues) {
         var team = [];
         var others = [];
         var unowned = [];
         for (var issue of issues) {
           if (issue.owner == null) {
             unowned.push(issue);
-          } else if (this.users.has(issue.owner) === -1) {
+          } else if (usernames.has(issue.owner)) {
             others.push(issue);
           } else {
             team.push(issue);
