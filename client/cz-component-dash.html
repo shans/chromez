@@ -101,7 +101,7 @@
       properties: {
         users: {
           type: 'Object',
-          value: function() { return []; },
+          value: function() { return new Set(); },
         },
         updateSLO: {
           type: 'Object',
@@ -123,7 +123,12 @@
 
       attached: function() {
         registerSource('cz-config', 'users', users => {
-          this.set('users', users.map(userData => userData['email']));
+          var userSet = new Set();
+          for (user of users) {
+            userSet.add(user.email);
+            userSet.add(this.getUsername(user.email));
+          }
+          this.set('users', userSet);
         });
         registerSource('cz-config', 'updateSLO', updateSLO => {
           this.set('updateSLO', updateSLO);
@@ -131,6 +136,10 @@
         registerSource('cz-config', 'issue-sources', issueSources => {
           this.updateIssueSource(issueSources[this.key]);
         });
+      },
+
+      getUsername: function(email) {
+        return /(.+)@/.exec(email)[1];
       },
 
       summarize: function(issues, updateSLO) {
@@ -156,7 +165,7 @@
         for (var issue of issues) {
           if (issue.owner == null) {
             unowned.push(issue);
-          } else if (this.users.indexOf(issue.owner) === -1) {
+          } else if (this.users.has(issue.owner) === -1) {
             others.push(issue);
           } else {
             team.push(issue);
