@@ -3,6 +3,7 @@
 <script src="../bower_components/papaparse/papaparse.min.js"></script>
 <script src="chromez-behaviors.js"></script>
 <script src="issue-lib.js"></script>
+<script src="crbug-lib.js"></script>
 
 <dom-module id="cz-crbug-issues">
 
@@ -45,7 +46,11 @@
           q: Crbug.queryString(query),
         };
         this.addCallbackToQuery(query, callback, params);
-      }
+      },
+
+      queryURL: function(query) {
+        return Crbug.queryURL(query);
+      },
     });
   </script>
 </dom-module>

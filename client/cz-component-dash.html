@@ -2,7 +2,6 @@
 <link rel="import" href="../bower_components/paper-card/paper-card.html">
 <link rel="import" href="../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../bower_components/paper-item/paper-item-body.html">
-<script src="crbug-lib.js"></script>
 <script src="issue-lib.js"></script>
 
 <dom-module id="cz-component-dash">
@@ -19,7 +18,7 @@
         align-content: flex-start;
       }
 
-      .component {
+      .breakdown {
         display: flex;
         flex-wrap: wrap;
         padding: 6px;
@@ -44,16 +43,16 @@
         text-decoration: none;
       }
     </style>
-    <a href="{{crbugLink(component.name)}}">
-      <paper-card heading="{{component.name}} Issues" id='card'>
+    <a href="{{queryURL(query)}}">
+      <paper-card heading="{{key}} Issues" id='card'>
         <div class="card-content">
           <div class='card-flex'>
             <paper-item>
               <paper-item-body two-line>
                 <div>Owned by us</div>
-                <div secondary class='component'>
-                  <template is="dom-repeat" items="{{issues(component.teamsIssues, updateSLO)}}">
-                    <a href="{{crbugLink(component.name, item.query)}}">
+                <div secondary class='breakdown'>
+                  <template is="dom-repeat" items="{{summarize(issueBreakdown.team, updateSLO)}}">
+                    <a href="{{queryURL(query, item.query)}}">
                       <span class="bubble" style="background-color: {{item.color}}">{{item.level}}</span>
                       <span class="summary">{{item.summary}}</span>
                     </a>
@@ -65,9 +64,9 @@
             <paper-item>
               <paper-item-body two-line>
                 <div>Owned by others</div>
-                <div secondary class='component'>
-                  <template is="dom-repeat" items="{{issues(component.othersIssues, updateSLO)}}">
-                    <a href="{{crbugLink(component.name, item.query)}}">
+                <div secondary class='breakdown'>
+                  <template is="dom-repeat" items="{{summarize(issueBreakdown.others, updateSLO)}}">
+                    <a href="{{queryURL(query, item.query)}}">
                       <span class="bubble" style="background-color: {{item.color}}">{{item.level}}</span>
                       <span class="summary">{{item.summary}}</span>
                     </a>
@@ -79,9 +78,9 @@
             <paper-item>
               <paper-item-body two-line>
                 <div>Unowned</div>
-                <div secondary class='component'>
-                  <template is="dom-repeat" items="{{issues(component.unownedIssues, updateSLO)}}">
-                    <a href="{{crbugLink(component.name, item.query)}}">
+                <div secondary class='breakdown'>
+                  <template is="dom-repeat" items="{{summarize(issueBreakdown.unowned, updateSLO)}}">
+                    <a href="{{queryURL(query, item.query)}}">
                       <span class="bubble" style="background-color: {{item.color}}">{{item.level}}</span>
                       <span class="summary">{{item.summary}}</span>
                     </a>
@@ -104,57 +103,79 @@
           type: 'Object',
           value: function() { return []; },
         },
-        component: {
-          type: 'Object',
-          value: function() { return {}; },
-        },
         updateSLO: {
           type: 'Object',
-          value: function() { return {}; },
+          value: function() { return null; },
+        },
+        query: {
+          type: 'Object',
+          value: function() { return null; },
+        },
+        issueSource: {
+          type: 'Object',
+          value: function() { return null; },
+        },
+        issueBreakdown: {
+          type: 'Object',
+          value: function() { return {}; }
         }
       },
 
       attached: function() {
-        registerSource('cz-config', 'users', function(users) {
+        registerSource('cz-config', 'users', users => {
           this.set('users', users.map(userData => userData['email']));
-        }.bind(this));
-        registerSource('cz-config', 'components', function(components) {
-          this.set('component', {name: components[this.key]});
-          this.updateComponentIssues(this.component)
-        }.bind(this));
-        registerSource('cz-config', 'updateSLO', function(updateSLO) {
+        });
+        registerSource('cz-config', 'updateSLO', updateSLO => {
           this.set('updateSLO', updateSLO);
-        }.bind(this));
+        });
+        registerSource('cz-config', 'issue-sources', issueSources => {
+          this.updateIssueSource(issueSources[this.key]);
+        });
       },
 
-      issues: function(issues, updateSLO) {
+      summarize: function(issues, updateSLO) {
+        if (!issues || !updateSLO) {
+          return [];
+        }
         return Issue.summarizeList(issues, updateSLO);
       },
 
-      updateComponentIssues: function(component) {
-        registerSource('cz-crbug-issues', {component: component.name}, function(issues) {
-          var teamsIssueList = [];
-          var othersIssueList = [];
-          var unownedIssueList = [];
-          for (var issue of issues) {
-            if (issue.owner == null) {
-              unownedIssueList.push(issue);
-            } else if (this.users.indexOf(issue.owner) === -1) {
-              othersIssueList.push(issue);
-            } else {
-              teamsIssueList.push(issue);
-            }
-          }
-          this.set('component.teamsIssues', teamsIssueList);
-          this.set('component.othersIssues', othersIssueList);
-          this.set('component.unownedIssues', unownedIssueList);
-        }.bind(this));
+      updateIssueSource: function({tag, query}) {
+        registerSource(tag, query, issues => {
+          this.updateIssues(issues);
+        }).then(sourceElement => {
+          this.set('issueSource', sourceElement);
+          this.set('query', query);
+        });
       },
 
-      crbugLink: function(component, query) {
-        var componentQuery = clone(query || {});
-        componentQuery.component = component;
-        return Crbug.queryURL(componentQuery);
+      updateIssues: function(issues) {
+        var team = [];
+        var others = [];
+        var unowned = [];
+        for (var issue of issues) {
+          if (issue.owner == null) {
+            unowned.push(issue);
+          } else if (this.users.indexOf(issue.owner) === -1) {
+            others.push(issue);
+          } else {
+            team.push(issue);
+          }
+        }
+        this.set('issueBreakdown.team', team);
+        this.set('issueBreakdown.others', others);
+        this.set('issueBreakdown.unowned', unowned);
+      },
+
+      queryURL: function(query, itemQuery) {
+        if (!this.issueSource) {
+          return '';
+        }
+        if (itemQuery) {
+          query = clone(query);
+          Object.assign(query, itemQuery);
+        }
+        return this.issueSource.queryURL(query);
       },
     });
   </script>
