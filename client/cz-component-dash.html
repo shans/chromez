@@ -43,7 +43,7 @@
         text-decoration: none;
       }
     </style>
-    <a href="{{queryURL(query)}}">
+    <a href="{{queryURL(issueSource, sourceQuery)}}">
       <paper-card heading="{{key}} Issues" id='card'>
         <div class="card-content">
           <div class='card-flex'>
@@ -52,7 +52,7 @@
                 <div>Owned by us</div>
                 <div secondary class='breakdown'>
                   <template is="dom-repeat" items="{{summarize(issueBreakdown.team, updateSLO)}}">
-                    <a href="{{queryURL(query, item.query)}}">
+                    <a href="{{queryURL(issueSource, sourceQuery, item.query)}}">
                       <span class="bubble" style="background-color: {{item.color}}">{{item.level}}</span>
                       <span class="summary">{{item.summary}}</span>
                     </a>
@@ -66,7 +66,7 @@
                 <div>Owned by others</div>
                 <div secondary class='breakdown'>
                   <template is="dom-repeat" items="{{summarize(issueBreakdown.others, updateSLO)}}">
-                    <a href="{{queryURL(query, item.query)}}">
+                    <a href="{{queryURL(issueSource, sourceQuery, item.query)}}">
                       <span class="bubble" style="background-color: {{item.color}}">{{item.level}}</span>
                       <span class="summary">{{item.summary}}</span>
                     </a>
@@ -80,7 +80,7 @@
                 <div>Unowned</div>
                 <div secondary class='breakdown'>
                   <template is="dom-repeat" items="{{summarize(issueBreakdown.unowned, updateSLO)}}">
-                    <a href="{{queryURL(query, item.query)}}">
+                    <a href="{{queryURL(issueSource, sourceQuery, item.query)}}">
                       <span class="bubble" style="background-color: {{item.color}}">{{item.level}}</span>
                       <span class="summary">{{item.summary}}</span>
                     </a>
@@ -107,7 +107,7 @@
           type: 'Object',
           value: function() { return null; },
         },
-        query: {
+        sourceQuery: {
           type: 'Object',
           value: function() { return null; },
         },
@@ -145,7 +145,7 @@
           this.updateIssues(issues);
         }).then(sourceElement => {
           this.set('issueSource', sourceElement);
-          this.set('query', query);
+          this.set('sourceQuery', query);
         });
       },
 
@@ -167,10 +167,11 @@
         this.set('issueBreakdown.unowned', unowned);
       },
 
-      queryURL: function(query, itemQuery) {
-        if (!this.issueSource) {
+      queryURL: function(issueSource, sourceQuery, itemQuery) {
+        if (!issueSource || !sourceQuery) {
           return '';
         }
+        var query = sourceQuery;
         if (itemQuery) {
           query = clone(query);
           Object.assign(query, itemQuery);
