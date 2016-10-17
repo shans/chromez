@@ -81,6 +81,10 @@ class Issue {
     }
   }
 
+  clone() {
+    return new Issue(this);
+  }
+
   daysSinceUpdate() {
     return Math.floor((Date.now() - this._lastUpdatedMS) / (1000 * 60 * 60 * 24));
   }
@@ -92,10 +96,6 @@ class Issue {
     }
     return result;
   }
-
-  clone() {
-    return new Issue(this);
-  }
 }
 
 class IssueList {
@@ -106,28 +106,21 @@ class IssueList {
     this._issues = issues;
   }
 
-  summary(updateSLO) {
-    var totals = this._reviewLevelCounts(this._issues);
-    var outOfSLO = this._outOfUpdateSLOCounts(this._issues, updateSLO);
-    var results = [];
-    for (var level in _reviewLevelMetadata) {
-      var metadata = _reviewLevelMetadata[level];
-      if (level in totals) {
-        var color = (level in updateSLO) ? _inSLOColor : _noSLOColor;
-        var levelSummary = totals[level].toString();
-        if (level in outOfSLO && outOfSLO[level] > 0) {
-          color = metadata.outOfSLOColor;
-          levelSummary += ' (' + outOfSLO[level] + ' out of SLO)';
-        }
-        results.push({
-          level: level,
-          color: color,
-          query: metadata.query,
-          summary: levelSummary,
-        });
-      }
-    }
-    return results;
+  clone() {
+    return new IssueList(this._issues.map(issue => issue.clone()));
+  }
+
+  push(issue) {
+    console.assert(issue instanceof Issue);
+    this._issues.push(issue);
+  }
+
+  get length() {
+    return this._issues.length;
+  }
+
+  [Symbol.iterator]() {
+    return this._issues[Symbol.iterator]();
   }
 
   _reviewLevelCounts() {
@@ -157,21 +150,28 @@ class IssueList {
     return result;
   }
 
-  clone() {
-    return new IssueList(this._issues.map(issue => issue.clone()));
-  }
-
-  [Symbol.iterator]() {
-    return this._issues[Symbol.iterator]();
-  }
-
-  push(issue) {
-    console.assert(issue instanceof Issue);
-    this._issues.push(issue);
-  }
-
-  get length() {
-    return this._issues.length;
+  summary(updateSLO) {
+    var totals = this._reviewLevelCounts(this._issues);
+    var outOfSLO = this._outOfUpdateSLOCounts(this._issues, updateSLO);
+    var results = [];
+    for (var level in _reviewLevelMetadata) {
+      var metadata = _reviewLevelMetadata[level];
+      if (level in totals) {
+        var color = (level in updateSLO) ? _inSLOColor : _noSLOColor;
+        var levelSummary = totals[level].toString();
+        if (level in outOfSLO && outOfSLO[level] > 0) {
+          color = metadata.outOfSLOColor;
+          levelSummary += ' (' + outOfSLO[level] + ' out of SLO)';
+        }
+        results.push({
+          level: level,
+          color: color,
+          query: metadata.query,
+          summary: levelSummary,
+        });
+      }
+    }
+    return results;
   }
 }
 
