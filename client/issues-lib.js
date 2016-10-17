@@ -1,7 +1,7 @@
 (function() {
 'use strict';
 
-if (window.Issue) {
+if (window.Issue && window.IssueList) {
   return;
 }
 
@@ -29,28 +29,34 @@ var _reviewLevelMetadata = {
     outOfSLOColor: '#F44336',  // Red 500
   },
   'none (P0)': {
-    query: {label: 'Pri-0', '-has': 'update'},
+    query: {label: 'Pri-0', '-has': 'Update'},
   },
   'none (P1)': {
-    query: {label: 'Pri-1', '-has': 'update'},
+    query: {label: 'Pri-1', '-has': 'Update'},
   },
   'none (P2)': {
-    query: {label: 'Pri-2', '-has': 'update'},
+    query: {label: 'Pri-2', '-has': 'Update'},
   },
   'none (P3)': {
-    query: {label: 'Pri-3', '-has': 'update'},
+    query: {label: 'Pri-3', '-has': 'Update'},
   },
 };
 var _defaultReviewLevel = 'none';
 var _inSLOColor = '#4CAF50';  // Green 500
 var _noSLOColor = '#757575';  // Grey 600
 
-// This class uses C style programming with JSON objects (representing issues)
-// and static methods.
-// This is to maintain the ability to clone the object in chromez-behaviours.js.
 class Issue {
-  static create({id, owner, summary, lastUpdatedString, labels}) {
-    var issue = {
+  constructor(params) {
+    // Copy constructor
+    if (params instanceof Issue) {
+      Object.assign(this, params);
+      this.labels = Array.from(this.labels);
+      return;
+    }
+
+    // Regular constructor.
+    var {id, owner, summary, lastUpdatedString, labels} = params;
+    Object.assign(this, {
       id,
       owner,
       summary,
@@ -58,40 +64,51 @@ class Issue {
       priority: undefined,
       _lastUpdatedMS: Date.parse(lastUpdatedString),
       _reviewLevel: _defaultReviewLevel,
-    };
+    });
 
-    console.assert(!isNaN(issue._lastUpdatedMS), lastUpdatedString + ' invalid format');
+    console.assert(!isNaN(this._lastUpdatedMS), lastUpdatedString + ' invalid format');
 
-    for (var label of labels) {
+    for (var label of this.labels) {
       if (label.substring(0, 4) == 'Pri-') {
-        issue.priority = Number(label.substring(4));
+        this.priority = Number(label.substring(4));
       }
       if (label.substring(0, 7) == 'Update-') {
         var reviewLevel = label.substring(7).toLowerCase();
         if (reviewLevel in _reviewLevelMetadata) {
-          issue._reviewLevel = reviewLevel;
+          this._reviewLevel = reviewLevel;
         }
       }
     }
-
-    return issue;
   }
 
-  static daysSinceUpdate(issue) {
-    return Math.floor((Date.now() - issue._lastUpdatedMS) / (1000 * 60 * 60 * 24));
+  daysSinceUpdate() {
+    return Math.floor((Date.now() - this._lastUpdatedMS) / (1000 * 60 * 60 * 24));
   }
 
-  static reviewLevelWithBackoff(issue) {
-    var result = issue._reviewLevel;
+  reviewLevelWithBackoff() {
+    var result = this._reviewLevel;
     if (result == _defaultReviewLevel) {
-      result += ' (P' + issue.priority + ')';
+      result += ' (P' + this.priority + ')';
     }
     return result;
   }
 
-  static summarizeList(issues, updateSLO) {
-    var totals = Issue._reviewLevelCounts(issues);
-    var outOfSLO = Issue._outOfUpdateSLOCounts(issues, updateSLO);
+  clone() {
+    return new Issue(this);
+  }
+}
+
+class IssueList {
+  constructor(issues = []) {
+    for (var issue of issues) {
+      console.assert(issue instanceof Issue);
+    }
+    this._issues = issues;
+  }
+
+  summary(updateSLO) {
+    var totals = this._reviewLevelCounts(this._issues);
+    var outOfSLO = this._outOfUpdateSLOCounts(this._issues, updateSLO);
     var results = [];
     for (var level in _reviewLevelMetadata) {
       var metadata = _reviewLevelMetadata[level];
@@ -113,10 +130,10 @@ class Issue {
     return results;
   }
 
-  static _reviewLevelCounts(issues) {
+  _reviewLevelCounts() {
     var result = {};
-    for (var issue of issues) {
-      var reviewLevel = Issue.reviewLevelWithBackoff(issue);
+    for (var issue of this._issues) {
+      var reviewLevel = issue.reviewLevelWithBackoff(issue);
       if (reviewLevel in result) {
         result[reviewLevel]++;
       } else {
@@ -126,21 +143,39 @@ class Issue {
     return result;
   }
 
-  static _outOfUpdateSLOCounts(issues, updateSLO) {
+  _outOfUpdateSLOCounts(updateSLO) {
     var result = {};
     for (var reviewLevel in updateSLO) {
       result[reviewLevel] = 0;
     }
-    for (var issue of issues) {
-      var reviewLevel = Issue.reviewLevelWithBackoff(issue);
-      if (reviewLevel in updateSLO && Issue.daysSinceUpdate(issue) >= updateSLO[reviewLevel]) {
+    for (var issue of this._issues) {
+      var reviewLevel = issue.reviewLevelWithBackoff();
+      if (reviewLevel in updateSLO && issue.daysSinceUpdate() >= updateSLO[reviewLevel]) {
         result[reviewLevel]++;
       }
     }
     return result;
   }
+
+  clone() {
+    return new IssueList(this._issues.map(issue => issue.clone()));
+  }
+
+  [Symbol.iterator]() {
+    return this._issues[Symbol.iterator]();
+  }
+
+  push(issue) {
+    console.assert(issue instanceof Issue);
+    this._issues.push(issue);
+  }
+
+  get length() {
+    return this._issues.length;
+  }
 }
 
 window.Issue = Issue;
+window.IssueList = IssueList;
 
 })();

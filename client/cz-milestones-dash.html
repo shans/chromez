@@ -30,12 +30,12 @@
           <div class='card-flex'>
             <template is="dom-repeat" items="{{users}}"
                       filter="filterUsers" sort="sortUsers"
-                      observe="issues">
+                      observe="issueList">
               <paper-item>
                 <paper-item-body two-line>
                   <div>{{item.user}}</div>
                   <!-- TODO(suzyh): convert to templatized HTML -->
-                  <div secondary inner-h-t-m-l="[[milestones(item.issues, releases)]]" class='milestones'></div>
+                  <div secondary inner-h-t-m-l="[[milestones(item.issueList, releases)]]" class='milestones'></div>
                 </paper-item-body>
               </paper-item>
             </template>
@@ -61,17 +61,17 @@
       },
 
       filterUsers(item) {
-        if (item.issues == undefined)
+        if (item.issueList == undefined)
           return false;
-        return (item.issues.filter(a => a.M != undefined).length > 0);
+        return (item.issueList.filter(a => a.M != undefined).length > 0);
       },
 
       sortUsers(a, b) {
-        if (a.issues == undefined || b.issues == undefined)
+        if (a.issueList == undefined || b.issueList == undefined)
           return 0;
         var minMilestoneA = undefined
-        for (var i = 0; i < a.issues.length; i++) {
-          var milestone = Number(a.issues[i].M);
+        for (var i = 0; i < a.issueList.length; i++) {
+          var milestone = Number(a.issueList[i].M);
           if (milestone == 0)
             continue;
           if (minMilestoneA == undefined || milestone < minMilestoneA)
@@ -79,8 +79,8 @@
         }
 
         var minMilestoneB = undefined
-        for (var i = 0; i < b.issues.length; i++) {
-          var milestone = Number(b.issues[i].M);
+        for (var i = 0; i < b.issueList.length; i++) {
+          var milestone = Number(b.issueList[i].M);
           if (milestone == 0)
             continue;
           if (minMilestoneB == undefined || milestone < minMilestoneB)
@@ -103,14 +103,14 @@
         }.bind(this));
       },
 
-      milestones: function(issues, releases) {
+      milestones: function(issueList, releases) {
         var div = "<div style='color: white; border-radius: 4px; padding: 0px 6px;";
-        if (issues == undefined)
+        if (issueList == undefined)
           return "pending"
         var milestones = {};
-        issues = issues.filter(a => a.M);
-        issues.forEach(a => a.M = Number(a.M) ? Math.max(Number(a.M), releases.stable) : a.M);
-        issues.forEach(a => milestones[a.M] ? milestones[a.M]++ : milestones[a.M] = 1);
+        issueList = issueList.filter(a => a.M);
+        issueList.forEach(a => a.M = Number(a.M) ? Math.max(Number(a.M), releases.stable) : a.M);
+        issueList.forEach(a => milestones[a.M] ? milestones[a.M]++ : milestones[a.M] = 1);
         var result = "";
         var keys = Object.keys(milestones).sort();
         for (var key of keys) {
@@ -131,8 +131,8 @@
       usersChanged: function(users) {
         // TODO: this probably only works for all-or-nothing changes to users right now.
         users.forEach(function(user, idx) {
-          registerSource('cz-crbug-issues', {owner: user.email}, function(issues) {
-            for (var issue of issues) {
+          registerSource('cz-crbug-issues', {owner: user.email}, function(issueList) {
+            for (var issue of issueList) {
               for (var label of issue.labels) {
                 if (label.substring(0, 2).toLowerCase() == 'm-') {
                   issue.M = label.substring(2);
@@ -140,7 +140,7 @@
                 }
               }
             }
-            this.set('users.' + idx + '.issues', issues);
+            this.set('users.' + idx + '.issueList', issueList);
           }.bind(this));
         }.bind(this));
       }

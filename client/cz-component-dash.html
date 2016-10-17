@@ -3,7 +3,7 @@
 <link rel="import" href="../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../bower_components/paper-item/paper-item-body.html">
 <script src="crbug-lib.js"></script>
-<script src="issue-lib.js"></script>
+<script src="issues-lib.js"></script>
 
 <dom-module id="cz-component-dash">
 
@@ -52,7 +52,7 @@
               <paper-item-body two-line>
                 <div>Owned by us</div>
                 <div secondary class='component'>
-                  <template is="dom-repeat" items="{{issues(component.teamsIssues, updateSLO)}}">
+                  <template is="dom-repeat" items="{{summary(component.teamsIssueList, updateSLO)}}">
                     <a href="{{crbugLink(component.name, item.query)}}">
                       <span class="bubble" style="background-color: {{item.color}}">{{item.level}}</span>
                       <span class="summary">{{item.summary}}</span>
@@ -66,7 +66,7 @@
               <paper-item-body two-line>
                 <div>Owned by others</div>
                 <div secondary class='component'>
-                  <template is="dom-repeat" items="{{issues(component.othersIssues, updateSLO)}}">
+                  <template is="dom-repeat" items="{{summary(component.othersIssueList, updateSLO)}}">
                     <a href="{{crbugLink(component.name, item.query)}}">
                       <span class="bubble" style="background-color: {{item.color}}">{{item.level}}</span>
                       <span class="summary">{{item.summary}}</span>
@@ -80,7 +80,7 @@
               <paper-item-body two-line>
                 <div>Unowned</div>
                 <div secondary class='component'>
-                  <template is="dom-repeat" items="{{issues(component.unownedIssues, updateSLO)}}">
+                  <template is="dom-repeat" items="{{summary(component.unownedIssueList, updateSLO)}}">
                     <a href="{{crbugLink(component.name, item.query)}}">
                       <span class="bubble" style="background-color: {{item.color}}">{{item.level}}</span>
                       <span class="summary">{{item.summary}}</span>
@@ -127,16 +127,16 @@
         }.bind(this));
       },
 
-      issues: function(issues, updateSLO) {
-        return Issue.summarizeList(issues, updateSLO);
+      summary: function(issueList, updateSLO) {
+        return issueList.summary(updateSLO);
       },
 
       updateComponentIssues: function(component) {
-        registerSource('cz-crbug-issues', {component: component.name}, function(issues) {
-          var teamsIssueList = [];
-          var othersIssueList = [];
-          var unownedIssueList = [];
-          for (var issue of issues) {
+        registerSource('cz-crbug-issues', {component: component.name}, function(issueList) {
+          var teamsIssueList = new IssueList();
+          var othersIssueList = new IssueList();
+          var unownedIssueList = new IssueList();
+          for (var issue of issueList) {
             if (issue.owner == null) {
               unownedIssueList.push(issue);
             } else if (this.users.indexOf(issue.owner) === -1) {
@@ -145,9 +145,9 @@
               teamsIssueList.push(issue);
             }
           }
-          this.set('component.teamsIssues', teamsIssueList);
-          this.set('component.othersIssues', othersIssueList);
-          this.set('component.unownedIssues', unownedIssueList);
+          this.set('component.teamsIssueList', teamsIssueList);
+          this.set('component.othersIssueList', othersIssueList);
+          this.set('component.unownedIssueList', unownedIssueList);
         }.bind(this));
       },
 
