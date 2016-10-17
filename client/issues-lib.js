@@ -50,7 +50,7 @@ class Issue {
     // Copy constructor
     if (params instanceof Issue) {
       Object.assign(this, params);
-      this.labels = Array.from(this.labels);
+      this.labels = clone(this.labels);
       return;
     }
 
@@ -151,8 +151,8 @@ class IssueList {
   }
 
   summary(updateSLO) {
-    var totals = this._reviewLevelCounts(this._issues);
-    var outOfSLO = this._outOfUpdateSLOCounts(this._issues, updateSLO);
+    var totals = this._reviewLevelCounts();
+    var outOfSLO = this._outOfUpdateSLOCounts(updateSLO);
     var results = [];
     for (var level in _reviewLevelMetadata) {
       var metadata = _reviewLevelMetadata[level];
