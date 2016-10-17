@@ -2,7 +2,8 @@
 <link rel="import" href="../bower_components/paper-card/paper-card.html">
 <link rel="import" href="../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../bower_components/paper-item/paper-item-body.html">
-<script src="issue-lib.js"></script>
+<script src="issues-lib.js"></script>
+<script src="crbug-lib.js"></script>
 
 <dom-module id="cz-component-dash">
 
@@ -51,7 +52,7 @@
               <paper-item-body two-line>
                 <div>Owned by us</div>
                 <div secondary class='breakdown'>
-                  <template is="dom-repeat" items="{{summarize(issueBreakdown.team, updateSLO)}}">
+                  <template is="dom-repeat" items="{{summary(issueBreakdown.team, updateSLO)}}">
                     <a href="{{queryURL(issueSource, sourceQuery, item.query)}}">
                       <span class="bubble" style="background-color: {{item.color}}">{{item.level}}</span>
                       <span class="summary">{{item.summary}}</span>
@@ -65,7 +66,7 @@
               <paper-item-body two-line>
                 <div>Owned by others</div>
                 <div secondary class='breakdown'>
-                  <template is="dom-repeat" items="{{summarize(issueBreakdown.others, updateSLO)}}">
+                  <template is="dom-repeat" items="{{summary(issueBreakdown.others, updateSLO)}}">
                     <a href="{{queryURL(issueSource, sourceQuery, item.query)}}">
                       <span class="bubble" style="background-color: {{item.color}}">{{item.level}}</span>
                       <span class="summary">{{item.summary}}</span>
@@ -79,7 +80,7 @@
               <paper-item-body two-line>
                 <div>Unowned</div>
                 <div secondary class='breakdown'>
-                  <template is="dom-repeat" items="{{summarize(issueBreakdown.unowned, updateSLO)}}">
+                  <template is="dom-repeat" items="{{summary(issueBreakdown.unowned, updateSLO)}}">
                     <a href="{{queryURL(issueSource, sourceQuery, item.query)}}">
                       <span class="bubble" style="background-color: {{item.color}}">{{item.level}}</span>
                       <span class="summary">{{item.summary}}</span>
@@ -119,9 +120,9 @@
           type: 'Object',
           value: function() { return new Set(); },
         },
-        issues: {
+        issueList: {
           type: 'Object',
-          value: function() { return []; },
+          value: function() { return null; },
         },
         issueBreakdown: {
           type: 'Object',
@@ -131,7 +132,7 @@
 
       observers: [
         'updateUsernames(users, issueSource)',
-        'updateIssueBreakdown(usernames, issues)',
+        'updateIssueBreakdown(usernames, issueList)',
       ],
 
       attached: function() {
@@ -146,16 +147,16 @@
         });
       },
 
-      summarize: function(issues, updateSLO) {
-        if (!issues || !updateSLO) {
+      summary: function(issueList, updateSLO) {
+        if (!issueList || !updateSLO) {
           return [];
         }
-        return Issue.summarizeList(issues, updateSLO);
+        return issueList.summary(updateSLO);
       },
 
       updateIssueSource: function({tag, query}) {
-        registerSource(tag, query, issues => {
-          this.set('issues', issues);
+        registerSource(tag, query, issueList => {
+          this.set('issueList', issueList);
         }).then(sourceElement => {
           this.set('issueSource', sourceElement);
           this.set('sourceQuery', query);
@@ -169,11 +170,14 @@
         this.set('usernames', new Set(users.map(user => issueSource.getUsername(user))));
       },
 
-      updateIssueBreakdown: function(usernames, issues) {
-        var team = [];
-        var others = [];
-        var unowned = [];
-        for (var issue of issues) {
+      updateIssueBreakdown: function(usernames, issueList) {
+        if (!issueList) {
+          return;
+        }
+        var team = new IssueList();
+        var others = new IssueList();
+        var unowned = new IssueList();
+        for (var issue of issueList) {
           if (issue.owner == null) {
             unowned.push(issue);
           } else if (!usernames.has(issue.owner)) {

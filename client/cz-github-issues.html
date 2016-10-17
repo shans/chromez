@@ -1,7 +1,7 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
 <script src="chromez-behaviors.js"></script>
-<script src="issue-lib.js"></script>
+<script src="issues-lib.js"></script>
 
 <dom-module id="cz-github-issues">
 
@@ -22,15 +22,15 @@
       behaviors: [ChromeZBehaviors.AJAXBehavior],
 
       onResponse: function(items) {
-        return items.map(item => {
-          return Issue.create({
+        return new IssueList(items.map(item => {
+          return new Issue({
             id: item.id,
             owner: item.assignee ? item.assignee.login : null,
             summary: item.title,
             lastUpdatedString: item.updated_at,
             labels: item.labels.map(label => label.name),
           });
-        });
+        }));
       },
 
       registerQuery: function(query, callback) {
