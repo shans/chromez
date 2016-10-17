@@ -176,7 +176,7 @@
         for (var issue of issues) {
           if (issue.owner == null) {
             unowned.push(issue);
-          } else if (usernames.has(issue.owner)) {
+          } else if (!usernames.has(issue.owner)) {
             others.push(issue);
           } else {
             team.push(issue);
