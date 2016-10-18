@@ -25,19 +25,30 @@
       is: "cz-crbug-issues",
       behaviors: [ChromeZBehaviors.AJAXBehavior],
 
-      onResponse: function(data) {
+      onResponse: function(data, query) {
         data = JSON.parse(data);
-        if (data.items == undefined)
-          return [];
-        return new IssueList(data.items.filter(a => a.ID !== "").map(item => {
-          return new Issue({
-            id: item.id,
-            owner: item.owner ? item.owner.name : null,
-            summary: item.summary,
-            lastUpdatedString: item.updated,
-            labels: item.labels,
+        var issues = [];
+        if (data.items) {
+          issues = data.items.filter(a => a.ID !== "").map(item => {
+            return new Issue({
+              id: item.id,
+              owner: item.owner ? item.owner.name : null,
+              summary: item.summary,
+              lastUpdatedString: item.updated,
+              labels: item.labels,
+            });
           });
-        }));
+        }
+
+        function getQueryURL(subQuery) {
+          if (subQuery) {
+            query = clone(query);
+            Object.assign(query, subQuery);
+          }
+          return Crbug.queryURL(query);
+        }
+
+        return new IssueList(issues, getQueryURL);
       },
 
       registerQuery: function(query, callback) {
@@ -46,10 +57,6 @@
           q: Crbug.queryString(query),
         };
         this.addCallbackToQuery(query, callback, params);
-      },
-
-      queryURL: function(query) {
-        return Crbug.queryURL(query);
       },
     });
   </script>
