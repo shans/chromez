@@ -49,20 +49,12 @@ var _inSLOColor = '#4CAF50';  // Green 500
 var _noSLOColor = '#757575';  // Grey 600
 
 class Issue {
-  constructor(params) {
-    // Copy constructor
-    if (params instanceof Issue) {
-      Object.assign(this, params);
-      this.labels = clone(this.labels);
-      return;
-    }
-
-    // Regular constructor.
-    var {id, owner, summary, lastUpdatedString, labels} = params;
+  constructor({id, owner, summary, lastUpdatedString, labels}) {
     Object.assign(this, {
       id,
       owner,
       summary,
+      lastUpdatedString,
       labels,
       priority: null,
       _lastUpdatedMS: Date.parse(lastUpdatedString),
@@ -85,7 +77,10 @@ class Issue {
   }
 
   clone() {
-    return new Issue(this);
+    var params = {};
+    Object.assign(params, this);
+    params.labels = clone(this.labels);
+    return new Issue(params);
   }
 
   daysSinceUpdate() {
@@ -102,15 +97,28 @@ class Issue {
 }
 
 class IssueList {
-  constructor(issues = []) {
+  constructor(issues = [], getQueryURL = null, getUsername = null) {
     for (var issue of issues) {
       console.assert(issue instanceof Issue);
     }
     this._issues = issues;
+    this._getQueryURL = getQueryURL;
+    this._getUsername = getUsername;
+  }
+
+  getQueryURL(subQuery) {
+    return this._getQueryURL(subQuery);
+  }
+
+  getUsername(userConfig) {
+    return this._getUsername(userConfig);
   }
 
   clone() {
-    return new IssueList(this._issues.map(issue => issue.clone()));
+    return new IssueList(
+        this._issues.map(issue => issue.clone()),
+        this._getQueryURL,
+        this._getUsername);
   }
 
   push(issue) {

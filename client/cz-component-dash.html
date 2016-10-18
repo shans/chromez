@@ -44,7 +44,7 @@
         text-decoration: none;
       }
     </style>
-    <a href="{{queryURL(issueSource, sourceQuery)}}">
+    <a href="{{queryURL(issueList)}}">
       <paper-card heading="{{key}} Issues" id='card'>
         <div class="card-content">
           <div class='card-flex'>
@@ -53,7 +53,7 @@
                 <div>Owned by us</div>
                 <div secondary class='breakdown'>
                   <template is="dom-repeat" items="{{summary(issueBreakdown.team, updateSLO)}}">
-                    <a href="{{queryURL(issueSource, sourceQuery, item.query)}}">
+                    <a href="{{queryURL(issueList, item.query)}}">
                       <span class="bubble" style="background-color: {{item.color}}">{{item.level}}</span>
                       <span class="summary">{{item.summary}}</span>
                     </a>
@@ -67,7 +67,7 @@
                 <div>Owned by others</div>
                 <div secondary class='breakdown'>
                   <template is="dom-repeat" items="{{summary(issueBreakdown.others, updateSLO)}}">
-                    <a href="{{queryURL(issueSource, sourceQuery, item.query)}}">
+                    <a href="{{queryURL(issueList, item.query)}}">
                       <span class="bubble" style="background-color: {{item.color}}">{{item.level}}</span>
                       <span class="summary">{{item.summary}}</span>
                     </a>
@@ -81,7 +81,7 @@
                 <div>Unowned</div>
                 <div secondary class='breakdown'>
                   <template is="dom-repeat" items="{{summary(issueBreakdown.unowned, updateSLO)}}">
-                    <a href="{{queryURL(issueSource, sourceQuery, item.query)}}">
+                    <a href="{{queryURL(issueList, item.query)}}">
                       <span class="bubble" style="background-color: {{item.color}}">{{item.level}}</span>
                       <span class="summary">{{item.summary}}</span>
                     </a>
@@ -108,11 +108,7 @@
           type: 'Object',
           value: function() { return null; },
         },
-        sourceQuery: {
-          type: 'Object',
-          value: function() { return null; },
-        },
-        issueSource: {
+        issueList: {
           type: 'Object',
           value: function() { return null; },
         },
@@ -131,7 +127,7 @@
       },
 
       observers: [
-        'updateUsernames(users, issueSource)',
+        'updateUsernames(users, issueList)',
         'updateIssueBreakdown(usernames, issueList)',
       ],
 
@@ -157,33 +153,29 @@
       updateIssueSource: function({tag, query}) {
         registerSource(tag, query, issueList => {
           this.set('issueList', issueList);
-        }).then(sourceElement => {
-          this.set('issueSource', sourceElement);
-          this.set('sourceQuery', query);
         });
       },
 
-      updateUsernames: function(users, issueSource) {
-        if (!issueSource) {
-          return;
-        }
-        this.set('usernames', new Set(users.map(user => issueSource.getUsername(user))));
-      },
-
-      updateIssueBreakdown: function(usernames, issueList) {
+      updateUsernames: function(users, issueList) {
         if (!issueList) {
           return;
         }
+        this.set('usernames', new Set(users.map(user => issueList.getUsername(user))));
+      },
+
+      updateIssueBreakdown: function(usernames, issueList) {
         var team = new IssueList();
         var others = new IssueList();
         var unowned = new IssueList();
-        for (var issue of issueList) {
-          if (issue.owner == null) {
-            unowned.push(issue);
-          } else if (!usernames.has(issue.owner)) {
-            others.push(issue);
-          } else {
-            team.push(issue);
+        if (issueList) {
+          for (var issue of issueList) {
+            if (issue.owner == null) {
+              unowned.push(issue);
+            } else if (!usernames.has(issue.owner)) {
+              others.push(issue);
+            } else {
+              team.push(issue);
+            }
           }
         }
         this.set('issueBreakdown.team', team);
@@ -191,16 +183,11 @@
         this.set('issueBreakdown.unowned', unowned);
       },
 
-      queryURL: function(issueSource, sourceQuery, itemQuery) {
-        if (!issueSource || !sourceQuery) {
+      queryURL: function(issueList, subQuery) {
+        if (!issueList) {
           return '';
         }
-        var query = sourceQuery;
-        if (itemQuery) {
-          query = clone(query);
-          Object.assign(query, itemQuery);
-        }
-        return this.issueSource.queryURL(query);
+        return issueList.getQueryURL(subQuery);
       },
     });
   </script>
