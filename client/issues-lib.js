@@ -76,7 +76,7 @@ class Issue {
   clone() {
     var params = {};
     Object.assign(params, this);
-    params.labels = clone(labels);
+    params.labels = clone(this.labels);
     return new Issue(params);
   }
 
