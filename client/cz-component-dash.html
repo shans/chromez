@@ -100,7 +100,7 @@
       is: "cz-component-dash",
 
       properties: {
-        users: {
+        userConfigs: {
           type: 'Object',
           value: function() { return []; },
         },
@@ -127,13 +127,13 @@
       },
 
       observers: [
-        'updateUsernames(users, issueList)',
+        'updateUsernames(userConfigs, issueList)',
         'updateIssueBreakdown(usernames, issueList)',
       ],
 
       attached: function() {
-        registerSource('cz-config', 'users', users => {
-          this.set('users', users);
+        registerSource('cz-config', 'users', userConfigs => {
+          this.set('userConfigs', userConfigs);
         });
         registerSource('cz-config', 'updateSLO', updateSLO => {
           this.set('updateSLO', updateSLO);
@@ -156,11 +156,12 @@
         });
       },
 
-      updateUsernames: function(users, issueList) {
+      updateUsernames: function(userConfigs, issueList) {
         if (!issueList) {
           return;
         }
-        this.set('usernames', new Set(users.map(user => issueList.getUsername(user))));
+        var usernames = userConfigs.map(userConfig => issueList.getUsername(userConfig));
+        this.set('usernames', new Set(usernames));
       },
 
       updateIssueBreakdown: function(usernames, issueList) {
