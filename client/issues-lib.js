@@ -44,24 +44,24 @@ var _defaultReviewLevel = 'none';
 var _inSLOColor = '#4CAF50';  // Green 500
 var _noSLOColor = '#757575';  // Grey 600
 
-var Issue = function(monorailIssue) {
-  this._rawData = monorailIssue;
+var Issue = function(crbugIssue) {
+  this._rawData = crbugIssue;
 
-  this.id = monorailIssue.id;
-  if (monorailIssue.owner) {
-    this.owner = monorailIssue.owner.name;
+  this.id = crbugIssue.id;
+  if (crbugIssue.owner) {
+    this.owner = crbugIssue.owner.name;
   } else {
     this.owner = null;
   }
-  this.summary = monorailIssue.summary;
+  this.summary = crbugIssue.summary;
   this.priority = undefined;
   this._reviewLevel = _defaultReviewLevel;
 
-  this._lastUpdatedString = monorailIssue.updated;
+  this._lastUpdatedString = crbugIssue.updated;
   this._lastUpdatedMS = Date.parse(this._lastUpdatedString);
 
-  for (var i = 0; i < monorailIssue.labels.length; i++) {
-    var label = monorailIssue.labels[i];
+  for (var i = 0; i < crbugIssue.labels.length; i++) {
+    var label = crbugIssue.labels[i];
     if (label.substring(0, 4) == 'Pri-') {
       this.priority = Number(label.substring(4));
     }

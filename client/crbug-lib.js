@@ -1,6 +1,6 @@
 (function() {
 
-if (window.CrBug) {
+if (window.Crbug) {
   return;
 }
 
@@ -12,7 +12,7 @@ function queryURL(query) {
   return 'https://bugs.chromium.org/p/chromium/issues/list?can=2&q=' + encodeURIComponent(queryString(query));
 }
 
-window.CrBug = {
+window.Crbug = {
   queryString,
   queryURL,
 };

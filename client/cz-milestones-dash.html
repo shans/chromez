@@ -131,7 +131,7 @@
       usersChanged: function(users) {
         // TODO: this probably only works for all-or-nothing changes to users right now.
         users.forEach(function(user, idx) {
-          registerSource('cz-issues', {owner: user.email}, function(data) {
+          registerSource('cz-crbug-issues', {owner: user.email}, function(data) {
             for (var i = 0; i < data.length; i++) {
               for (var j = 0; j < data[i].labels.length; j++) {
                 var label = data[i].labels[j];

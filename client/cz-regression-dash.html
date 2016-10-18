@@ -106,7 +106,7 @@
         if (this.components.length == 0) {
           return;
         }
-        registerSource('cz-issues', {type: 'Bug-Regression', component: this.components}, function(issues) {
+        registerSource('cz-crbug-issues', {type: 'Bug-Regression', component: this.components}, function(issues) {
           var regressionVersions = [];
           for (var issue of issues) {
             var version = null;
@@ -124,7 +124,7 @@
       },
 
       crbugLink: function(components) {
-        return CrBug.queryURL({type: 'Bug-Regression', component: components});
+        return Crbug.queryURL({type: 'Bug-Regression', component: components});
       },
 
       joinSpace: list => list.join(' '),

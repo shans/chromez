@@ -132,7 +132,7 @@
       },
 
       updateComponentIssues: function(component) {
-        registerSource('cz-issues', {component: component.name}, function(data) {
+        registerSource('cz-crbug-issues', {component: component.name}, function(data) {
           var teamsIssueList = new IssueList();
           var othersIssueList = new IssueList();
           var unownedIssueList = new IssueList();
@@ -155,7 +155,7 @@
       crbugLink: function(component, query) {
         var componentQuery = clone(query || {});
         componentQuery.component = component;
-        return CrBug.queryURL(componentQuery);
+        return Crbug.queryURL(componentQuery);
       },
     });
   </script>
