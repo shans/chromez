@@ -153,6 +153,7 @@
 
       attached: function() {
         registerSource('cz-config', 'cardview-heading', cvHeading => this.set('cardview-heading', (cvHeading ? cvHeading : 'Card Feed')));
+        registerSource('cz-config', 'cardview-columns', cvColumns => this.columns = cvColumns);
         this.last = {};
       },
 
