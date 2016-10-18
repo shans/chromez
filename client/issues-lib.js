@@ -46,20 +46,12 @@ var _inSLOColor = '#4CAF50';  // Green 500
 var _noSLOColor = '#757575';  // Grey 600
 
 class Issue {
-  constructor(params) {
-    // Copy constructor
-    if (params instanceof Issue) {
-      Object.assign(this, params);
-      this.labels = clone(this.labels);
-      return;
-    }
-
-    // Regular constructor.
-    var {id, owner, summary, lastUpdatedString, labels} = params;
+  constructor({id, owner, summary, lastUpdatedString, labels}) {
     Object.assign(this, {
       id,
       owner,
       summary,
+      lastUpdatedString,
       labels,
       priority: undefined,
       _lastUpdatedMS: Date.parse(lastUpdatedString),
@@ -82,7 +74,10 @@ class Issue {
   }
 
   clone() {
-    return new Issue(this);
+    var params = {};
+    Object.assign(params, this);
+    params.labels = clone(labels);
+    return new Issue(params);
   }
 
   daysSinceUpdate() {
