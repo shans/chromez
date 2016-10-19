@@ -94,15 +94,20 @@ class Issue {
 }
 
 class IssueList {
-  constructor(issues = []) {
+  constructor(issues = [], getQueryURL = null) {
     for (var issue of issues) {
       console.assert(issue instanceof Issue);
     }
     this._issues = issues;
+    this._getQueryURL = getQueryURL;
+  }
+
+  getQueryURL(subQuery) {
+    return this._getQueryURL(subQuery);
   }
 
   clone() {
-    return new IssueList(this._issues.map(issue => issue.clone()));
+    return new IssueList(this._issues.map(issue => issue.clone()), this._getQueryURL);
   }
 
   push(issue) {

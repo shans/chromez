@@ -16,6 +16,7 @@ ChromeZBehaviors.AJAXBehavior = {
       }
     }
     this.push('searchQueries', {
+      query: clone(query),
       callbacks: [callback],
       params: params,
       key: queryKey,
@@ -28,17 +29,17 @@ ChromeZBehaviors.AJAXBehavior = {
     }
   },
   handleResponse: function(data) {
-    var query = this.searchQueries[data.model.index];
+    var searchQuery = this.searchQueries[data.model.index];
     var result = data.detail.response;
     if (this.onResponse)
-      result = this.onResponse(result);
-    if (query.dataCache && JSON.stringify(query.dataCache) == JSON.stringify(result)) {
+      result = this.onResponse(result, searchQuery.query);
+    if (searchQuery.dataCache && JSON.stringify(searchQuery.dataCache) == JSON.stringify(result)) {
       return;
     }
-    query.dataCache = result;
-    query.element = data.target;
-    for (var i = 0; i < query.callbacks.length; i++)
-      query.callbacks[i](clone(result));
+    searchQuery.dataCache = result;
+    searchQuery.element = data.target;
+    for (var i = 0; i < searchQuery.callbacks.length; i++)
+      searchQuery.callbacks[i](clone(result));
   },
 }
 

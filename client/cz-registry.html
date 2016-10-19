@@ -55,7 +55,10 @@
           }.bind(this));
         }
 
-        return this.registeredSources[type].then(source => source.registerQuery(query, callback));
+        return this.registeredSources[type].then(source => {
+          source.registerQuery(query, callback);
+          return source;
+        });
       },
     });
   </script>

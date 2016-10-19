@@ -17,7 +17,7 @@
 },
 "dashes": [
   "cz-clock-dash",
-  "cz-component-dash(animation)",
+  "cz-component-dash(Blink Animations)",
   "cz-issue-priority-dash",
   "cz-regression-dash",
   "cz-review-latency-dash(false)",
@@ -41,6 +41,12 @@
     "name": "web-animations-next",
     "repo": "web-animations/web-animations-next",
     "shields": ["travis", "github/issues-pr", "github/issues"]
+  }
+},
+"issue-sources": {
+  "Blink Animations": {
+    "tag": "cz-crbug-issues",
+    "query": {"component": "Blink>Animation"}
   }
 }
 }

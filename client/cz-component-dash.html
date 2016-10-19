@@ -44,16 +44,16 @@
         text-decoration: none;
       }
     </style>
-    <a href="{{crbugLink(component.name)}}">
-      <paper-card heading="{{component.name}} Issues" id='card'>
+    <a href="{{queryURL(issueList)}}">
+      <paper-card heading="{{key}} Issues" id='card'>
         <div class="card-content">
           <div class='card-flex'>
             <paper-item>
               <paper-item-body two-line>
                 <div>Owned by us</div>
                 <div secondary class='component'>
-                  <template is="dom-repeat" items="{{summary(component.teamsIssueList, updateSLO)}}">
-                    <a href="{{crbugLink(component.name, item.query)}}">
+                  <template is="dom-repeat" items="{{summary(component.team, updateSLO)}}">
+                    <a href="{{queryURL(issueList, item.query)}}">
                       <span class="bubble" style="background-color: {{item.color}}">{{item.level}}</span>
                       <span class="summary">{{item.summary}}</span>
                     </a>
@@ -66,8 +66,8 @@
               <paper-item-body two-line>
                 <div>Owned by others</div>
                 <div secondary class='component'>
-                  <template is="dom-repeat" items="{{summary(component.othersIssueList, updateSLO)}}">
-                    <a href="{{crbugLink(component.name, item.query)}}">
+                  <template is="dom-repeat" items="{{summary(component.others, updateSLO)}}">
+                    <a href="{{queryURL(issueList, item.query)}}">
                       <span class="bubble" style="background-color: {{item.color}}">{{item.level}}</span>
                       <span class="summary">{{item.summary}}</span>
                     </a>
@@ -80,8 +80,8 @@
               <paper-item-body two-line>
                 <div>Unowned</div>
                 <div secondary class='component'>
-                  <template is="dom-repeat" items="{{summary(component.unownedIssueList, updateSLO)}}">
-                    <a href="{{crbugLink(component.name, item.query)}}">
+                  <template is="dom-repeat" items="{{summary(component.unowned, updateSLO)}}">
+                    <a href="{{queryURL(issueList, item.query)}}">
                       <span class="bubble" style="background-color: {{item.color}}">{{item.level}}</span>
                       <span class="summary">{{item.summary}}</span>
                     </a>
@@ -104,57 +104,74 @@
           type: 'Object',
           value: function() { return []; },
         },
-        component: {
-          type: 'Object',
-          value: function() { return {}; },
-        },
         updateSLO: {
           type: 'Object',
-          value: function() { return {}; },
+          value: function() { return null; },
+        },
+        issueList: {
+          type: 'Object',
+          value: function() { return null; },
+        },
+        component: {
+          type: 'Object',
+          value: function() { return {}; }
         }
       },
 
+      observers: [
+        'updateComponent(issueList)',
+      ],
+
       attached: function() {
-        registerSource('cz-config', 'users', function(users) {
+        registerSource('cz-config', 'users', users => {
           this.set('users', users.map(userData => userData['email']));
-        }.bind(this));
-        registerSource('cz-config', 'components', function(components) {
-          this.set('component', {name: components[this.key]});
-          this.updateComponentIssues(this.component)
-        }.bind(this));
-        registerSource('cz-config', 'updateSLO', function(updateSLO) {
+        });
+        registerSource('cz-config', 'updateSLO', updateSLO => {
           this.set('updateSLO', updateSLO);
-        }.bind(this));
+        });
+        registerSource('cz-config', 'issue-sources', issueSources => {
+          this.updateIssueSource(issueSources[this.key]);
+        });
       },
 
       summary: function(issueList, updateSLO) {
+        if (!issueList || !updateSLO) {
+          return [];
+        }
         return issueList.summary(updateSLO);
       },
 
-      updateComponentIssues: function(component) {
-        registerSource('cz-crbug-issues', {component: component.name}, function(issueList) {
-          var teamsIssueList = new IssueList();
-          var othersIssueList = new IssueList();
-          var unownedIssueList = new IssueList();
-          for (var issue of issueList) {
-            if (issue.owner == null) {
-              unownedIssueList.push(issue);
-            } else if (this.users.indexOf(issue.owner) === -1) {
-              othersIssueList.push(issue);
-            } else {
-              teamsIssueList.push(issue);
-            }
-          }
-          this.set('component.teamsIssueList', teamsIssueList);
-          this.set('component.othersIssueList', othersIssueList);
-          this.set('component.unownedIssueList', unownedIssueList);
-        }.bind(this));
+      updateIssueSource: function({tag, query}) {
+        registerSource(tag, query, issueList => {
+          this.set('issueList', issueList);
+        });
       },
 
-      crbugLink: function(component, query) {
-        var componentQuery = clone(query || {});
-        componentQuery.component = component;
-        return Crbug.queryURL(componentQuery);
+      updateComponent: function(issueList) {
+        var team = new IssueList();
+        var others = new IssueList();
+        var unowned = new IssueList();
+        if (issueList) {
+          for (var issue of issueList) {
+            if (issue.owner == null) {
+              unowned.push(issue);
+            } else if (this.users.indexOf(issue.owner) === -1) {
+              others.push(issue);
+            } else {
+              team.push(issue);
+            }
+          }
+        }
+        this.set('component.team', team);
+        this.set('component.others', others);
+        this.set('component.unowned', unowned);
+      },
+
+      queryURL: function(issueList, subQuery) {
+        if (!issueList) {
+          return '';
+        }
+        return issueList.getQueryURL(subQuery);
       },
     });
   </script>
