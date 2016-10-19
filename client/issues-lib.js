@@ -40,6 +40,9 @@ var _reviewLevelMetadata = {
   'none (P3)': {
     query: {label: 'Pri-3', '-has': 'Update'},
   },
+  'none': {
+    query: {'-has': 'Update'},
+  },
 };
 var _defaultReviewLevel = 'none';
 var _inSLOColor = '#4CAF50';  // Green 500
@@ -53,7 +56,7 @@ class Issue {
       summary,
       lastUpdatedString,
       labels,
-      priority: undefined,
+      priority: null,
       _lastUpdatedMS: Date.parse(lastUpdatedString),
       _reviewLevel: _defaultReviewLevel,
     });
@@ -86,7 +89,7 @@ class Issue {
 
   reviewLevelWithBackoff() {
     var result = this._reviewLevel;
-    if (result == _defaultReviewLevel) {
+    if (result == _defaultReviewLevel && this.priority != null) {
       result += ' (P' + this.priority + ')';
     }
     return result;
@@ -94,20 +97,28 @@ class Issue {
 }
 
 class IssueList {
-  constructor(issues = [], getQueryURL = null) {
+  constructor(issues = [], getQueryURL = null, getUsername = null) {
     for (var issue of issues) {
       console.assert(issue instanceof Issue);
     }
     this._issues = issues;
     this._getQueryURL = getQueryURL;
+    this._getUsername = getUsername;
   }
 
   getQueryURL(subQuery) {
     return this._getQueryURL(subQuery);
   }
 
+  getUsername(userConfig) {
+    return this._getUsername(userConfig);
+  }
+
   clone() {
-    return new IssueList(this._issues.map(issue => issue.clone()), this._getQueryURL);
+    return new IssueList(
+        this._issues.map(issue => issue.clone()),
+        this._getQueryURL,
+        this._getUsername);
   }
 
   push(issue) {

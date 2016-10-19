@@ -100,7 +100,7 @@
       is: "cz-component-dash",
 
       properties: {
-        users: {
+        userConfigs: {
           type: 'Object',
           value: function() { return []; },
         },
@@ -112,25 +112,33 @@
           type: 'Object',
           value: function() { return null; },
         },
+        usernames: {
+          type: 'Object',
+          value: function() { return []; },
+        },
         component: {
           type: 'Object',
           value: function() { return {}; }
-        }
+        },
       },
 
       observers: [
-        'updateComponent(issueList)',
+        'updateUsernames(userConfigs, issueList)',
+        'updateComponent(usernames, issueList)',
       ],
 
       attached: function() {
-        registerSource('cz-config', 'users', users => {
-          this.set('users', users.map(userData => userData['email']));
+        registerSource('cz-config', 'users', userConfigs => {
+          this.userConfigs = userConfigs;
         });
         registerSource('cz-config', 'updateSLO', updateSLO => {
-          this.set('updateSLO', updateSLO);
+          this.updateSLO = updateSLO;
         });
         registerSource('cz-config', 'issue-sources', issueSources => {
-          this.updateIssueSource(issueSources[this.key]);
+          var issueSource = issueSources[this.key];
+          registerSource(issueSource.tag, issueSource.query, issueList => {
+            this.issueList = issueList;
+          });
         });
       },
 
@@ -141,13 +149,14 @@
         return issueList.summary(updateSLO);
       },
 
-      updateIssueSource: function({tag, query}) {
-        registerSource(tag, query, issueList => {
-          this.set('issueList', issueList);
-        });
+      updateUsernames: function(userConfigs, issueList) {
+        if (!issueList) {
+          return;
+        }
+        this.usernames = userConfigs.map(userConfig => issueList.getUsername(userConfig));
       },
 
-      updateComponent: function(issueList) {
+      updateComponent: function(usernames, issueList) {
         var team = new IssueList();
         var others = new IssueList();
         var unowned = new IssueList();
@@ -155,7 +164,7 @@
           for (var issue of issueList) {
             if (issue.owner == null) {
               unowned.push(issue);
-            } else if (this.users.indexOf(issue.owner) === -1) {
+            } else if (!usernames.includes(issue.owner)) {
               others.push(issue);
             } else {
               team.push(issue);

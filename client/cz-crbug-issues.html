@@ -48,7 +48,11 @@
           return Crbug.queryURL(query);
         }
 
-        return new IssueList(issues, getQueryURL);
+        function getUsername(userConfig) {
+          return userConfig.email;
+        }
+
+        return new IssueList(issues, getQueryURL, getUsername);
       },
 
       registerQuery: function(query, callback) {
