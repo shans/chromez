@@ -19,7 +19,7 @@
         align-content: flex-start;
       }
 
-      .breakdown {
+      .component {
         display: flex;
         flex-wrap: wrap;
         padding: 6px;
@@ -51,8 +51,8 @@
             <paper-item>
               <paper-item-body two-line>
                 <div>Owned by us</div>
-                <div secondary class='breakdown'>
-                  <template is="dom-repeat" items="{{summary(issueBreakdown.team, updateSLO)}}">
+                <div secondary class='component'>
+                  <template is="dom-repeat" items="{{summary(component.team, updateSLO)}}">
                     <a href="{{queryURL(issueList, item.query)}}">
                       <span class="bubble" style="background-color: {{item.color}}">{{item.level}}</span>
                       <span class="summary">{{item.summary}}</span>
@@ -65,8 +65,8 @@
             <paper-item>
               <paper-item-body two-line>
                 <div>Owned by others</div>
-                <div secondary class='breakdown'>
-                  <template is="dom-repeat" items="{{summary(issueBreakdown.others, updateSLO)}}">
+                <div secondary class='component'>
+                  <template is="dom-repeat" items="{{summary(component.others, updateSLO)}}">
                     <a href="{{queryURL(issueList, item.query)}}">
                       <span class="bubble" style="background-color: {{item.color}}">{{item.level}}</span>
                       <span class="summary">{{item.summary}}</span>
@@ -79,8 +79,8 @@
             <paper-item>
               <paper-item-body two-line>
                 <div>Unowned</div>
-                <div secondary class='breakdown'>
-                  <template is="dom-repeat" items="{{summary(issueBreakdown.unowned, updateSLO)}}">
+                <div secondary class='component'>
+                  <template is="dom-repeat" items="{{summary(component.unowned, updateSLO)}}">
                     <a href="{{queryURL(issueList, item.query)}}">
                       <span class="bubble" style="background-color: {{item.color}}">{{item.level}}</span>
                       <span class="summary">{{item.summary}}</span>
@@ -116,11 +116,7 @@
           type: 'Object',
           value: function() { return new Set(); },
         },
-        issueList: {
-          type: 'Object',
-          value: function() { return null; },
-        },
-        issueBreakdown: {
+        component: {
           type: 'Object',
           value: function() { return {}; }
         },
@@ -128,7 +124,7 @@
 
       observers: [
         'updateUsernames(userConfigs, issueList)',
-        'updateIssueBreakdown(usernames, issueList)',
+        'updateComponent(usernames, issueList)',
       ],
 
       attached: function() {
@@ -139,7 +135,10 @@
           this.set('updateSLO', updateSLO);
         });
         registerSource('cz-config', 'issue-sources', issueSources => {
-          this.updateIssueSource(issueSources[this.key]);
+          var issueSource = issueSources[this.key];
+          registerSource(issueSource.tag, issueSource.query, issueList => {
+            this.set('issueList', issueList);
+          });
         });
       },
 
@@ -150,12 +149,6 @@
         return issueList.summary(updateSLO);
       },
 
-      updateIssueSource: function({tag, query}) {
-        registerSource(tag, query, issueList => {
-          this.set('issueList', issueList);
-        });
-      },
-
       updateUsernames: function(userConfigs, issueList) {
         if (!issueList) {
           return;
@@ -164,7 +157,7 @@
         this.set('usernames', new Set(usernames));
       },
 
-      updateIssueBreakdown: function(usernames, issueList) {
+      updateComponent: function(usernames, issueList) {
         var team = new IssueList();
         var others = new IssueList();
         var unowned = new IssueList();
@@ -179,9 +172,9 @@
             }
           }
         }
-        this.set('issueBreakdown.team', team);
-        this.set('issueBreakdown.others', others);
-        this.set('issueBreakdown.unowned', unowned);
+        this.set('component.team', team);
+        this.set('component.others', others);
+        this.set('component.unowned', unowned);
       },
 
       queryURL: function(issueList, subQuery) {
