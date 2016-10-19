@@ -114,7 +114,7 @@
         },
         usernames: {
           type: 'Object',
-          value: function() { return new Set(); },
+          value: function() { return []; },
         },
         component: {
           type: 'Object',
@@ -129,15 +129,15 @@
 
       attached: function() {
         registerSource('cz-config', 'users', userConfigs => {
-          this.set('userConfigs', userConfigs);
+          this.userConfigs = userConfigs;
         });
         registerSource('cz-config', 'updateSLO', updateSLO => {
-          this.set('updateSLO', updateSLO);
+          this.updateSLO = updateSLO;
         });
         registerSource('cz-config', 'issue-sources', issueSources => {
           var issueSource = issueSources[this.key];
           registerSource(issueSource.tag, issueSource.query, issueList => {
-            this.set('issueList', issueList);
+            this.issueList = issueList;
           });
         });
       },
@@ -153,8 +153,7 @@
         if (!issueList) {
           return;
         }
-        var usernames = userConfigs.map(userConfig => issueList.getUsername(userConfig));
-        this.set('usernames', new Set(usernames));
+        this.usernames = userConfigs.map(userConfig => issueList.getUsername(userConfig));
       },
 
       updateComponent: function(usernames, issueList) {
@@ -165,7 +164,7 @@
           for (var issue of issueList) {
             if (issue.owner == null) {
               unowned.push(issue);
-            } else if (!usernames.has(issue.owner)) {
+            } else if (!usernames.includes(issue.owner)) {
               others.push(issue);
             } else {
               team.push(issue);
