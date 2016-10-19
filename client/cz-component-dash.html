@@ -19,7 +19,7 @@
         align-content: flex-start;
       }
 
-      .breakdown {
+      .component {
         display: flex;
         flex-wrap: wrap;
         padding: 6px;
@@ -51,8 +51,8 @@
             <paper-item>
               <paper-item-body two-line>
                 <div>Owned by us</div>
-                <div secondary class='breakdown'>
-                  <template is="dom-repeat" items="{{summary(issueBreakdown.team, updateSLO)}}">
+                <div secondary class='component'>
+                  <template is="dom-repeat" items="{{summary(component.team, updateSLO)}}">
                     <a href="{{queryURL(issueList, item.query)}}">
                       <span class="bubble" style="background-color: {{item.color}}">{{item.level}}</span>
                       <span class="summary">{{item.summary}}</span>
@@ -65,8 +65,8 @@
             <paper-item>
               <paper-item-body two-line>
                 <div>Owned by others</div>
-                <div secondary class='breakdown'>
-                  <template is="dom-repeat" items="{{summary(issueBreakdown.others, updateSLO)}}">
+                <div secondary class='component'>
+                  <template is="dom-repeat" items="{{summary(component.others, updateSLO)}}">
                     <a href="{{queryURL(issueList, item.query)}}">
                       <span class="bubble" style="background-color: {{item.color}}">{{item.level}}</span>
                       <span class="summary">{{item.summary}}</span>
@@ -79,8 +79,8 @@
             <paper-item>
               <paper-item-body two-line>
                 <div>Unowned</div>
-                <div secondary class='breakdown'>
-                  <template is="dom-repeat" items="{{summary(issueBreakdown.unowned, updateSLO)}}">
+                <div secondary class='component'>
+                  <template is="dom-repeat" items="{{summary(component.unowned, updateSLO)}}">
                     <a href="{{queryURL(issueList, item.query)}}">
                       <span class="bubble" style="background-color: {{item.color}}">{{item.level}}</span>
                       <span class="summary">{{item.summary}}</span>
@@ -112,14 +112,14 @@
           type: 'Object',
           value: function() { return null; },
         },
-        issueBreakdown: {
+        component: {
           type: 'Object',
           value: function() { return {}; }
         }
       },
 
       observers: [
-        'updateIssueBreakdown(issueList)',
+        'updateComponent(issueList)',
       ],
 
       attached: function() {
@@ -147,7 +147,7 @@
         });
       },
 
-      updateIssueBreakdown: function(issueList) {
+      updateComponent: function(issueList) {
         var team = new IssueList();
         var others = new IssueList();
         var unowned = new IssueList();
@@ -162,9 +162,9 @@
             }
           }
         }
-        this.set('issueBreakdown.team', team);
-        this.set('issueBreakdown.others', others);
-        this.set('issueBreakdown.unowned', unowned);
+        this.set('component.team', team);
+        this.set('component.others', others);
+        this.set('component.unowned', unowned);
       },
 
       queryURL: function(issueList, subQuery) {
