@@ -52,12 +52,12 @@
                       items="{{users}}"
                       as="user"
                       filter="filterUsers"
-                      observe="issues">
+                      observe="issueList">
               <paper-item>
                 <paper-item-body two-line>
                   <div>{{user.user}}</div>
                   <div secondary class='priorities'>
-                    <template is="dom-repeat" items="{{priorities(user.issues, updateSLO)}}">
+                    <template is="dom-repeat" items="{{summary(user.issueList, updateSLO)}}">
                       <a href="{{crbugLink(user.email, item.query)}}">
                         <span class="bubble" style="background-color: {{item.color}}">{{item.level}}</span>
                         <span class="summary">{{item.summary}}</span>
@@ -89,9 +89,9 @@
       },
 
       filterUsers(item) {
-        if (item.issues == undefined)
+        if (item.issueList == undefined)
           return false;
-        return item.issues.length() > 0;
+        return item.issueList.length > 0;
       },
 
       attached: function() {
@@ -103,8 +103,8 @@
         }.bind(this));
       },
 
-      priorities: function(issues, updateSLO) {
-        return issues.summary(updateSLO);
+      summary: function(issueList, updateSLO) {
+        return issueList.summary(updateSLO);
       },
 
       crbugLink: function(email, query) {
@@ -116,12 +116,8 @@
       usersChanged: function(users) {
         // TODO: this probably only works for all-or-nothing changes to users right now.
         users.forEach(function(user, idx) {
-          registerSource('cz-crbug-issues', {owner: user.email}, function(data) {
-            var issueList = new IssueList();
-            for (var i = 0; i < data.length; i++) {
-              issueList.append(new Issue(data[i]));
-            }
-            this.set('users.' + idx + '.issues', issueList);
+          registerSource('cz-crbug-issues', {owner: user.email}, function(issueList) {
+            this.set('users.' + idx + '.issueList', issueList);
           }.bind(this));
         }.bind(this));
       }

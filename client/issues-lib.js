@@ -1,4 +1,5 @@
 (function() {
+'use strict';
 
 if (window.Issue && window.IssueList) {
   return;
@@ -8,108 +9,119 @@ if (window.Issue && window.IssueList) {
 // https://www.google.com/design/spec/style/color.html#color-color-palette
 var _reviewLevelMetadata = {
   'daily': {
-    query: {label: 'Update-daily'},
+    query: {label: 'Update-Daily'},
     outOfSLOColor: '#B71C1C',  // Red 900
   },
   'weekly': {
-    query: {label: 'Update-weekly'},
+    query: {label: 'Update-Weekly'},
     outOfSLOColor: '#C62828',  // Red 800
   },
   'fortnightly': {
-    query: {label: 'Update-fortnightly'},
+    query: {label: 'Update-Fortnightly'},
     outOfSLOColor: '#D32F2F',  // Red 700
   },
   'monthly': {
-    query: {label: 'Update-monthly'},
+    query: {label: 'Update-Monthly'},
     outOfSLOColor: '#E53935',  // Red 600
   },
   'quarterly': {
-    query: {label: 'Update-quarterly'},
+    query: {label: 'Update-Quarterly'},
     outOfSLOColor: '#F44336',  // Red 500
   },
   'none (P0)': {
-    query: {label: 'Pri-0', '-has': 'update'},
+    query: {label: 'Pri-0', '-has': 'Update'},
   },
   'none (P1)': {
-    query: {label: 'Pri-1', '-has': 'update'},
+    query: {label: 'Pri-1', '-has': 'Update'},
   },
   'none (P2)': {
-    query: {label: 'Pri-2', '-has': 'update'},
+    query: {label: 'Pri-2', '-has': 'Update'},
   },
   'none (P3)': {
-    query: {label: 'Pri-3', '-has': 'update'},
+    query: {label: 'Pri-3', '-has': 'Update'},
   },
 };
 var _defaultReviewLevel = 'none';
 var _inSLOColor = '#4CAF50';  // Green 500
 var _noSLOColor = '#757575';  // Grey 600
 
-var Issue = function(crbugIssue) {
-  this._rawData = crbugIssue;
+class Issue {
+  constructor({id, owner, summary, lastUpdatedString, labels}) {
+    Object.assign(this, {
+      id,
+      owner,
+      summary,
+      lastUpdatedString,
+      labels,
+      priority: undefined,
+      _lastUpdatedMS: Date.parse(lastUpdatedString),
+      _reviewLevel: _defaultReviewLevel,
+    });
 
-  this.id = crbugIssue.id;
-  if (crbugIssue.owner) {
-    this.owner = crbugIssue.owner.name;
-  } else {
-    this.owner = null;
-  }
-  this.summary = crbugIssue.summary;
-  this.priority = undefined;
-  this._reviewLevel = _defaultReviewLevel;
+    console.assert(!isNaN(this._lastUpdatedMS), lastUpdatedString + ' invalid format');
 
-  this._lastUpdatedString = crbugIssue.updated;
-  this._lastUpdatedMS = Date.parse(this._lastUpdatedString);
-
-  for (var i = 0; i < crbugIssue.labels.length; i++) {
-    var label = crbugIssue.labels[i];
-    if (label.substring(0, 4) == 'Pri-') {
-      this.priority = Number(label.substring(4));
-    }
-    if (label.substring(0, 7) == 'Update-') {
-      var reviewLevel = label.substring(7).toLowerCase();
-      if (reviewLevel in _reviewLevelMetadata) {
-        this._reviewLevel = reviewLevel;
+    for (var label of this.labels) {
+      if (label.substring(0, 4) == 'Pri-') {
+        this.priority = Number(label.substring(4));
+      }
+      if (label.substring(0, 7) == 'Update-') {
+        var reviewLevel = label.substring(7).toLowerCase();
+        if (reviewLevel in _reviewLevelMetadata) {
+          this._reviewLevel = reviewLevel;
+        }
       }
     }
   }
-};
 
-Issue.prototype = {
-  daysSinceUpdate: function() {
+  clone() {
+    var params = {};
+    Object.assign(params, this);
+    params.labels = clone(this.labels);
+    return new Issue(params);
+  }
+
+  daysSinceUpdate() {
     return Math.floor((Date.now() - this._lastUpdatedMS) / (1000 * 60 * 60 * 24));
-  },
+  }
 
-  lastUpdated: function() {
-    var result = new Date(this._lastUpdatedMS);
-    return result.toDateString();
-  },
-
-  reviewLevelWithBackoff: function() {
+  reviewLevelWithBackoff() {
     var result = this._reviewLevel;
     if (result == _defaultReviewLevel) {
       result += ' (P' + this.priority + ')';
     }
     return result;
-  },
-};
+  }
+}
 
-var IssueList = function() {
-  this._data = [];
-};
+class IssueList {
+  constructor(issues = []) {
+    for (var issue of issues) {
+      console.assert(issue instanceof Issue);
+    }
+    this._issues = issues;
+  }
 
-IssueList.prototype = {
-  append: function(issue) {
-    this._data.push(issue);
-  },
+  clone() {
+    return new IssueList(this._issues.map(issue => issue.clone()));
+  }
 
-  length: function() {
-    return this._data.length;
-  },
+  push(issue) {
+    console.assert(issue instanceof Issue);
+    this._issues.push(issue);
+  }
 
-  _reviewLevelCounts: function() {
+  get length() {
+    return this._issues.length;
+  }
+
+  [Symbol.iterator]() {
+    return this._issues[Symbol.iterator]();
+  }
+
+  _reviewLevelCounts() {
     var result = {};
-    for (var i = 0; i < this._data.length; i++) {
-      var reviewLevel = this._data[i].reviewLevelWithBackoff();
+    for (var issue of this._issues) {
+      var reviewLevel = issue.reviewLevelWithBackoff(issue);
       if (reviewLevel in result) {
         result[reviewLevel]++;
       } else {
@@ -117,24 +129,23 @@ IssueList.prototype = {
       }
     }
     return result;
-  },
+  }
 
-  _outOfUpdateSLOCounts: function(updateSLO) {
+  _outOfUpdateSLOCounts(updateSLO) {
     var result = {};
     for (var reviewLevel in updateSLO) {
       result[reviewLevel] = 0;
     }
-    for (var i = 0; i < this._data.length; i++) {
-      var issue = this._data[i];
+    for (var issue of this._issues) {
       var reviewLevel = issue.reviewLevelWithBackoff();
       if (reviewLevel in updateSLO && issue.daysSinceUpdate() >= updateSLO[reviewLevel]) {
         result[reviewLevel]++;
       }
     }
     return result;
-  },
+  }
 
-  summary: function(updateSLO) {
+  summary(updateSLO) {
     var totals = this._reviewLevelCounts();
     var outOfSLO = this._outOfUpdateSLOCounts(updateSLO);
     var results = [];
@@ -156,8 +167,8 @@ IssueList.prototype = {
       }
     }
     return results;
-  },
-};
+  }
+}
 
 window.Issue = Issue;
 window.IssueList = IssueList;

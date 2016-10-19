@@ -2,6 +2,7 @@
 <link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
 <script src="../bower_components/papaparse/papaparse.min.js"></script>
 <script src="chromez-behaviors.js"></script>
+<script src="issues-lib.js"></script>
 
 <dom-module id="cz-crbug-issues">
 
@@ -27,7 +28,15 @@
         data = JSON.parse(data);
         if (data.items == undefined)
           return [];
-        return data.items.filter(a => a.ID !== "");
+        return new IssueList(data.items.filter(a => a.ID !== "").map(item => {
+          return new Issue({
+            id: item.id,
+            owner: item.owner ? item.owner.name : null,
+            summary: item.summary,
+            lastUpdatedString: item.updated,
+            labels: item.labels,
+          });
+        }));
       },
 
       registerQuery: function(query, callback) {

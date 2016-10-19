@@ -43,5 +43,8 @@ ChromeZBehaviors.AJAXBehavior = {
 }
 
 function clone(data) {
+  if (data instanceof Object && data.clone instanceof Function) {
+    return data.clone();
+  }
   return JSON.parse(JSON.stringify(data));
 }

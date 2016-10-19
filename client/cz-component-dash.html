@@ -52,7 +52,7 @@
               <paper-item-body two-line>
                 <div>Owned by us</div>
                 <div secondary class='component'>
-                  <template is="dom-repeat" items="{{issues(component.teamsIssues, updateSLO)}}">
+                  <template is="dom-repeat" items="{{summary(component.teamsIssueList, updateSLO)}}">
                     <a href="{{crbugLink(component.name, item.query)}}">
                       <span class="bubble" style="background-color: {{item.color}}">{{item.level}}</span>
                       <span class="summary">{{item.summary}}</span>
@@ -66,7 +66,7 @@
               <paper-item-body two-line>
                 <div>Owned by others</div>
                 <div secondary class='component'>
-                  <template is="dom-repeat" items="{{issues(component.othersIssues, updateSLO)}}">
+                  <template is="dom-repeat" items="{{summary(component.othersIssueList, updateSLO)}}">
                     <a href="{{crbugLink(component.name, item.query)}}">
                       <span class="bubble" style="background-color: {{item.color}}">{{item.level}}</span>
                       <span class="summary">{{item.summary}}</span>
@@ -80,7 +80,7 @@
               <paper-item-body two-line>
                 <div>Unowned</div>
                 <div secondary class='component'>
-                  <template is="dom-repeat" items="{{issues(component.unownedIssues, updateSLO)}}">
+                  <template is="dom-repeat" items="{{summary(component.unownedIssueList, updateSLO)}}">
                     <a href="{{crbugLink(component.name, item.query)}}">
                       <span class="bubble" style="background-color: {{item.color}}">{{item.level}}</span>
                       <span class="summary">{{item.summary}}</span>
@@ -127,28 +127,27 @@
         }.bind(this));
       },
 
-      issues: function(issues, updateSLO) {
-        return issues.summary(updateSLO);
+      summary: function(issueList, updateSLO) {
+        return issueList.summary(updateSLO);
       },
 
       updateComponentIssues: function(component) {
-        registerSource('cz-crbug-issues', {component: component.name}, function(data) {
+        registerSource('cz-crbug-issues', {component: component.name}, function(issueList) {
           var teamsIssueList = new IssueList();
           var othersIssueList = new IssueList();
           var unownedIssueList = new IssueList();
-          for (var i = 0; i < data.length; i++) {
-            var issue = new Issue(data[i]);
+          for (var issue of issueList) {
             if (issue.owner == null) {
-              unownedIssueList.append(issue);
+              unownedIssueList.push(issue);
             } else if (this.users.indexOf(issue.owner) === -1) {
-              othersIssueList.append(issue);
+              othersIssueList.push(issue);
             } else {
-              teamsIssueList.append(issue);
+              teamsIssueList.push(issue);
             }
           }
-          this.set('component.teamsIssues', teamsIssueList);
-          this.set('component.othersIssues', othersIssueList);
-          this.set('component.unownedIssues', unownedIssueList);
+          this.set('component.teamsIssueList', teamsIssueList);
+          this.set('component.othersIssueList', othersIssueList);
+          this.set('component.unownedIssueList', unownedIssueList);
         }.bind(this));
       },
 
