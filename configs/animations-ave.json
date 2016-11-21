@@ -23,7 +23,6 @@
   "cz-regression-dash",
   "cz-review-latency-dash(false)",
   "cz-review-load-dash",
-  "cz-shields-dash(web-animations-js)",
   "cz-shields-dash(web-animations-next)"
 ],
 "timezones": [
@@ -33,15 +32,10 @@
   {"city": "Sydney", "timezone": "Australia/Sydney", "local": true}
 ],
 "github": {
-  "web-animations-js": {
-    "name": "web-animations-js",
-    "repo": "web-animations/web-animations-js",
-    "shields": ["travis", "github/issues-pr", "github/issues"]
-  },
   "web-animations-next": {
     "name": "web-animations-next",
     "repo": "web-animations/web-animations-next",
-    "shields": ["travis", "github/issues-pr", "github/issues"]
+    "shields": ["github/issues-pr", "github/issues"]
   }
 },
 "issue-sources": {
