@@ -1,10 +1,10 @@
 {"cardview-heading": "Welcome to Animations Avenue (go/animations-ave)",
 "cardview-columns": 1,
 "users": [
-  {"user": "Eric", "email": "ericwilligers@chromium.org"},
-  {"user": "Alan", "email": "alancutter@chromium.org"},
-  {"user": "Suzy", "email": "suzyh@chromium.org"},
-  {"user": "Alexey", "email": "loyso@chromium.org"}
+  {"user": "Eric", "email": "ericwilligers@chromium.org", "github": "ewilligers"},
+  {"user": "Alan", "email": "alancutter@chromium.org", "github": "alancutter"},
+  {"user": "Suzy", "email": "suzyh@chromium.org", "github": "suzyh"},
+  {"user": "Alexey", "email": "loyso@chromium.org", "github": "loyso"}
 ],
 "components": {
   "animation": "Blink>Animation"
