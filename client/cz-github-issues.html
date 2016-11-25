@@ -22,7 +22,9 @@
       behaviors: [ChromeZBehaviors.AJAXBehavior],
 
       onResponse: function(items, query) {
-        var issues = items.map(item => {
+        var issues = items.filter(item => {
+          return !("pull_request" in item);
+        }).map(item => {
           return new Issue({
             id: item.id,
             owner: item.assignee ? item.assignee.login : null,
@@ -37,7 +39,7 @@
         }
 
         function getUsername(userConfig) {
-          return /(.+)@/.exec(userConfig.email)[1];
+          return userConfig.github;
         }
 
         return new IssueList(issues, getQueryUrl, getUsername);
