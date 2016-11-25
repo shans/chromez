@@ -23,7 +23,7 @@
 
       onResponse: function(items, query) {
         var issues = items.filter(item => {
-          return !("pull_request" in item);
+          return !('pull_request' in item);
         }).map(item => {
           return new Issue({
             id: item.id,
