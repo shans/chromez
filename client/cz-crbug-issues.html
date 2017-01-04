@@ -40,12 +40,10 @@
           });
         }
 
-        function getQueryURL(subQuery) {
-          if (subQuery) {
-            query = clone(query);
-            Object.assign(query, subQuery);
-          }
-          return Crbug.queryURL(query);
+        function getQueryURL(subQuery = {}) {
+          var urlQuery = clone(query);
+          Object.assign(urlQuery, subQuery);
+          return Crbug.queryURL(urlQuery);
         }
 
         function getUsername(userConfig) {
