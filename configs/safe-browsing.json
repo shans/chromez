@@ -1,4 +1,20 @@
-{"users": [
+{
+"cardview-heading": "Welcome to Chrome SafeBrowsing",
+"cardview-columns": 1,
+"components": {
+  "Services-SafeBrowsing": "Services>Safebrowsing"
+},
+"dashes": [
+  "cz-milestones-dash",
+  "cz-review-load-dash"
+],
+"issue-sources": {
+  "Blink Animations": {
+    "tag": "cz-crbug-issues",
+    "query": {"component": "Services>Safebrowsing"}
+  }
+},
+"users": [
   {"user": "Jialiu", "email": "jialiul@chromium.org"},
   {"user": "Luke", "email": "lpz@chromium.org"},
   {"user": "Nathan", "email": "nparker@chromium.org"},
@@ -7,9 +23,5 @@
 "timezones": [
   {"city": "MTV", "timezone": "US/Pacific", "local": true},
   {"city": "Waterloo", "timezone": "America/Nipigon"}
-  ],
-"dashes": [
-  "cz-milestones-dash",
-  "cz-review-load-dash"
 ]
 }
