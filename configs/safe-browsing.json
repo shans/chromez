@@ -6,7 +6,7 @@
   "cz-review-load-dash"
 ],
 "issue-sources": {
-  "Blink Animations": {
+  "SafeBrowsing(Services)": {
     "tag": "cz-crbug-issues",
     "query": {"component": "Services>Safebrowsing"}
   }
