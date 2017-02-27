@@ -1,13 +1,8 @@
 {
 "cardview-heading": "Welcome to Chrome SafeBrowsing",
-"cardview-columns": 1,
-"components": {
-  "Services-SafeBrowsing": "Services>Safebrowsing"
-},
 "dashes": [
   "cz-clock-dash",
-  "cz-issue-priority-dash",
-  "cz-regression-dash",
+  "cz-review-latency-dash",
   "cz-review-load-dash"
 ],
 "issue-sources": {
