@@ -9,7 +9,6 @@
   {"city": "Waterloo", "timezone": "America/Nipigon"}
   ],
 "dashes": [
-  "cz-clock-dash",
   "cz-milestones-dash",
   "cz-review-load-dash"
 ]
