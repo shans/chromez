@@ -1,0 +1,24 @@
+{
+"cardview-heading": "Welcome to Chrome SafeBrowsing",
+"dashes": [
+  "cz-clock-dash",
+  "cz-review-latency-dash",
+  "cz-review-load-dash"
+],
+"issue-sources": {
+  "SafeBrowsing(Services)": {
+    "tag": "cz-crbug-issues",
+    "query": {"component": "Services>Safebrowsing"}
+  }
+},
+"users": [
+  {"user": "Jialiu", "email": "jialiul@chromium.org"},
+  {"user": "Luke", "email": "lpz@chromium.org"},
+  {"user": "Nathan", "email": "nparker@chromium.org"},
+  {"user": "Varun", "email": "vakh@chromium.org"}
+],
+"timezones": [
+  {"city": "MTV", "timezone": "US/Pacific", "local": true},
+  {"city": "Waterloo", "timezone": "America/Nipigon"}
+]
+}
