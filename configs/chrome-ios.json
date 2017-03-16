@@ -1,0 +1,35 @@
+{"cardview-heading": "Chrome iOS",
+"users": [
+  {"user": "Claude", "email": "cmasso@chromium.org"},
+  {"user": "Ed", "email": "edchin@chromium.org"},
+  {"user": "Elodie", "email": "lod@chromium.org"},
+  {"user": "Eugene", "email": "eugenebut@chromium.org"},
+  {"user": "Gauthier", "email": "gambard@chromium.org"},
+  {"user": "Gregory", "email": "gchatz@chromium.org"},
+  {"user": "Jean-François", "email": "jif@chromium.org"},
+  {"user": "Justin", "email": "justincohen@chromium.org"},
+  {"user": "Kurt", "email": "kkhorimoto@chromium.org"},
+  {"user": "Mark", "email": "marq@chromium.org"},
+  {"user": "Mike", "email": "michaeldo@chromium.org"},
+  {"user": "Mohammad", "email": "mrefaat@chromium.org"},
+  {"user": "Olivier", "email": "olivierrobin@chromium.org"},
+  {"user": "Rohit", "email": "rohitrao@chromium.org"},
+  {"user": "Sergio", "email": "sczs@chromium.org"},
+  {"user": "Peter", "email": "pkl@chromium.org"},
+  {"user": "Stephan", "email": "stkhapugin@chromium.org"},
+  {"user": "Eric", "email": "noyau@chromium.org"},
+  {"user": "Menglu", "email": "huangml@chromium.org"},
+  {"user": "Baxley", "email": "baxley@chromium.org"},
+  {"user": "Yuke", "email": "liaoyuke@chromium.org"},
+  {"user": "Sylvain", "email": "sdefresne@chromium.org"},
+  {"user": "Lindsay", "email": "lindsayw@chromium.org"},
+  {"user": "Sana", "email": "smut@chromium.org"},
+  {"user": "Sergey", "email": "sergeyberezin@chromium.org"}
+],
+"dashes": ["cz-clock-dash", "cz-review-latency-dash", "cz-review-load-dash"],
+"timezones": [
+  {"city": "MTV/SFO", "timezone": "US/Pacific", "local": true},
+  {"city": "MTV/RES", "timezone": "US/Eastern"},
+  {"city": "PAR", "timezone": "Europe/Paris"}
+  ]
+}
