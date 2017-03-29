@@ -28,8 +28,8 @@
 ],
 "dashes": ["cz-clock-dash", "cz-review-latency-dash", "cz-review-load-dash"],
 "timezones": [
-  {"city": "MTV/SFO", "timezone": "US/Pacific", "local": true},
-  {"city": "MTV/RES", "timezone": "US/Eastern"},
+  {"city": "MTV", "timezone": "US/Pacific", "local": true},
+  {"city": "RES", "timezone": "US/Eastern"},
   {"city": "PAR", "timezone": "Europe/Paris"}
   ]
 }
