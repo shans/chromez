@@ -26,7 +26,11 @@
   {"user": "Sana", "email": "smut@chromium.org"},
   {"user": "Sergey", "email": "sergeyberezin@chromium.org"}
 ],
-"dashes": ["cz-clock-dash", "cz-review-latency-dash", "cz-review-load-dash"],
+"dashes": [
+  "cz-clock-dash",
+  "cz-review-latency-dash(true)",
+  "cz-review-load-dash"
+],
 "timezones": [
   {"city": "MTV", "timezone": "US/Pacific", "local": true},
   {"city": "RES", "timezone": "US/Eastern"},
