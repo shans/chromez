@@ -2,6 +2,7 @@ language: node_js
 node_js:
  - '6'
 script:
+ - node empty.js
 before_deploy:
   - openssl aes-256-cbc -k "$super_secret_password" -in client-secret.json.enc -out client-secret.json -d
 deploy:
