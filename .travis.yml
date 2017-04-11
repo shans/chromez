@@ -1,0 +1,17 @@
+language: node_js
+node_js:
+ - '6'
+script:
+before_deploy:
+  - openssl aes-256-cbc -k "$super_secret_password" -in client-secret.json.enc -out client-secret.json -d
+deploy:
+  provider: gae
+  skip_cleanup: true
+  keyfile: client-secret.json
+  project: chromez-app
+  config: app.yaml
+  version: 1
+  default: true
+env:
+  global:
+    secure: OukU+NQndSq8o913TAIYWuUXRL9YUO1vC8ssitkRzS3qbQ9QXe+p7TUEbIOg0GIRxxOKqyVn1bRSZYDXBqs4SO4iqbgy0aQWI5+2QEafLb7jce/fy3gP/Uo/KQrW3NmYnFaxIhekFVMAdZqxas1wtjGsvJdecKt/Vp+zC9v6Fo5tE7W44hGm8o56/reesTyjdxE+rdRrf7EONnzLMUZyFrn+ESppPfWPDiW8s1X4+C/cpAalY0jsTzQur9yV/TOIfXdBiBHgZAZUgOMb1vjdgwtBbcD+pOZBis+Cw/Tiwz2uQ3iJMuvgbGU56ZuxZmTY0aScVu1SXiChM73GBdOH0VbHIKZilODIotAymWzc20+YqKiQDXGQqxE4GuXLIZuqqs7Prr89vx3qmhGEXOq7IBn5tOihY8QTORFHjtuRlp1BlDuZJbC0KxM1S204+1E5B8csTrwN3rvBo8YcCdLn0m0lWodh7NYy8GbVbiIN0eNgJJzR4vA8Xx3YbN7UPO1ayQAzLfocBalvBoN/VZhqDuavAQhINYgEFHBElqrHu88Y7hifMxYH1QppjNJcLTzk1qij6Qa9DaWY871XWH1wklDWNkPf/U2cRsdStAYfIM6mRifkBLuI+LmFiRqCeJxzouVNg7GZpJVmK5sEIox22fj6u/8jWXQd4mZM1qsL4pE=
