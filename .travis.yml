@@ -1,8 +1,11 @@
-language: node_js
-node_js:
- - '6'
+language: python
+python:
+ - "2.7"
 script:
- - node empty.js
+ - mkdir lib
+ - pip install -t lib/ google-api-python-client
+ - npm install -g bower
+ - bower install
 before_deploy:
   - openssl aes-256-cbc -k "$super_secret_password" -in client-secret.json.enc -out client-secret.json -d
 deploy:
