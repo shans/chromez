@@ -16,7 +16,7 @@
   {"user": "Rohit", "email": "rohitrao@chromium.org"},
   {"user": "Sergio", "email": "sczs@chromium.org"},
   {"user": "Peter", "email": "pkl@chromium.org"},
-  {"user": "Stephan", "email": "stkhapugin@chromium.org"},
+  {"user": "Stepan", "email": "stkhapugin@chromium.org"},
   {"user": "Eric", "email": "noyau@chromium.org"},
   {"user": "Menglu", "email": "huangml@chromium.org"},
   {"user": "Baxley", "email": "baxley@chromium.org"},
@@ -28,7 +28,6 @@
 ],
 "dashes": [
   "cz-clock-dash",
-  "cz-review-latency-dash(true)",
   "cz-review-load-dash"
 ],
 "timezones": [
