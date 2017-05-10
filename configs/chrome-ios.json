@@ -29,6 +29,7 @@
 ],
 "dashes": [
   "cz-clock-dash",
+  "cz-review-latency-dash(true)",
   "cz-review-load-dash"
 ],
 "timezones": [
