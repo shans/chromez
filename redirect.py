@@ -25,8 +25,14 @@ class MainPage(webapp2.RequestHandler):
       )
       if self.request.get('site') == 'issues':
           urlfetch.set_default_fetch_deadline(10)
+          startIndex = self.request.get('start')
+          try:
+            startIndex = int(startIndex)
+          except:
+            startIndex = 0
           self.response.headers.add_header("Access-Control-Allow-Origin", "*")
-          result = monorail.issues().list(projectId='chromium', q=self.request.get('q'), can='open').execute()
+          result = monorail.issues().list(projectId='chromium', q=self.request.get('q'), can='open',
+                                          startIndex=startIndex).execute()
           self.response.write(json.dumps(result))
       elif self.request.get('site') == 'issue':
           urlfetch.set_default_fetch_deadline(10)

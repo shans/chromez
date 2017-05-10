@@ -5,7 +5,7 @@ ChromeZBehaviors.AJAXBehavior = {
       this.searchQueries[i].element.generateRequest();
     }
   },
-  addCallbackToQuery: function(query, callback, params) {
+  addCallbackToQuery: function(query, callback, params, paginated) {
     var queryKey = JSON.stringify(query);
     for (var i = 0; i < this.searchQueries.length; i++) {
       if (this.searchQueries[i].key == queryKey) {
@@ -20,6 +20,7 @@ ChromeZBehaviors.AJAXBehavior = {
       callbacks: [callback],
       params: params,
       key: queryKey,
+      paginated: paginated
     });
   },
   properties: {
@@ -31,11 +32,17 @@ ChromeZBehaviors.AJAXBehavior = {
   handleResponse: function(data) {
     var searchQuery = this.searchQueries[data.model.index];
     var result = data.detail.response;
-    if (this.onResponse)
-      result = this.onResponse(result, searchQuery.query);
+    if (this.onResponse) {
+      result = this.onResponse(result, searchQuery);
+      if (!result && searchQuery.paginated) {
+        data.target.generateRequest();
+        return;
+      }
+    }
     if (searchQuery.dataCache && JSON.stringify(searchQuery.dataCache) == JSON.stringify(result)) {
       return;
     }
+
     searchQuery.dataCache = result;
     searchQuery.element = data.target;
     for (var i = 0; i < searchQuery.callbacks.length; i++)
