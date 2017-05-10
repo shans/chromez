@@ -27,21 +27,30 @@
 
       onResponse: function(data, query) {
         data = JSON.parse(data);
-        var issues = [];
+        var issues = query.issues || [];
         if (data.items) {
-          issues = data.items.filter(a => a.ID !== "").map(item => {
-            return new Issue({
+          data.items.filter(a => a.ID !== "").forEach(item => {
+            issues.push(new Issue({
               id: item.id,
               owner: item.owner ? item.owner.name : null,
               summary: item.summary,
               lastUpdatedString: item.updated,
               labels: item.labels,
-            });
+            }));
           });
         }
 
+        if (data.totalResults > issues.length) {
+          query.params.start = issues.length;
+          query.issues = issues;
+          return
+        }
+
+        query.params.start = undefined;
+        query.issues = undefined;
+
         function getQueryURL(subQuery = {}) {
-          var urlQuery = clone(query);
+          var urlQuery = clone(query.query);
           Object.assign(urlQuery, subQuery);
           return Crbug.queryURL(urlQuery);
         }
@@ -58,7 +67,7 @@
           site: 'issues',
           q: Crbug.queryString(query),
         };
-        this.addCallbackToQuery(query, callback, params);
+        this.addCallbackToQuery(query, callback, params, true);
       },
     });
   </script>
