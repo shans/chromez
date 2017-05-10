@@ -39,7 +39,7 @@
                 latencyPerBug.push({subject: issue.subject, owner: issue.owner,
                                     issue: issue.issue, latency: soleLatency + sharedLatency});
                 multipleLatency += sharedLatency;
-                if (multipleLatency > 0)
+                if (sharedLatency > 0)
                   multipleOutstanding.push({subject: issue.subject, owner: issue.owner,
                                           issue: issue.issue, latency: sharedLatency})
               }
