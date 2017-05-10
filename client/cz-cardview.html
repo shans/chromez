@@ -5,6 +5,10 @@
 
   <template>
     <style>
+      :host {
+        width: calc(var(--total-percent, 100%) - 40px) !important;
+      }
+
       paper-card {
         width: 100%;
       }
@@ -153,7 +157,7 @@
 
       attached: function() {
         registerSource('cz-config', 'cardview-heading', cvHeading => this.set('cardview-heading', (cvHeading ? cvHeading : 'Card Feed')));
-        registerSource('cz-config', 'cardview-columns', cvColumns => this.columns = cvColumns);
+        registerSource('cz-config', 'cardview-columns', cvColumns => { if (cvColumns) this.columns = cvColumns });
         this.last = {};
       },
 
@@ -167,7 +171,9 @@
         if (views.length > this.columns)
           views.splice(this.columns, views.length - this.columns);
         this.set('views', views);
+
         this.customStyle['--column-percent'] = (100/this.columns) + '%';
+        this.customStyle['--total-percent'] = ((this.columns * 100)/(Number(this.columns) + 2)) + '%';
         this.updateStyles();
         this.async(function() {
           var columns = this.querySelectorAll('.column');
@@ -176,6 +182,12 @@
             columns[i].view = this.views[i];
           }
           this.model = new CardModel(columns, this.offsetHeight - this.$.header.offsetHeight);
+          var views = this.views;
+          // Something's getting confused about updating the repeat template
+          // with the views setting above.
+          // Doing this here gets us the correct number of visual columns.
+          this.set('views', undefined);
+          this.set('views', views);
         });
       },
 
