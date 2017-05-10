@@ -36,8 +36,10 @@
                 abandonedBugs.push(issue.issue);
               } else {
                 latency += soleLatency;
-                latencyPerBug.push({subject: issue.subject, owner: issue.owner,
-                                    issue: issue.issue, latency: soleLatency + sharedLatency});
+                if (soleLatency > 0) {
+                  latencyPerBug.push({subject: issue.subject, owner: issue.owner,
+                                    issue: issue.issue, latency: soleLatency});
+                }
                 multipleLatency += sharedLatency;
                 if (sharedLatency > 0)
                   multipleOutstanding.push({subject: issue.subject, owner: issue.owner,
