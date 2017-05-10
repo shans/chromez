@@ -1,4 +1,5 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
+<script src="codereview-summarize.js"></script>
 
 <dom-module id="cz-review-latency">
 
@@ -11,12 +12,6 @@
 
       registerQuery: function(query, callback) {
         registerSource("cz-codereview", {user: query.email, type: 'search'}, function(data) {
-          var now = Date.now() + (new Date()).getTimezoneOffset() * 60 * 1000;
-          var latency = 0;
-          var abandonedBugs = [];
-          var latencyPerBug = [];
-          var multipleOutstanding = [];
-          var multipleLatency = 0;
 
           if (data == null) {
             // invalid user
@@ -24,74 +19,32 @@
             return;
           }
 
-          for (var i = 0; i < data.results.length; i++) {
-            var issue = data.results[i];
+          var issues = data.results.map(fastAnnotate);
 
-            var reviewers = issue.reviewers;
-            // console.log(issue.issue);
+          var latency = 0;
+          var abandonedBugs = [];
+          var latencyPerBug = [];
+          var multipleOutstanding = [];
+          var multipleLatency = 0;
 
-            var timestamp = undefined;
-            var previousMessageWasAuthor = false;
-            var soleReviewOwed = reviewers.length == 1;
+          issues.forEach(issue => {
+            if (issue.pendingWaiting[query.email]) {
+              var soleLatency = issue.pendingWaiting[query.email].sole / 1000 / 60 / 60;
+              var sharedLatency = issue.pendingWaiting[query.email].shared / 1000 / 60 / 60;
 
-            for (var j = 0; j < issue.messages.length; j++) {
-              var message = issue.messages[j];
-
-              // ignore automatic messages
-              // TODO: if the issue is on the commit queue
-              // then no review is owed
-              // TODO: need per-reviewer latency start times
-              // corresponding to when the reviewer was added
-              // to the issue
-              // TODO: Incorporate reviewer *removal* into
-              // latency start times too.
-              if (message.auto_generated)
-               continue;
-
-              // LGTM gets you off the review hook and
-              // resets the clock
-              if (message.approval) {
-                var idx = reviewers.indexOf(message.sender);
-                if (idx > -1)
-                  reviewers.splice(idx, 1);
-                timestamp = message.date;
-                soleReviewOwed = reviewers.length == 1;
-              }
-
-              if (message.sender == issue.owner_email) {
-                // the first in a sequence of author messages resets the clock
-                if (!previousMessageWasAuthor)
-                  timestamp = message.date;
-                previousMessageWasAuthor = true;
-                // the author responding puts sole reviewers back on the hook
-                soleReviewOwed = reviewers.length == 1;
-              }
-              if (message.sender != issue.owner_email)
-                previousMessageWasAuthor = false;
-
-              // responding if you're the only reviewer gets you off the hook
-              if (soleReviewOwed && reviewers[0] == message.sender)
-                soleReviewOwed = false;
-            }
-
-            if (timestamp == undefined)
-              timestamp = issue.created;
-
-            var thisLatency = (now - Date.parse(timestamp)) / 1000 / 60 / 60;
-            if (thisLatency > 24 * 31) {
-              abandonedBugs.push(issue.issue);
-            } else {
-              if (soleReviewOwed && reviewers[0] == query.email) {
-                latency += thisLatency;
+              if (soleLatency + sharedLatency > 24 * 31) {
+                abandonedBugs.push(issue.issue);
+              } else {
+                latency += soleLatency;
                 latencyPerBug.push({subject: issue.subject, owner: issue.owner,
-                                    issue: issue.issue, latency: thisLatency});
-              } else if (reviewers.length > 1 && reviewers.indexOf(query.email) > -1) {
-                multipleOutstanding.push({subject: issue.subject, owner: issue.owner,
-                                          issue: issue.issue, latency: thisLatency});
-                multipleLatency += thisLatency;
+                                    issue: issue.issue, latency: soleLatency + sharedLatency});
+                multipleLatency += sharedLatency;
+                if (multipleLatency > 0)
+                  multipleOutstanding.push({subject: issue.subject, owner: issue.owner,
+                                          issue: issue.issue, latency: sharedLatency})
               }
             }
-          }
+          });
           callback({latency: latency, abandonedBugs: abandonedBugs,
                     latencyPerBug: latencyPerBug, multipleLatency: multipleLatency,
                     multipleOutstanding: multipleOutstanding});
