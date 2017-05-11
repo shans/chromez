@@ -10,6 +10,7 @@ function registerSource(type, query, callback) {
 }
 
 var cardview = undefined;
+var dashview = undefined;
 
 function addCard(card) {
   if (cardview == undefined)
@@ -38,16 +39,22 @@ function addDash(dashSpec, elementAfter) {
     var key = undefined;
   }
 
-  var e = elementAfter.parentElement.querySelector(dash);
-  if (e && e.key == key)
-    return;
-  Polymer.Base.importHref(dash + '.html',
-    function(e) {
-      var elt = document.createElement(dash);
-      elt.key = key;
-      elementAfter.parentElement.insertBefore(elt, elementAfter);
-    },
-    function(e) {
-      console.error("couldn't create dash " + dash);
-    });
+  if (dashview == undefined)
+      dashview = document.querySelector('cz-dashview');
+  
+  if (dashview)
+    dashview.addDash(dash, key);
+}
+
+function getTotalColumns() {
+  if (cardview == undefined)
+    cardview = document.querySelector('cz-cardview');
+  if (dashview == undefined)
+    dashview = document.querySelector('cz-dashview');
+  var columns = 0;
+  if (cardview)
+    columns += Number(cardview.columns);
+  if (dashview)
+    columns += Number(dashview.columns);
+  return columns;
 }
