@@ -1,0 +1,61 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+
+<dom-module id="cz-dashview">
+
+  <template>
+    <style>
+      #distribute {
+        display: flex;
+        flex-wrap: wrap;
+        flex-direction: column;
+        max-height: 100%;
+        align-content: center;
+        padding: 10px;
+      }
+      #distribute > * {
+        width: calc(var(--column-percent, 100%) - 20px);
+        margin: 10px;
+      }
+    </style>
+    <div id='distribute'>
+      <div id='marker'></div>
+      <content id='content'></content>
+    </div>
+  </template>
+  <script>
+    Polymer({
+      is: "cz-dashview",
+
+      properties: {
+        columns: { value: 1, observer: 'columnsChanged' },
+        totalColumns: { value: 2, observer: 'columnsChanged'}  
+      },
+
+      columnsChanged() {
+        this.customStyle['--column-percent'] = (100/Number(this.totalColumns)) + '%';
+        this.updateStyles();
+      },
+
+      addDash(dash, key) {
+        var sameDashes = this.$.distribute.querySelectorAll(dash);
+
+        // don't add a dash that was already added
+        if ([].filter.call(sameDashes, dash => dash.key == key).length > 0)
+          return;
+
+        Polymer.Base.importHref(dash + '.html',
+          e => {
+            var elt = document.createElement(dash);
+            elt.key = key;
+            // this is necessary in order for shady dom to recognize
+            // that this element is a child that needs styling
+            elt.classList.add('cz-dashview');
+            this.$.distribute.insertBefore(elt, this.$.marker);
+          },
+          function(e) {
+            console.error("couldn't create dash " + dash);
+          });
+      }
+    });
+  </script>
+</dom-module>

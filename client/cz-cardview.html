@@ -152,13 +152,18 @@
 
       properties: {
         columns: { value: 1, observer: 'columnsChanged' },
+        totalColumns: {value: 2, observer: 'totalColumnsChanged' },
         views: { type: 'Object', value: function() { return [{cards: [], height: 0}]; }}
       },
 
       attached: function() {
         registerSource('cz-config', 'cardview-heading', cvHeading => this.set('cardview-heading', (cvHeading ? cvHeading : 'Card Feed')));
-        registerSource('cz-config', 'cardview-columns', cvColumns => { if (cvColumns) this.columns = cvColumns });
         this.last = {};
+      },
+
+      totalColumnsChanged: function() {
+        this.customStyle['--total-percent'] = (Number(this.columns) * 100)/(Number(this.totalColumns)) + '%';
+        this.updateStyles();
       },
 
       columnsChanged: function() {
@@ -172,8 +177,8 @@
           views.splice(this.columns, views.length - this.columns);
         this.set('views', views);
 
-        this.customStyle['--column-percent'] = (100/this.columns) + '%';
-        this.customStyle['--total-percent'] = ((this.columns * 100)/(Number(this.columns) + 2)) + '%';
+        this.customStyle['--column-percent'] = (100/Number(this.columns)) + '%';
+        this.customStyle['--total-percent'] = (Number(this.columns) * 100)/(Number(this.totalColumns)) + '%';
         this.updateStyles();
         this.async(function() {
           var columns = this.querySelectorAll('.column');

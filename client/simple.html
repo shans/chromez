@@ -4,6 +4,7 @@
 <link rel="import" href="cz-milestones-dash.html">
 <link rel="import" href="cz-review-load-dash.html">
 <link rel="import" href="cz-cardview.html">
+<link rel="import" href="cz-dashview.html">
 <link rel="import" href="cz-calendar-feed-source.html">
 
 <script src="chromez-api.js"></script>
@@ -31,20 +32,6 @@ paper-material, paper-card {
   padding-top: 0;
 }
 
-.distribute {
-  display: flex;
-  flex-wrap: wrap;
-  flex-direction: column;
-  max-height: 100%;
-  align-content: center;
-  padding: 10px;
-}
-
-.distribute > * {
-  width: calc(25% - 20px);
-  margin: 10px;
-}
-
 cz-cardview paper-card {
   margin-bottom: 5px;
 }
@@ -59,10 +46,25 @@ cz-cardview {
   <cz-config id=config></cz-config>
 </cz-registry>
 
-<div class='distribute'>
-<cz-cardview id='feed' columns=2></cz-cardview>
-</div>
+<cz-dashview id='dash' total-columns=4 columns=2>
+  <cz-cardview id='feed' total-columns=4 columns=2></cz-cardview>
+</cz-dashview>
 
 <script>
 registerSource('cz-config', 'dashes', dashes => dashes.forEach(a => addDash(a, feed)));
+registerSource('cz-config', 'cardview-columns', cvColumns => { 
+  if (cvColumns) {
+    feed.columns = cvColumns;
+    feed.totalColumns = Number(cvColumns) + Number(dash.columns);
+    dash.totalColumns = Number(cvColumns) + Number(dash.columns);
+  }
+});
+registerSource('cz-config', 'dashview-columns', dvColumns => { 
+  if (dvColumns) {
+    dash.columns = dvColumns;
+    feed.totalColumns = Number(dvColumns) + Number(feed.columns);
+    dash.totalColumns = Number(dvColumns) + Number(feed.columns);
+  }
+});
 </script>
+
