@@ -33,8 +33,8 @@
   "cz-review-load-dash"
 ],
 "timezones": [
-  {"city": "MTV", "timezone": "US/Pacific", "local": true},
   {"city": "RES", "timezone": "US/Eastern"},
-  {"city": "PAR", "timezone": "Europe/Paris"}
+  {"city": "PAR", "timezone": "Europe/Paris"},
+  {"city": "MTV", "timezone": "US/Pacific"}
   ]
 }
