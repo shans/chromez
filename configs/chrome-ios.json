@@ -24,12 +24,12 @@
   {"user": "Yuke", "email": "liaoyuke@chromium.org"},
   {"user": "Sylvain", "email": "sdefresne@chromium.org"},
   {"user": "Lindsay", "email": "lindsayw@chromium.org"},
-  {"user": "Sana", "email": "smut@chromium.org"},
+  {"user": "Sana", "email": "smut@google.com"},
   {"user": "Sergey", "email": "sergeyberezin@chromium.org"}
 ],
 "dashes": [
   "cz-clock-dash",
-  "cz-review-latency-dash(true)",
+  "cz-review-latency-dash(true,max)",
   "cz-review-load-dash"
 ],
 "timezones": [
