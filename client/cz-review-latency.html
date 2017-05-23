@@ -20,6 +20,7 @@
           }
 
           var issues = data.results.map(fastAnnotate);
+          var maxLatency = query.maxLatency
 
           var latency = 0;
           var abandonedBugs = [];
@@ -35,12 +36,22 @@
               if (soleLatency + sharedLatency > 24 * 31) {
                 abandonedBugs.push(issue.issue);
               } else {
-                latency += soleLatency;
+                if (maxLatency) {
+                  if (soleLatency > latency) {
+                    latency = soleLatency
+                  }
+                  if (sharedLatency > multipleLatency){
+                    multipleLatency = sharedLatency;
+                  }
+                } else { // Get the total latency instead
+                  latency += soleLatency;
+                  multipleLatency += sharedLatency;
+                }
+
                 if (soleLatency > 0) {
                   latencyPerBug.push({subject: issue.subject, owner: issue.owner,
                                     issue: issue.issue, latency: soleLatency});
                 }
-                multipleLatency += sharedLatency;
                 if (sharedLatency > 0)
                   multipleOutstanding.push({subject: issue.subject, owner: issue.owner,
                                           issue: issue.issue, latency: sharedLatency})
