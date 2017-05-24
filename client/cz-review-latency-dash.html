@@ -148,10 +148,10 @@
         return list.length;
       },
 
-      usersChanged: function(users, showMaxLatency) {
+      usersChanged: function(users) {
         // TODO: this probably only works for all-or-nothing changes to users right now.
         users.forEach(function(user, idx) {
-          registerSource('cz-review-latency', {user: user.user, email: user.email, maxLatency: showMaxLatency}, function(data) {
+          registerSource('cz-review-latency', {user: user.user, email: user.email, maxLatency: this.showMaxLatency}, function(data) {
             if (data.error) {
               this.set('users.' + idx + '.data', data);
               return;
