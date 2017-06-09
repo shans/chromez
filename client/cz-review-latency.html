@@ -1,5 +1,6 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <script src="codereview-summarize.js"></script>
+<script src="latency-info.js"></script>
 
 <dom-module id="cz-review-latency">
 
@@ -24,20 +25,10 @@
 
           var results = {};
 
-          function newEmailDataChunk() {
-            return {
-              latency: 0,
-              abandonedBugs: [],
-              latencyPerBug: [],
-              multipleOutstanding: [],
-              multipleLatency: 0
-            };
-          }
-
           issues.forEach(issue => {
             for (var email in issue.pendingWaiting) {
               if (results[email] == undefined) {
-                results[email] = newEmailDataChunk();
+                results[email] = new LatencyInfo();
               }
 
               var soleLatency = issue.pendingWaiting[email].sole / 1000 / 60 / 60;
