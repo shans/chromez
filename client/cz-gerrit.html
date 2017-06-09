@@ -1,0 +1,35 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+<script src="chromez-behaviors.js"></script>
+
+<dom-module id="cz-gerrit">
+
+  <template>
+    <template is="dom-repeat" items="{{searchQueries}}">
+      <iron-ajax
+        auto
+        params="{{item.params}}"
+        url="redirect/?"
+        on-response="handleResponse"></iron-ajax>
+    </template>
+  </template>
+
+  <script>
+    Polymer({
+      is: "cz-gerrit",
+      behaviors: [ChromeZBehaviors.AJAXBehavior],
+
+      registerQuery: function(query, callback) {
+        if (query.type == 'search') {
+          this.addCallbackToQuery(query, callback,
+              {
+                site: 'gerrit',
+                q: `reviewer:${query.user}+is:open+limit:100`,
+                o: "MESSAGES"
+              });
+        }
+      }
+    });
+  </script>
+
+</dom-module>
