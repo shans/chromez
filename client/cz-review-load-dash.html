@@ -120,6 +120,7 @@
         users.forEach(function(user, idx) {
           registerSource('cz-review-latency', {user: user.user, email: user.email}, function(data) {
             // this.users[idx].data = data;
+            data = data[user.email] || new LatencyInfo();
             this.set('users.' + idx + '.data', data);
             if (++count == users.length)
               this.set('userCounts', this.users);
