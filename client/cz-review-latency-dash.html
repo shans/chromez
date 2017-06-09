@@ -152,6 +152,13 @@
         // TODO: this probably only works for all-or-nothing changes to users right now.
         users.forEach(function(user, idx) {
           registerSource('cz-review-latency', {user: user.user, email: user.email, maxLatency: this.showMaxLatency}, function(data) {
+            data = data[user.email] || {
+              latency: 0,
+              abandonedBugs: [],
+              latencyPerBug: [],
+              multipleOutstanding: [],
+              multipleLatency: 0
+            };
             if (data.error) {
               this.set('users.' + idx + '.data', data);
               return;

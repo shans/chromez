@@ -22,45 +22,53 @@
           var issues = data.results.map(fastAnnotate);
           var maxLatency = query.maxLatency
 
-          var latency = 0;
-          var abandonedBugs = [];
-          var latencyPerBug = [];
-          var multipleOutstanding = [];
-          var multipleLatency = 0;
+          var results = {};
+
+          function newEmailDataChunk() {
+            return {
+              latency: 0,
+              abandonedBugs: [],
+              latencyPerBug: [],
+              multipleOutstanding: [],
+              multipleLatency: 0
+            };
+          }
 
           issues.forEach(issue => {
-            if (issue.pendingWaiting[query.email]) {
-              var soleLatency = issue.pendingWaiting[query.email].sole / 1000 / 60 / 60;
-              var sharedLatency = issue.pendingWaiting[query.email].shared / 1000 / 60 / 60;
+            for (var email in issue.pendingWaiting) {
+              if (results[email] == undefined) {
+                results[email] = newEmailDataChunk();
+              }
+
+              var soleLatency = issue.pendingWaiting[email].sole / 1000 / 60 / 60;
+              var sharedLatency = issue.pendingWaiting[email].shared / 1000 / 60 / 60;
 
               if (soleLatency + sharedLatency > 24 * 31) {
-                abandonedBugs.push(issue.issue);
+                results[email].abandonedBugs.push(issue.issue);
               } else {
                 if (maxLatency) {
-                  if (soleLatency > latency) {
-                    latency = soleLatency
+                  if (soleLatency > results[email].latency) {
+                    results[email].latency = soleLatency
                   }
-                  if (sharedLatency > multipleLatency){
-                    multipleLatency = sharedLatency;
+                  if (sharedLatency > results[email].multipleLatency){
+                    results[email].multipleLatency = sharedLatency;
                   }
                 } else { // Get the total latency instead
-                  latency += soleLatency;
-                  multipleLatency += sharedLatency;
+                  results[email].latency += soleLatency;
+                  results[email].multipleLatency += sharedLatency;
                 }
 
                 if (soleLatency > 0) {
-                  latencyPerBug.push({subject: issue.subject, owner: issue.owner,
+                  results[email].latencyPerBug.push({subject: issue.subject, owner: issue.owner,
                                     issue: issue.issue, latency: soleLatency});
                 }
                 if (sharedLatency > 0)
-                  multipleOutstanding.push({subject: issue.subject, owner: issue.owner,
+                  results[email].multipleOutstanding.push({subject: issue.subject, owner: issue.owner,
                                           issue: issue.issue, latency: sharedLatency})
               }
             }
           });
-          callback({latency: latency, abandonedBugs: abandonedBugs,
-                    latencyPerBug: latencyPerBug, multipleLatency: multipleLatency,
-                    multipleOutstanding: multipleOutstanding});
+          callback(results);
         }.bind(this));
       }
     });
