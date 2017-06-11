@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+
+<link rel="import" href="cz-registry.html">
+<script src="chromez-api.js"></script>
+
+<cz-registry>
+</cz-registry>
+
+<script>
+
+function HTMLify(data) {
+  var s = "";
+  if (typeof data == "object") {
+    if (data.length) {
+      s += "<ul>"
+      for (var e of data)
+        s += `<li>${HTMLify(e)}</li>`;
+      s += "</ul>"
+    } else {
+      for (var key in data) {
+        s += `${key}: ${HTMLify(data[key])}<br>`
+      }
+    }
+  } else {
+    s = JSON.stringify(data);
+  }
+  return s;
+}
+
+registerSource("cz-gerrit", {q: "reviewer:cmasso@chromium.org", type: 'query'}, function(data) {
+  data = JSON.parse(data);
+
+  document.documentElement.innerHTML = HTMLify(data);
+});
+</script>

@@ -28,6 +28,19 @@
                 o: "MESSAGES"
               });
         }
+        if (query.type == 'query') {
+          this.addCallbackToQuery(query, callback,
+              {
+                site: 'gerrit',
+                q: query.q,
+                o: "MESSAGES"
+              });
+
+        }
+      },
+
+      onResponse: function(data) {
+        return JSON.parse(data);
       }
     });
   </script>
