@@ -26,7 +26,7 @@
       <div class='card-content' id='cardview'>
         <template is='dom-repeat' items='{{reviews}}' sort="compareReviews">
           <div><b>{{item.creator}}</b> has been waiting {{item.duration}} on
-            <a href="{{issueLink(item.issue)}}" target="blank">{{item.issue}}</a></div>
+            <a href="{{issueLink(item)}}" target="blank">{{item.issue}}</a></div>
           <div class='title'>{{item.title}}</div>
         </template>
       </div>
@@ -53,8 +53,10 @@
         return 0;
       },
 
-      issueLink(number) {
-        return "https://codereview.chromium.org/" + number;
+      issueLink(item) {
+        if (item.source == 'codereview')
+          return "https://codereview.chromium.org/" + item.issue;
+        return "https://chromium-review.googlesource.com/c/" + item.issue;
       }
 
     });

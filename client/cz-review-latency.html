@@ -78,11 +78,11 @@
 
               if (soleLatency > 0) {
                 results[email].latencyPerBug.push({subject: issue.subject, owner: issue.owner,
-                                  issue: issue.issue, latency: soleLatency});
+                                  issue: issue.issue, latency: soleLatency, source: issue.source});
               }
               if (sharedLatency > 0)
                 results[email].multipleOutstanding.push({subject: issue.subject, owner: issue.owner,
-                                        issue: issue.issue, latency: sharedLatency})
+                                        issue: issue.issue, latency: sharedLatency, source: issue.source})
             }
           }
         });

@@ -172,13 +172,13 @@
             card.reviews = data.latencyPerBug.map(function(bug) {
               return { title: bug.subject, creator: bug.owner,
                        issue: bug.issue, duration: this.hourString(bug.latency),
-                       numericDuration: bug.latency}
+                       numericDuration: bug.latency, source: bug.source}
             }.bind(this));
             card.priority = 'high';
             sharedCard.reviews = data.multipleOutstanding.map(function(bug) {
               return { title: bug.subject, creator: bug.owner,
                        issue: bug.issue, duration: this.hourString(bug.latency),
-                       numericDuration: bug.latency}
+                       numericDuration: bug.latency, source: bug.source}
             }.bind(this));
             sharedCard.priority = 'medium';
 

@@ -26,6 +26,8 @@ function fastAnnotate(data) {
   generateEffectiveReviewers(data);
   classifyWaitingType(data);
   computeAggregateWaitingTimes(data);
+  addCodereviewStyleInfo(data);
+  data.source = 'gerrit';  
   return data;
 }
 
@@ -306,6 +308,11 @@ function computeAggregateWaitingTimes(data) {
       break;
     }
   }
+}
+
+function addCodereviewStyleInfo(data) {
+  data.owner = data.owner.email;
+  data.issue = data._number;
 }
 
 return fastAnnotate;
