@@ -23,6 +23,7 @@ function fastAnnotate(data) {
   determineCommentCount(data);
   addNormalizedNames(data);
   computeAggregateWaitingTimes(data);
+  data.source = 'codereview';
   return data;
 }
 
