@@ -1,5 +1,6 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <script src="codereview-summarize.js"></script>
+<script src="gerrit-summarize.js"></script>
 <script src="latency-info.js"></script>
 
 <dom-module id="cz-review-latency">
@@ -8,59 +9,83 @@
   </template>
 
   <script>
+    var PENDING = 0;
+    var COMPLETE = 1;
+    var ERROR = 2;
+
     Polymer({
       is: "cz-review-latency",
 
       registerQuery: function(query, callback) {
-        registerSource("cz-codereview", {user: query.email, type: 'search', isOwner: query.isOwner}, function(data) {
-
+        var results = {};
+        var codereviewState = PENDING;
+        var gerritState = PENDING;
+        registerSource("cz-codereview", {user: query.email, type: 'search', isOwner: query.isOwner}, data => {
           if (data == null) {
             // invalid user
-            callback({error: "user not found"});
-            return;
+            codereviewState = ERROR;
+            if (gerritState == ERROR)
+              callback({error: "user not found"});
+          } else {
+            var issues = data.results.map(issue => fastAnnotate(issue));
+            this.processData(issues, query.maxLatency, results);
+            codereviewState = COMPLETE;
+            if (gerritState != PENDING)
+              callback(results);
           }
+        });
+        registerSource("cz-gerrit", {user: query.email, type: 'search', isOwner: query.isOwner}, data => {
+          if (data == null) {
+            // invalid user
+            gerritState = ERROR;
+            if (codereviewState == ERROR)
+              callback({error: "user not found"});
+          } else {
+            var issues = data.map(issue => fastAnnotateGerrit(issue));
+            this.processData(issues, query.maxLatency, results);
+            gerritState = COMPLETE;
+            if (codereviewState != PENDING)
+              callback(results);
+          }          
+        });
+      },
 
-          var issues = data.results.map(fastAnnotate);
-          var maxLatency = query.maxLatency
+      processData: function(issues, maxLatency, results) {
 
-          var results = {};
-
-          issues.forEach(issue => {
-            for (var email in issue.pendingWaiting) {
-              if (results[email] == undefined) {
-                results[email] = new LatencyInfo();
-              }
-
-              var soleLatency = issue.pendingWaiting[email].sole / 1000 / 60 / 60;
-              var sharedLatency = issue.pendingWaiting[email].shared / 1000 / 60 / 60;
-
-              if (soleLatency + sharedLatency > 24 * 31) {
-                results[email].abandonedBugs.push(issue.issue);
-              } else {
-                if (maxLatency) {
-                  if (soleLatency > results[email].latency) {
-                    results[email].latency = soleLatency
-                  }
-                  if (sharedLatency > results[email].multipleLatency){
-                    results[email].multipleLatency = sharedLatency;
-                  }
-                } else { // Get the total latency instead
-                  results[email].latency += soleLatency;
-                  results[email].multipleLatency += sharedLatency;
-                }
-
-                if (soleLatency > 0) {
-                  results[email].latencyPerBug.push({subject: issue.subject, owner: issue.owner,
-                                    issue: issue.issue, latency: soleLatency});
-                }
-                if (sharedLatency > 0)
-                  results[email].multipleOutstanding.push({subject: issue.subject, owner: issue.owner,
-                                          issue: issue.issue, latency: sharedLatency})
-              }
+        issues.forEach(issue => {
+          for (var email in issue.pendingWaiting) {
+            if (results[email] == undefined) {
+              results[email] = new LatencyInfo();
             }
-          });
-          callback(results);
-        }.bind(this));
+
+            var soleLatency = issue.pendingWaiting[email].sole / 1000 / 60 / 60;
+            var sharedLatency = issue.pendingWaiting[email].shared / 1000 / 60 / 60;
+
+            if (soleLatency + sharedLatency > 24 * 31) {
+              results[email].abandonedBugs.push(issue.issue);
+            } else {
+              if (maxLatency) {
+                if (soleLatency > results[email].latency) {
+                  results[email].latency = soleLatency
+                }
+                if (sharedLatency > results[email].multipleLatency){
+                  results[email].multipleLatency = sharedLatency;
+                }
+              } else { // Get the total latency instead
+                results[email].latency += soleLatency;
+                results[email].multipleLatency += sharedLatency;
+              }
+
+              if (soleLatency > 0) {
+                results[email].latencyPerBug.push({subject: issue.subject, owner: issue.owner,
+                                  issue: issue.issue, latency: soleLatency});
+              }
+              if (sharedLatency > 0)
+                results[email].multipleOutstanding.push({subject: issue.subject, owner: issue.owner,
+                                        issue: issue.issue, latency: sharedLatency})
+            }
+          }
+        });
       }
     });
   </script>
