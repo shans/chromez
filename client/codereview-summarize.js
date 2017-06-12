@@ -363,6 +363,13 @@ function computeAggregateWaitingTimes(data) {
       var now = Date.now() + (new Date()).getTimezoneOffset() * 60 * 1000;
       data.pendingWaiting[reviewer][alloc] += now - Date.parse(message.date);
     });
+  } else if (type == "waiting for author"){
+    var alloc = (message.reviewers.length == 1 ? "sole" : "shared");
+    if (data.pendingWaiting[data.owner_email] == undefined) {
+      data.pendingWaiting[data.owner_email] = { sole: 0, shared: 0};
+    }
+    var now = Date.now() + (new Date()).getTimezoneOffset() * 60 * 1000;
+    data.pendingWaiting[data.owner_email][alloc] += now - Date.parse(message.date);
   } else {
     return;
   }

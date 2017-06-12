@@ -1,0 +1,132 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../bower_components/paper-item/paper-item-body.html">
+<link rel="import" href="../bower_components/paper-badge/paper-badge.html">
+
+<dom-module id="cz-outgoing-author-actions-dash">
+
+  <template>
+    <style>
+
+      paper-card .card-flex {
+        display: flex;
+        flex-wrap: wrap;
+        align-content: flex-start;
+      }
+
+      paper-item {
+        width: 50%;
+        box-sizing: border-box;
+      }
+
+      .avatar {
+        display: inline-block;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        margin-right: 10px;
+        overflow: hidden;
+        background: #ccc;
+      }
+
+      .avatar.red {
+        background-color: #e57373;
+      }
+
+      .avatar.amber {
+        background-color: #ffd54f;
+      }
+
+      .avatar.green {
+        background-color: #81c784;
+      }
+
+      paper-badge {
+        --paper-badge-background: var(--paper-blue-300);
+      }
+    </style>
+      <paper-card id='card' heading='Outgoing Reviews: Author Actions'>
+        <div class="card-content">
+          <div class='card-flex'>
+            <template is="dom-repeat" items="{{users}}"
+                      observe="data" sort="sortUsers">
+              <paper-item>
+                <div class$="avatar {{threshold(item.data, userCounts)}}">
+                  <template is="dom-if" if="{{count(item.data)}}">
+                    <paper-badge label="{{count(item.data)}}"></paper-badge>
+                  </template>
+                </div>
+                <paper-item-body>
+                  <div>{{item.user}}</div>
+                </paper-item-body>
+              </paper-item>
+            </template>
+          </div>
+        </div>
+      </paper-card>
+  </template>
+  <script>
+    Polymer({
+      is: "cz-outgoing-author-actions-dash",
+
+      properties: {
+        users: {
+          type: 'Object',
+          value: function() { return []; },
+          observer: "usersChanged",
+        },
+        userCounts: {
+          type: 'Object',
+          value: function() { return []; },
+        }
+      },
+
+      sortUsers: function(a, b) {
+        if (a.user < b.user)
+          return -1;
+        if (a.user > b.user)
+          return 1;
+        return 0;
+      },
+
+      threshold: function(data, users) {
+        var counts = users.map(user => this.count(user.data));
+        if (counts.length == 0)
+          return '';
+        counts = counts.sort(function(a, b) { if (a < b) return -1; if (a > b) return 1; return 0;});
+        if (counts[Math.floor(counts.length / 3)] >= this.count(data))
+          return 'green';
+        if (counts[Math.floor(counts.length * 2 / 3)] >= this.count(data))
+          return 'amber';
+        return 'red';
+      },
+
+      count: function(data) {
+        if (data == undefined || data.error)
+          return '-';
+        return data.latencyPerBug.length + data.multipleOutstanding.length;
+      },
+
+      attached: function() {
+        registerSource('cz-config', 'users', function(users) {
+          this.set('users', users);
+        }.bind(this));
+      },
+
+      usersChanged: function(users) {
+        var count = 0;
+        users.forEach(function(user, idx) {
+          registerSource('cz-review-latency', {user: user.user, email: user.email, isOwner: 'true'}, function(data) {
+            // this.users[idx].data = data;
+            data = data[user.email] || new LatencyInfo();
+            this.set('users.' + idx + '.data', data);
+            if (++count == users.length)
+              this.set('userCounts', this.users);
+          }.bind(this));
+        }.bind(this));
+      }
+
+    });
+  </script>
+</dom-module>
