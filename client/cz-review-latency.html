@@ -12,7 +12,7 @@
       is: "cz-review-latency",
 
       registerQuery: function(query, callback) {
-        registerSource("cz-codereview", {user: query.email, type: 'search'}, function(data) {
+        registerSource("cz-codereview", {user: query.email, type: 'search', isOwner: query.isOwner}, function(data) {
 
           if (data == null) {
             // invalid user
