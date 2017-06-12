@@ -21,14 +21,25 @@
 
       registerQuery: function(query, callback) {
         if (query.type == 'search') {
-          this.addCallbackToQuery(query, callback,
-              {
-                reviewer: query.user,
-                closed: 3,
-                format: 'json',
-                with_messages: 'True',
-                limit: 100
-              });
+          if (query.isOwner){
+            this.addCallbackToQuery(query, callback,
+                {
+                  owner: query.user,
+                  closed: 3,
+                  format: 'json',
+                  with_messages: 'True',
+                  limit: 100
+                });
+          } else {
+            this.addCallbackToQuery(query, callback,
+                {
+                  reviewer: query.user,
+                  closed: 3,
+                  format: 'json',
+                  with_messages: 'True',
+                  limit: 100
+                });
+          }
         }
       }
     });
