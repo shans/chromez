@@ -41,8 +41,20 @@ class MainPage(webapp2.RequestHandler):
           self.response.write(json.dumps(result))
       elif self.request.get('site') == 'comments':
           urlfetch.set_default_fetch_deadline(10)
+          startIndex = self.request.get('start')
+
+          try:
+            startIndex = int(startIndex)
+          except:
+            startIndex = 0
+
+          maxResults = self.request.get('max')
+          try:
+            maxResults = int(maxResults)
+          except:
+            maxResults = 0
           self.response.headers.add_header("Access-Control-Allow-Origin", "*")
-          result = monorail.issues().comments().list(projectId='chromium', issueId=self.request.get('issueId')).execute()
+          result = monorail.issues().comments().list(projectId='chromium', issueId=self.request.get('issueId'), maxResults=max, startIndex=startIndex).execute()
           self.response.write(json.dumps(result))
       elif self.request.get('site') == 'gerrit':
           urlfetch.set_default_fetch_deadline(10)
