@@ -21,12 +21,21 @@
 
       registerQuery: function(query, callback) {
         if (query.type == 'search') {
-          this.addCallbackToQuery(query, callback,
-              {
-                site: 'gerrit',
-                q: `reviewer:${query.user}+is:open+limit:100`,
-                o: "MESSAGES"
-              });
+          if (query.isOwner) {
+            this.addCallbackToQuery(query, callback,
+                {
+                  site: 'gerrit',
+                  q: `owner:${query.user}+is:open+limit:100`,
+                  o: "MESSAGES"
+                });
+          } else {
+            this.addCallbackToQuery(query, callback,
+                {
+                  site: 'gerrit',
+                  q: `reviewer:${query.user}+is:open+limit:100`,
+                  o: "MESSAGES"
+                });
+          }
         }
         if (query.type == 'query') {
           this.addCallbackToQuery(query, callback,
