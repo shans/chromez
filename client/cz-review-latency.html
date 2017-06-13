@@ -30,8 +30,12 @@
             var issues = data.results.map(issue => fastAnnotate(issue));
             this.processData(issues, query.maxLatency, results);
             codereviewState = COMPLETE;
-            if (gerritState != PENDING)
+            if (gerritState != PENDING) {
               callback(results);
+              results = {};
+              codereviewState = PENDING;
+              gerritState = PENDING;
+            }
           }
         });
         registerSource("cz-gerrit", {user: query.email, type: 'search', isOwner: query.isOwner}, data => {
@@ -44,8 +48,12 @@
             var issues = data.map(issue => fastAnnotateGerrit(issue));
             this.processData(issues, query.maxLatency, results);
             gerritState = COMPLETE;
-            if (codereviewState != PENDING)
+            if (codereviewState != PENDING) {
               callback(results);
+              results = {};
+              codereviewState = PENDING;
+              gerritState = PENDING;              
+            }
           }          
         });
       },
