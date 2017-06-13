@@ -17,24 +17,35 @@
       is: "cz-review-latency",
 
       registerQuery: function(query, callback) {
-        var results = {};
         var codereviewState = PENDING;
         var gerritState = PENDING;
+
+        var codereviewResults = {};
+        var gerritResults = {};
+
+        var complete = function(data) {
+          if (data)
+            callback(data);
+          else {
+            var result = this.merge(codereviewResults, gerritResults);
+            callback(result);
+          }
+          codereviewState = PENDING;
+          gerritState = PENDING;
+        }.bind(this);
+
         registerSource("cz-codereview", {user: query.email, type: 'search', isOwner: query.isOwner}, data => {
           if (data == null) {
             // invalid user
             codereviewState = ERROR;
             if (gerritState == ERROR)
-              callback({error: "user not found"});
+              complete({error: "user not found"});
           } else {
             var issues = data.results.map(issue => fastAnnotate(issue));
-            this.processData(issues, query.maxLatency, results);
+            codereviewResults = this.processData(issues, query.maxLatency);
             codereviewState = COMPLETE;
             if (gerritState != PENDING) {
-              callback(results);
-              results = {};
-              codereviewState = PENDING;
-              gerritState = PENDING;
+              complete();
             }
           }
         });
@@ -43,22 +54,52 @@
             // invalid user
             gerritState = ERROR;
             if (codereviewState == ERROR)
-              callback({error: "user not found"});
+              complete({error: "user not found"});
           } else {
             var issues = data.map(issue => fastAnnotateGerrit(issue));
-            this.processData(issues, query.maxLatency, results);
+            gerritResults = this.processData(issues, query.maxLatency);
             gerritState = COMPLETE;
             if (codereviewState != PENDING) {
-              callback(results);
-              results = {};
-              codereviewState = PENDING;
-              gerritState = PENDING;              
+              complete();
             }
           }          
         });
       },
 
-      processData: function(issues, maxLatency, results) {
+      merge: function(r1, r2) {
+        var results = {};
+        for (var email in r1) {
+          this.addToResults(results, r1, email);
+        }
+        for (var email in r2) {
+          this.addToResults(results, r2, email);
+        }
+
+        return results;
+      },
+
+      addToResults: function(results, object, key) {
+        if (results[key] == undefined) {
+          results[key] = {
+            latency: object[key].latency,
+            multipleLatency: object[key].latency,
+            abandonedBugs: object[key].abandonedBugs.slice(),
+            latencyPerBug: object[key].latencyPerBug.slice(),
+            multipleOutstanding: object[key].multipleOutstanding.slice()
+          }
+          return;
+        }
+
+        results[key].latency += object[key].latency;
+        results[key].multipleLatency += object[key].multipleLatency;
+        results[key].abandonedBugs = results[key].abandonedBugs.concat(object[key].abandonedBugs);
+        results[key].latencyPerBug = results[key].latencyPerBug.concat(object[key].latencyPerBug);
+        results[key].multipleOutstanding = results[key].multipleOutstanding.concat(object[key].multipleOutstanding);
+      },
+
+      processData: function(issues, maxLatency) {
+
+        var results = {};
 
         issues.forEach(issue => {
           for (var email in issue.pendingWaiting) {
@@ -94,6 +135,8 @@
             }
           }
         });
+
+        return results;
       }
     });
   </script>
