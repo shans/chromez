@@ -148,6 +148,25 @@ function generateEffectiveReviewers(data) {
     }
     mergedMessages.push(message);
   }
+
+  var newReviewers = reviewerUpdates.filter(update => update.state == "REVIEWER");
+  if (newReviewers.length > 0) {
+    reviewers = reviewers.concat(newReviewers.map(update => update.reviewer.email));
+    var updated = newReviewers[0].updated;
+
+    if (mergedMessages.length == 0)
+      var previousTimestamp = updated;
+    else
+      var previousTimestamp = mergedMessages[mergedMessages.length - 1].date;
+    mergedMessages.push({
+      date: updated,
+      delta: Date.parse(updated) - Date.parse(previousTimestamp),
+      reviewers,
+      type: ChangedReviewers
+    });
+    message.delta -= mergedMessages[mergedMessages.length - 1].delta;
+  }
+
   data.messages = mergedMessages;
 }
 
