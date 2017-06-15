@@ -42,19 +42,19 @@ class MainPage(webapp2.RequestHandler):
       elif self.request.get('site') == 'comments':
           urlfetch.set_default_fetch_deadline(10)
           startIndex = self.request.get('start')
-
           try:
             startIndex = int(startIndex)
           except:
             startIndex = 0
-
           maxResults = self.request.get('max')
           try:
             maxResults = int(maxResults)
+            if (maxResults > 200)
+              console.error('You can only fetch 200 comments at a time. If you need to fetch more comments than that please paginate using the startIndex.')
           except:
             maxResults = 0
           self.response.headers.add_header("Access-Control-Allow-Origin", "*")
-          result = monorail.issues().comments().list(projectId='chromium', issueId=self.request.get('issueId'), maxResults=max, startIndex=startIndex).execute()
+          result = monorail.issues().comments().list(projectId='chromium', issueId=self.request.get('issueId'), maxResults=maxResults, startIndex=startIndex).execute()
           self.response.write(json.dumps(result))
       elif self.request.get('site') == 'gerrit':
           urlfetch.set_default_fetch_deadline(10)
