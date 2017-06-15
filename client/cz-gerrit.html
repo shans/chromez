@@ -49,7 +49,11 @@
       },
 
       onResponse: function(data) {
-        return JSON.parse(data);
+        try {
+          return JSON.parse(data);
+        } catch (e) {
+          return null;
+        }
       }
     });
   </script>
