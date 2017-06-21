@@ -51,7 +51,7 @@ class MainPage(webapp2.RequestHandler):
             maxResults = int(maxResults)
             if (maxResults > 200):
               maxResults = 200
-              console.error('You can only fetch 200 comments at a time. If you need to fetch more comments than that please paginate using the startIndex.')
+              logging.error('You can only fetch 200 comments at a time. If you need to fetch more comments than that please paginate using the startIndex.')
           except:
             maxResults = 0
           self.response.headers.add_header("Access-Control-Allow-Origin", "*")
