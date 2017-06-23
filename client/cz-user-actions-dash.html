@@ -17,6 +17,11 @@
 	  <div class="card-content">
         <div class='card-flex'>
           <template is="dom-repeat" items="{{users}}">
+            <div class='from-reviews'>
+              <template is="dom-repeat" items="{{item.fromReviews}}">
+                <div class='user-box'>{{item.user}}</div>
+              </template>
+            </div>
           	<div class='user-box'>{{item.user}}</div>
           </template>
         </div>
@@ -41,9 +46,16 @@
       },
 
       usersChanged: function(users) {
-      	users.forEach(function(user, idx) {
+      	users.forEach((user, idx) => {
           registerSource('cz-review-latency', {user: user.user, email: user.email}, data => {
-
+            var fromReviews = [];
+            for (var fromUser in data) {
+              for (var bug of data[fromUser].latencyPerBug) {
+                console.log(user, fromUser, bug);
+                fromReviews.push({user: fromUser});
+              }
+            }
+            this.set('users.' + idx + '.fromReviews', fromReviews);
           });
       	});
       }
