@@ -13,16 +13,20 @@ class MainPage(webapp2.RequestHandler):
       credentials = AppAssertionCredentials(scope)
       http = credentials.authorize(Http())
 
-      DISCOVERY_URL = (
+      MONORAIL_DISCOVERY_URL = (
         'https://monorail-prod.appspot.com/_ah/api/discovery/v1/apis/'
         '{api}/{apiVersion}/rest'
       )
 
       monorail = build(
         'monorail', 'v1',
-        discoveryServiceUrl=DISCOVERY_URL,
+        discoveryServiceUrl=MONORAIL_DISCOVERY_URL,
         http=http
       )
+
+      scope = "https://www.googleapis.com/auth/gerritcodereview"
+      auth_token, _ = app_identity.get_access_token(scope)
+
       if self.request.get('site') == 'issues':
           urlfetch.set_default_fetch_deadline(10)
           startIndex = self.request.get('start')
@@ -47,7 +51,9 @@ class MainPage(webapp2.RequestHandler):
       elif self.request.get('site') == 'gerrit':
           urlfetch.set_default_fetch_deadline(10)
           self.response.headers.add_header("Access-Control-Allow-Origin", "*")
-          result = urlfetch.fetch("https://chromium-review.googlesource.com/changes/?q=" + self.request.get('q') + "&o=" + self.request.get('o') + "&o=DETAILED_ACCOUNTS&o=REVIEWER_UPDATES")
+          result = urlfetch.fetch(url="https://chromium-review.googlesource.com/a/changes/?q=" 
+            + self.request.get('q') + "&o=" + self.request.get('o') + "&o=DETAILED_ACCOUNTS&o=REVIEWER_UPDATES",
+            headers={"Authorization": "Bearer " + auth_token});
           self.response.write(json.dumps(result.content[5:]));
 app = webapp2.WSGIApplication([
     ('/.*', MainPage),
