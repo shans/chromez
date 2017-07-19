@@ -364,27 +364,31 @@ function computeAggregateWaitingTimes(data) {
 
   if (type == WaitingForReview) {
     var alloc = (message.reviewers.length == 1 ? "sole" : "shared");
+    let reviewers = new Set(message.reviewers);
+    for (var i = data.messages.length - 1; i >= 1 && data.messages[i].type == WaitingForReview; i--) {
+      let message = data.messages[i];
+      let previousMessage = data.messages[i - 1];
+      if (previousMessage.type != WaitingForReview) {
+        break;
+      }
+      for (let reviewer of reviewers.entries()) {
+        if (previousMessage.reviewers.includes(reviewer)) {
+          var alloc = (previousMessage.reviewers.length == 1 ? "sole" : "shared");
+          if (data.pendingWaiting[reviewer] == undefined) {
+            data.pendingWaiting[reviewer] = { sole: 0, shared: 0};
+          }
+          data.pendingWaiting[reviewer][alloc] += message.delta;
+        } else {
+          reviewers.delete(reviewer);
+        }
+      }
+    }
     message.reviewers.forEach(reviewer => {
       if (data.pendingWaiting[reviewer] == undefined) {
         data.pendingWaiting[reviewer] = { sole: 0, shared: 0};
       }
       data.pendingWaiting[reviewer][alloc] += finalDelta;
     });
-    for (var i = data.messages.length -1; i >= 0; i--) {
-      type = (i == 0 ? Other : data.messages[i - 1].waitClass);
-      message = data.messages[i];
-      if (type == WaitingForReview) {
-        var alloc = (message.reviewers.length == 1 ? "sole" : "shared");
-        message.reviewers.forEach(reviewer => {
-          if (data.pendingWaiting[reviewer] == undefined) {
-            data.pendingWaiting[reviewer] = { sole: 0, shared: 0};
-          }
-          data.pendingWaiting[reviewer][alloc] += message.delta;
-        });
-      } else {
-        break;
-      }
-    }
   } else if (type == WaitingForAuthor){
     var alloc = (message.reviewers.length == 1 ? "sole" : "shared");
     if (data.pendingWaiting[data.owner_email] == undefined) {
