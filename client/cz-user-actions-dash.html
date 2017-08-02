@@ -16,7 +16,7 @@
 	<paper-card id='card' heading='Pending User Actions'>
 	  <div class="card-content">
         <div class='card-flex'>
-          <template is="dom-repeat" items="{{users}}">
+          <template is="dom-repeat" items="{{users}}" sort="sortUsers">
             <div class='from-reviews'>
               <template is="dom-repeat" items="{{item.fromReviews}}">
                 <div class='user-box'>{{item.user}}</div>
@@ -41,6 +41,14 @@
         }
       },
 
+      sortUsers: function(a, b) {
+        if (a.user < b.user)
+          return -1;
+        if (a.user > b.user)
+          return 1;
+        return 0;
+      },
+
       attached: function() {
         registerSource('cz-config', 'users', users => this.set('users', users));
       },
@@ -52,7 +60,7 @@
             for (var fromUser in data) {
               for (var bug of data[fromUser].latencyPerBug) {
                 console.log(user, fromUser, bug);
-                fromReviews.push({user: fromUser});
+                fromReviews.push({user: bug.owner});
               }
             }
             this.set('users.' + idx + '.fromReviews', fromReviews);
@@ -62,5 +70,3 @@
     });
   </script>
 </dom-module>
-
-
