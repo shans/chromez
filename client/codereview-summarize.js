@@ -348,6 +348,8 @@ function computeAggregateWaitingTimes(data) {
   var type = Other;
   data.waitingTimes = {};
   data.pendingWaiting = {};
+  if (data.messages.length == 0)
+    return;
   for (var message of data.messages) {
     if (data.waitingTimes[type] == undefined)
       data.waitingTimes[type] = 0;
