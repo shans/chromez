@@ -29,8 +29,8 @@
 ],
 "dashes": [
   "cz-clock-dash",
-  "cz-review-latency-dash(true,max)",
-  "cz-review-load-dash"
+  "cz-outgoing-author-actions-dash",
+  "cz-outgoing-author-actions-latency-dash(true,max)"
 ],
 "timezones": [
   {"city": "RES", "timezone": "US/Eastern"},

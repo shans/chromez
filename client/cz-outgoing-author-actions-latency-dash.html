@@ -1,0 +1,212 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../bower_components/paper-item/paper-item-body.html">
+
+<link rel="import" href="cz-author-action-review-latency-card.html">
+
+<dom-module id="cz-outgoing-author-actions-latency-dash">
+
+  <template>
+    <style>
+
+      paper-card .card-flex {
+        display: flex;
+        flex-wrap: wrap;
+        align-content: flex-start;
+      }
+      paper-card {
+      }
+
+      paper-item {
+        box-sizing: border-box;
+        width: 50%;
+        margin: 5px 0px;
+      }
+
+      .red {
+        color: var(--paper-red-500);
+      }
+
+      .amber {
+        color: var(--paper-amber-500);
+      }
+
+      .green {
+        color: var(--paper-green-500);
+      }
+
+    </style>
+    <template is="dom-if" if="{{showSummary}}">
+      <paper-card id='card' heading='Outgoing Review Latency: Author actions'>
+        <div class="card-content">
+          <div class='card-flex'>
+            <template is="dom-repeat" items="{{users}}"
+                      filter="filterUsers" sort="sortUsers"
+                      observe="data">
+              <paper-item>
+                <paper-item-body two-line>
+                  <div>{{item.user}}</div>
+                  <div hidden$="{{item.data.error}}">
+                    <div secondary>
+                      <span class$="{{hourColor(item.data.latency)}}">{{hourString(item.data.latency)}}</span>
+                        - sole</div>
+                    <div secondary>
+                      <span class$="{{hourColor(item.data.multipleLatency)}}">{{hourString(item.data.multipleLatency)}}</span>
+                        - shared</div>
+                    <div secondary>{{count(item.data.latencyPerBug)}} sole - {{count(item.data.multipleOutstanding)}} shared - {{count(item.data.abandonedBugs)}} stale</div>
+                  </div>
+                  <div hidden$="{{!item.data.error}}" class="red">
+                    {{item.data.error}}
+                  </div>
+                </paper-item-body>
+              </paper-item>
+            </template>
+          </div>
+        </div>
+      </paper-card>
+    </template>
+  </template>
+
+  <script>
+    Polymer({
+      is: "cz-outgoing-author-actions-latency-dash",
+
+      properties: {
+        users: {
+          type: 'Object',
+          value: function() { return []; },
+          observer: "usersChanged"
+        }
+      },
+
+      filterUsers(item) {
+        if (item.data == undefined){
+          return false;
+        }
+        if (item.data.error){
+          
+          return true;
+        }
+        console.log(item);
+        return item.data.latency > 0 || item.data.multipleLatency > 0 || item.data.abandonedBugs > 0;
+      },
+
+      sortUsers(a, b) {
+          if (a.data == undefined || b.data == undefined)
+            return 0;
+          if (a.data.latency < b.data.latency)
+            return 1;
+          if (a.data.latency > b.data.latency)
+            return -1;
+          if (a.data.multipleLatency < b.data.multipleLatency)
+            return 1;
+          if (a.data.multipleLatency > b.data.multipleLatency)
+            return -1;
+          if (a.data.abandonedBugs < b.data.abandonedBugs)
+            return 1;
+          if (a.data.abandonedBugs > b.data.abandonedBugs)
+            return -1;
+          return 0;
+      },
+
+      attached: function() {
+        var latencyDashParams = this.key.split(',')
+        this.set('showSummary', latencyDashParams[0] == 'true');
+        this.set('showMaxLatency', latencyDashParams[1] == 'max');
+        registerSource('cz-config', 'users', function(users) {
+          this.set('users', users);
+        }.bind(this));
+      },
+
+      hourColor(hours) {
+        if (hours == undefined)
+          return "";
+        if (hours < 1)
+          return "green";
+        if (hours < 24)
+          return "amber";
+        return "red";
+      },
+
+      hourString(hours) {
+        if (hours < 0) hours = 0;
+        if (hours == undefined)
+          return "pending"
+        var days = Math.floor(hours / 24);
+        hours = Math.floor(hours % 24);
+        if (days > 0) {
+          if (days == 1)
+            return days + " day";
+          return days + " days";
+        } else {
+          if (hours == 1)
+            return hours + " hr";
+          return hours + " hrs";
+        }
+      },
+
+      count(list) {
+        if (list == undefined)
+          return "-"
+        return list.length;
+      },
+
+      usersChanged: function(users) {
+        // TODO: this probably only works for all-or-nothing changes to users right now.
+        users.forEach(function(user, idx) {
+          registerSource('cz-review-latency', {user: user.user, email: user.email, maxLatency: this.showMaxLatency, isOwner: 'true'}, function(data) {
+            data = data[user.email] || new LatencyInfo();
+            if (data.error) {
+              this.set('users.' + idx + '.data', data);
+              return;
+            }
+
+            var card = this.users[idx].data ? this.users[idx].data.card : undefined;
+            if (card == undefined) {
+              var card = document.createElement('cz-author-action-review-latency-card');
+              card.name = user.user + "'s CLs to review";
+              card.added = false;
+              var sharedCard = document.createElement('cz-author-action-review-latency-card');
+              sharedCard.name = user.user + "'s CLs to review";
+              sharedCard.added = false;
+            } else {
+              var sharedCard = this.users[idx].data.sharedCard;
+            }
+            card.reviews = data.latencyPerBug.map(function(bug) {
+              return { title: bug.subject, creator: bug.owner,
+                       issue: bug.issue, duration: this.hourString(bug.latency),
+                       numericDuration: bug.latency}
+            }.bind(this));
+            card.priority = 'high';
+            sharedCard.reviews = data.multipleOutstanding.map(function(bug) {
+              return { title: bug.subject, creator: bug.owner,
+                       issue: bug.issue, duration: this.hourString(bug.latency),
+                       numericDuration: bug.latency}
+            }.bind(this));
+            sharedCard.priority = 'medium';
+
+            if (data.latencyPerBug.length > 0 && !card.added) {
+              card.added = true;
+              addCard(card);
+            } else if (data.latencyPerBug.length == 0 && card.added) {
+              card.added = false;
+              removeCard(card);
+            }
+            if (data.multipleOutstanding.length > 0 && !sharedCard.added) {
+              sharedCard.added = true;
+              addCard(sharedCard);
+            } else if (data.multipleOutstanding.length == 0 && sharedCard.added) {
+              sharedCard.added = false;
+              removeCard(sharedCard);
+            }
+            data.card = card;
+            data.sharedCard = sharedCard;
+            this.set('users.' + idx + '.data', data);
+          }.bind(this));
+        }.bind(this));
+      }
+
+    });
+  </script>
+</dom-module>
