@@ -30,7 +30,12 @@
           	  <div class='user-box'>{{item.user}}</div>
               <div class='to-reviews'>
                 <template is="dom-repeat" items="{{item.toReviewsWaitingForThem}}">
-                  <div class='user-box'>{{item.user}}</div>
+                  <div class='user-box'>
+                    <template is="dom-repeat" items="{{item.user}}">
+                      {{item}}<br>
+                    </template>
+                    {{item.issue}}
+                  </div>
                 </template>
               </div>
             </div>
@@ -68,18 +73,29 @@
       	users.forEach((user, idx) => {
           registerSource('cz-review-latency', {user: user.user, email: user.email}, data => {
             var fromReviewsWaitingForMe = [];
-            var toReviewsWaitingForThem = [];
             for (var fromUser in data) {
               for (var bug of data[fromUser].latencyPerBug) {
-                console.log(user, fromUser, bug);
-                if (fromUser == user.user || fromUser == user.email)
-                  fromReviewsWaitingForMe.push({user: bug.owner});
-                else {
-                  toReviewsWaitingForThem.push({user: fromUser});
-                }
+                fromReviewsWaitingForMe.push({user: [bug.owner], issue: bug.issue});
               }
             }
             this.set('users.' + idx + '.fromReviewsWaitingForMe', fromReviewsWaitingForMe);
+          });
+          registerSource('cz-review-latency', {user: user.user, email: user.email, isOwner: true}, data => {
+            var toReviewsWaitingForThem = [];
+            var sharedByIssue = {};
+            for (var fromUser in data) {
+              for (var bug of data[fromUser].latencyPerBug) {
+                toReviewsWaitingForThem.push({user: [fromUser], issue: bug.issue});
+              }
+              for (var bug of data[fromUser].multipleOutstanding) {
+                if (sharedByIssue[bug.issue] == undefined)
+                  sharedByIssue[bug.issue] = [];
+                sharedByIssue[bug.issue].push(fromUser);
+              }
+            }
+            for (issue in sharedByIssue) {
+              toReviewsWaitingForThem.push({user: sharedByIssue[issue], issue});
+            }
             this.set('users.' + idx + '.toReviewsWaitingForThem', toReviewsWaitingForThem);
           });
       	});

@@ -102,8 +102,6 @@
         var results = {};
 
         issues.forEach(issue => {
-          if (issue.issue == 2788413002)
-            console.log(issue);
           for (var email in issue.pendingWaiting) {
             if (results[email] == undefined) {
               results[email] = new LatencyInfo();
