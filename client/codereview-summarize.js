@@ -397,6 +397,19 @@ function computeAggregateWaitingTimes(data) {
       data.pendingWaiting[data.owner_email] = { sole: 0, shared: 0};
     }
     data.pendingWaiting[data.owner_email][alloc] += finalDelta;
+
+    for (var i = data.messages.length - 1; i >= 1 && data.messages[i].type == WaitingForAuthor; i--) {
+      let message = data.messages[i];
+      let previousMessage = data.messages[i - 1];
+      if (previousMessage.type !== WaitingForAuthor) {
+        break;
+      }
+      var alloc = (message.reviewers.length == 1 ? "sole" : "shared");
+      if (data.pendingWaiting[data.owner_email] == undefined) {
+        data.pendingWaiting[data.owner_email] = { sole: 0, shared: 0};
+      }
+      data.pendingWaiting[data.owner_email][alloc] += message.delta;
+    }
   }
 }
 
