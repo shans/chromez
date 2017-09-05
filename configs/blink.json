@@ -18,11 +18,9 @@
   {"user": "Tim Ansell", "email": "mithro@mithis.com"}
 ],
 "dashes": [
-  "cz-clock-dash",
   "cz-review-latency-dash(true)",
-  "cz-review-load-dash",
-  "cz-calendar-feed-source",
-  "cz-shields-dash(customelements)"
+  "cz-user-actions-dash",
+  "cz-calendar-feed-source"
 ],
 "timezones": [
   {"city": "MTV", "timezone": "US/Pacific"},
