@@ -32,7 +32,7 @@
             this.addCallbackToQuery(query, callback,
                 {
                   site: 'gerrit',
-                  q: `reviewer:${query.user}+is:open+limit:100`,
+                  q: `reviewer:${query.user}%20-owner:${query.user}+is:open+limit:100`,
                   o: "MESSAGES"
                 });
           }
