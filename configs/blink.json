@@ -20,7 +20,6 @@
 "dashes": [
   "cz-clock-dash",
   "cz-review-latency-dash(true)",
-  "cz-user-actions-dash",
   "cz-review-load-dash",
   "cz-calendar-feed-source",
   "cz-shields-dash(customelements)"
