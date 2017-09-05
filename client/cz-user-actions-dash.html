@@ -75,7 +75,7 @@
                 if (fromUser == user.user || fromUser == user.email)
                   fromReviewsWaitingForMe.push({user: bug.owner});
                 else {
-                  toReviewsWaitingForMe.push({user: fromUser});
+                  toReviewsWaitingForThem.push({user: fromUser});
                 }
               }
             }
