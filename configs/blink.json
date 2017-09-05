@@ -4,18 +4,15 @@
   {"user": "Shane", "email": "shans@chromium.org"},
   {"user": "Doug", "email": "dstockwell@chromium.org"},
   {"user": "Eric", "email": "ericwilligers@chromium.org"},
-  {"user": "Alan", "email": "alancutter@chromium.org"},
   {"user": "Mike", "email": "mikelawther@chromium.org"},
   {"user": "Naina", "email": "nainar@chromium.org"},
-  {"user": "Suzy", "email": "suzyh@chromium.org"},
-  {"user": "Noel", "email": "noel@chromium.org"},
+  {"user": "Minh-Duc", "email": "nmduc@chromium.org"},
+  {"user": "Raul", "email": "rvera@chromium.org"},
   {"user": "Bugs", "email": "bugsnash@chromium.org"},
   {"user": "Renee", "email": "rjwright@chromium.org"},
   {"user": "Eddy", "email": "meade@chromium.org"},
-  {"user": "Alexey", "email": "loyso@chromium.org"},
-  {"user": "Sam", "email": "samli@chromium.org"},
-  {"user": "Sasha", "email": "sashab@chromium.org"},
-  {"user": "Tim Ansell", "email": "mithro@mithis.com"}
+  {"user": "Darren", "email": "shend@chromium.org"},
+  {"user": "Sasha", "email": "sashab@chromium.org"}
 ],
 "dashes": [
   "cz-review-latency-dash(true)",

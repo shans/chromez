@@ -57,7 +57,11 @@
               complete({error: "user not found"});
           } else {
             var issues = data.map(issue => fastAnnotateGerrit(issue));
+            if (query.email == 'shend@chromium.org' && !query.isOwner)
+              console.log(issues);
             gerritResults = this.processData(issues, query.maxLatency);
+            if (query.email == 'shend@chromium.org' && !query.isOwner)
+              console.log(gerritResults);
             gerritState = COMPLETE;
             if (codereviewState != PENDING) {
               complete();

@@ -13,6 +13,10 @@
   	  	border: solid 1px black;
       }
 
+      .user-box[shared] {
+        border-color: green;
+      }
+
       .entry {
         display: flex;
       }
@@ -24,13 +28,13 @@
             <div class='entry'>
               <div class='from-reviews'>
                 <template is="dom-repeat" items="{{item.fromReviewsWaitingForMe}}">
-                  <div class='user-box'>{{item.user}}</div>
+                  <div class='user-box' shared$="{{item.shared}}">{{item.user}}<br>{{item.issue}}</div>
                 </template>
               </div>
           	  <div class='user-box'>{{item.user}}</div>
               <div class='to-reviews'>
                 <template is="dom-repeat" items="{{item.toReviewsWaitingForThem}}">
-                  <div class='user-box'>
+                  <div class='user-box' shared$="{{item.shared}}">
                     <template is="dom-repeat" items="{{item.user}}">
                       {{item}}<br>
                     </template>
@@ -72,12 +76,20 @@
       usersChanged: function(users) {
       	users.forEach((user, idx) => {
           registerSource('cz-review-latency', {user: user.user, email: user.email}, data => {
-            var fromReviewsWaitingForMe = [];
-            for (var fromUser in data) {
-              for (var bug of data[fromUser].latencyPerBug) {
+            let fromReviewsWaitingForMe = [];
+            let seenIssues = new Set();
+            for (let fromUser in data) {
+              for (let bug of data[fromUser].latencyPerBug) {
                 fromReviewsWaitingForMe.push({user: [bug.owner], issue: bug.issue});
               }
+              for (let bug of data[fromUser].multipleOutstanding) {
+                if (seenIssues.has(bug.issue))
+                  continue;
+                seenIssues.add(bug.issue);
+                fromReviewsWaitingForMe.push({user: [bug.owner], issue: bug.issue, shared: true})
+              }
             }
+
             this.set('users.' + idx + '.fromReviewsWaitingForMe', fromReviewsWaitingForMe);
           });
           registerSource('cz-review-latency', {user: user.user, email: user.email, isOwner: true}, data => {
@@ -94,7 +106,7 @@
               }
             }
             for (issue in sharedByIssue) {
-              toReviewsWaitingForThem.push({user: sharedByIssue[issue], issue});
+              toReviewsWaitingForThem.push({user: sharedByIssue[issue], issue, shared: true});
             }
             this.set('users.' + idx + '.toReviewsWaitingForThem', toReviewsWaitingForThem);
           });
