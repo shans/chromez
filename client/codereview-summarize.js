@@ -364,8 +364,9 @@ function computeAggregateWaitingTimes(data) {
     data.waitingTimes[type] = (data.waitingTimes[type] || 0) + finalDelta;
   }
 
+  var alloc = (message.reviewers.length == 1 ? "sole" : "shared");
+
   if (type == WaitingForReview) {
-    var alloc = (message.reviewers.length == 1 ? "sole" : "shared");
     let reviewers = new Set(message.reviewers);
     for (var i = data.messages.length - 1; i >= 1 && data.messages[i].type == WaitingForReview; i--) {
       let message = data.messages[i];
@@ -375,7 +376,6 @@ function computeAggregateWaitingTimes(data) {
       }
       for (let reviewer of reviewers.entries()) {
         if (previousMessage.reviewers.includes(reviewer)) {
-          var alloc = (previousMessage.reviewers.length == 1 ? "sole" : "shared");
           if (data.pendingWaiting[reviewer] == undefined) {
             data.pendingWaiting[reviewer] = { sole: 0, shared: 0};
           }
@@ -391,8 +391,7 @@ function computeAggregateWaitingTimes(data) {
       }
       data.pendingWaiting[reviewer][alloc] += finalDelta;
     });
-  } else if (type == WaitingForAuthor){
-    var alloc = (message.reviewers.length == 1 ? "sole" : "shared");
+  } else if (type == WaitingForAuthor) {
     if (data.pendingWaiting[data.owner_email] == undefined) {
       data.pendingWaiting[data.owner_email] = { sole: 0, shared: 0};
     }
@@ -404,10 +403,7 @@ function computeAggregateWaitingTimes(data) {
       if (previousMessage.type !== WaitingForAuthor) {
         break;
       }
-      var alloc = (message.reviewers.length == 1 ? "sole" : "shared");
-      if (data.pendingWaiting[data.owner_email] == undefined) {
-        data.pendingWaiting[data.owner_email] = { sole: 0, shared: 0};
-      }
+
       data.pendingWaiting[data.owner_email][alloc] += message.delta;
     }
   }

@@ -62,7 +62,7 @@
             if (codereviewState != PENDING) {
               complete();
             }
-          }          
+          }
         });
       },
 
@@ -82,7 +82,7 @@
         if (results[key] == undefined) {
           results[key] = {
             latency: object[key].latency,
-            multipleLatency: object[key].latency,
+            multipleLatency: object[key].multipleLatency,
             abandonedBugs: object[key].abandonedBugs.slice(),
             latencyPerBug: object[key].latencyPerBug.slice(),
             multipleOutstanding: object[key].multipleOutstanding.slice()
