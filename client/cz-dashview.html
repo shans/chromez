@@ -5,16 +5,17 @@
   <template>
     <style>
       #distribute {
-        display: flex;
-        flex-wrap: wrap;
-        flex-direction: column;
-        max-height: 100%;
+        display: block;
+        column-count: var(--columns);
+        column-gap: 0;
         align-content: center;
-        padding: 10px;
+        height: 100%;
+        overflow: hidden;
       }
       #distribute > * {
-        width: calc(var(--column-percent, 100%) - 20px);
-        margin: 10px;
+        display: inline-block;
+        position: static;
+        width: 100%;
       }
     </style>
     <div id='distribute'>
@@ -28,10 +29,11 @@
 
       properties: {
         columns: { value: 1, observer: 'columnsChanged' },
-        totalColumns: { value: 2, observer: 'columnsChanged'}  
+        totalColumns: { value: 2, observer: 'columnsChanged'}
       },
 
       columnsChanged() {
+        this.customStyle['--columns'] = this.columns;
         this.customStyle['--column-percent'] = (100/Number(this.totalColumns)) + '%';
         this.updateStyles();
       },

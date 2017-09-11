@@ -15,16 +15,17 @@
 }
 
 body {
-  background: #ECEFF1;
   margin: 0;
+  background: #ECEFF1;
   overflow: hidden;
   width: 100vw;
   height: 100vh;
+  display: flex;
+  flex-flow: row;
+  --card-padding: 5px;
 }
 
 paper-material, paper-card {
-  margin-bottom: 20px;
-  margin-right: 20px;
   background: white;
 }
 
@@ -32,12 +33,12 @@ paper-material, paper-card {
   padding-top: 0;
 }
 
-cz-cardview paper-card {
-  margin-bottom: 5px;
+cz-dashview, cz-dashview {
+  height: 100vh;
 }
 
-cz-cardview {
-  height: calc(100% - 40px);
+paper-card {
+  margin: var(--card-padding);
 }
 
 </style>
@@ -47,19 +48,20 @@ cz-cardview {
 </cz-registry>
 
 <cz-dashview id='dash' total-columns=4 columns=2>
-  <cz-cardview id='feed' total-columns=4 columns=2></cz-cardview>
 </cz-dashview>
+
+<cz-cardview id='feed' total-columns=4 columns=2></cz-cardview>
 
 <script>
 registerSource('cz-config', 'dashes', dashes => dashes.forEach(a => addDash(a, feed)));
-registerSource('cz-config', 'cardview-columns', cvColumns => { 
+registerSource('cz-config', 'cardview-columns', cvColumns => {
   if (cvColumns) {
     feed.columns = cvColumns;
     feed.totalColumns = Number(cvColumns) + Number(dash.columns);
     dash.totalColumns = Number(cvColumns) + Number(dash.columns);
   }
 });
-registerSource('cz-config', 'dashview-columns', dvColumns => { 
+registerSource('cz-config', 'dashview-columns', dvColumns => {
   if (dvColumns) {
     dash.columns = dvColumns;
     feed.totalColumns = Number(dvColumns) + Number(feed.columns);
@@ -67,4 +69,3 @@ registerSource('cz-config', 'dashview-columns', dvColumns => {
   }
 });
 </script>
-

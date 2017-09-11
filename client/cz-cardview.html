@@ -6,11 +6,11 @@
   <template>
     <style>
       :host {
-        width: calc(var(--total-percent, 100%) - 40px) !important;
+        width: var(--total-percent, 100%) !important;
       }
 
-      paper-card {
-        width: 100%;
+      #header {
+        display: block;
       }
 
       #container {
@@ -19,7 +19,8 @@
       }
 
       .column {
-        width: calc(var(--column-percent, 100%) - 20px);
+        width: var(--column-percent, 100%);
+        padding-right: calc(2 * var(--card-padding, 5px));
       }
 
     </style>
