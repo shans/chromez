@@ -1,11 +1,11 @@
 {"cardview-heading": "🍻🍕🍑🍔🍟🍦🍫🍰🍩🍪🍗🍝🍣🍱🍙🍘🍡🍠🍨🍵🍖🍯🌽🍜🍥🍤🍳🍻",
 "users": [
-  {"user": "Tim Loh", "email": "timloh@chromium.org"},
+  {"user": "Alice", "email": "aboxhall@chromium.org"},
   {"user": "Shane", "email": "shans@chromium.org"},
   {"user": "Doug", "email": "dstockwell@chromium.org"},
   {"user": "Eric", "email": "ericwilligers@chromium.org"},
   {"user": "Mike", "email": "mikelawther@chromium.org"},
-  {"user": "Naina", "email": "nainar@chromium.org"},
+  {"user": "nainar", "email": "nainar@chromium.org"},
   {"user": "Minh-Duc", "email": "nmduc@chromium.org"},
   {"user": "Raul", "email": "rvera@chromium.org"},
   {"user": "Bugs", "email": "bugsnash@chromium.org"},

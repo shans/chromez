@@ -9,39 +9,179 @@
 
   <template>
   	<style>
-  	  .user-box {
-  	  	border: solid 1px black;
+      paper-card .card-flex {
+        display: grid;
+        grid-template-columns: 1fr 1fr max-content 1fr 1fr;
+        grid-row-gap: 20px;
+        align-items: center;
+      }
+
+      canvas {
+        width: 100%;
+        height: 100%;
+      }
+
+      paper-card {
+        width: calc(100% - 20px);
+      }
+
+  	  div[user-box] {
+        padding: 5px;
+        border-width: 1px;
+        border-style: solid;
+        border-radius: 4px;
+        font-size: 24px;
+        text-align: center;
+        display: flex;
+        justify-content: space-between;
+      }
+
+      .cl-box {
+        margin: 5px;
+        text-align: right;
+      }
+
+      .red-border {
+        border-color: var(--paper-red-500);
+      }
+
+      .amber-border {
+        border-color: var(--paper-amber-500);
+      }
+
+      .green-border {
+        border-color: var(--paper-green-500);
       }
 
       .user-box[shared] {
-        border-color: green;
+      }
+
+
+      .for-them {
+        color: darkgrey;
+      }
+
+      .for-me {
+        font-size: 20px;
+        margin: 5px;
       }
 
       .entry {
         display: flex;
+      }
+
+      .bottom-line {
+        display: flex;
+        padding-left: 20px;
+        justify-content: space-between;
+        font-size: 16px;
+      }
+
+      .latency-line {
+        font-size: 16px;
+        text-align: right;
+      }
+
+      .bottom-line.right {
+        padding-right: 20px;
+      }
+
+      .latency {
+        text-align: left;
+      }
+
+      .red {
+        color: var(--paper-red-500);
+      }
+
+      .amber {
+        color: var(--paper-amber-500);
+      }
+
+      .green {
+        color: var(--paper-green-500);
+      }
+
+      a {
+        text-decoration: none;
       }
   	</style>
 	  <paper-card id='card' heading='Pending User Actions'>
 	    <div class="card-content">
         <div class='card-flex'>
           <template is="dom-repeat" items="{{users}}" sort="sortUsers">
-            <div class='entry'>
-              <div class='from-reviews'>
-                <template is="dom-repeat" items="{{item.fromReviewsWaitingForMe}}">
-                  <div class='user-box' shared$="{{item.shared}}">{{item.user}}<br>{{item.issue}}</div>
-                </template>
-              </div>
-          	  <div class='user-box'>{{item.user}}</div>
-              <div class='to-reviews'>
-                <template is="dom-repeat" items="{{item.toReviewsWaitingForThem}}">
-                  <div class='user-box' shared$="{{item.shared}}">
-                    <template is="dom-repeat" items="{{item.user}}">
-                      {{item}}<br>
-                    </template>
-                    {{item.issue}}
+            <div class$="{{item.user}}">
+              <template is="dom-if" if="{{item.toReviewsWaitingForThem.length}}">
+                waiting for review
+              </template>
+              <template is="dom-repeat" items="{{item.toReviewsWaitingForThem}}">
+                <div class='cl-box for-them' shared$="{{item.shared}}" item={{item}}>
+                  <template is="dom-repeat" items="{{item.user}}">
+                    {{item}}
+                  </template>
+                  <br>
+                  <div class='bottom-line'>
+                    <span class='latency'><span class$='{{hourColor(item.latency)}}'>{{hourString(item.latency)}}</span></span>
+                    <span><a href$={{issueLink(item)}}><template is='dom-if' if={{item.shared}}>👥</template>{{item.issue}}</a></span>
                   </div>
-                </template>
+                </div>
+              </template>
+              <template is="dom-if" if="{{item.fromReviewsWaitingForThem.length}}">
+                waiting for changes
+              </template>
+              <template is="dom-repeat" items="{{item.fromReviewsWaitingForThem}}">
+                <div class='cl-box for-them' shared$="{{item.shared}}" item={{item}}>{{item.user}}<br>
+                  <div class='bottom-line'>
+                    <span class='latency'>{{hourString(item.latency)}}</span>
+                    <span><a href$={{issueLink(item)}}><template is='dom-if' if={{item.shared}}>👥</template>{{item.issue}}</a></span>
+                  </div>
+                </div>
+              </template>
+            </div>
+
+            <canvas id$={{leftCanvas(item.user)}}></canvas>
+
+        	  <div class$='{{colorizedUser(item.latency, item.user)}}' user-box>
+              <div>{{item.user}}</div>
+              <div class='latency-line'>
+                <div class$={{hourColor(item.latency)}}>👤 {{hourString(item.latency)}}</div>
+                <div class$={{hourColor(item.multipleLatency)}}>👥 {{hourString(item.multipleLatency)}}</div>
               </div>
+            </div>
+
+            <canvas id$={{rightCanvas(item.user)}}></canvas>
+
+            <div class$='{{item.user}}'>
+              <template is="dom-if" if="{{item.fromReviewsWaitingForMe.length}}">
+                <div style='text-align: right'>review these</div>
+              </template>
+              <template is="dom-repeat" items="{{item.fromReviewsWaitingForMe}}">
+                <div class='for-me' shared$="{{item.shared}}" item={{item}}>
+                  <div class$='{{hourColor(item.latency)}}'>{{item.user}}<br>
+                    <div class='bottom-line right'>
+                      <span><a href$={{issueLink(item)}}>{{item.issue}}<template is='dom-if' if={{item.shared}}>👥</template></a></span>
+                      <span class='latency'>{{hourString(item.latency)}}</span>
+                    </div>
+                  </div>
+                </div>
+              </template>
+              <template is="dom-if" if="{{item.toReviewsWaitingForMe.length}}">
+                <div style='text-align: right'>reply to these</div>
+              </template>
+              <template is="dom-repeat" items="{{item.toReviewsWaitingForMe}}">
+                <div class='for-me' shared$="{{item.shared}}" item={{item}}>
+                  <div>
+                    <template is="dom-repeat" items="{{item.user}}">
+                      {{item}}
+                    </template>
+                    <br>
+                    <div class='bottom-line right'>
+                      <span><a href$={{issueLink(item)}}>{{item.issue}}<template is='dom-if' if={{item.shared}}>👥</template></a></span>
+                      <span class='latency'>{{hourString(item.latency)}}</span>
+                    </div>
+                  </div>
+                </div>
+              </template>
             </div>
           </template>
         </div>
@@ -61,6 +201,10 @@
         }
       },
 
+      leftCanvas: function(user) { return `left-canvas-${user}`;},
+
+      rightCanvas: function(user) { return `right-canvas-${user}`;},
+
       sortUsers: function(a, b) {
         if (a.user < b.user)
           return -1;
@@ -73,44 +217,160 @@
         registerSource('cz-config', 'users', users => this.set('users', users));
       },
 
+      hourColor(hours) {
+        if (hours == undefined)
+          return "";
+        if (hours < 24)
+          return "green";
+        if (hours < 72)
+          return "amber";
+        return "red";
+      },
+
+      hourString(hours) {
+        if (hours < 0) hours = 0;
+        if (hours == undefined)
+          return "pending"
+        var days = Math.floor(hours / 24);
+        hours = Math.floor(hours % 24);
+        if (days > 0) {
+          if (days == 1)
+            return days + " day";
+          return days + " days";
+        } else {
+          if (hours == 1)
+            return hours + " hour";
+          return hours + " hrs";
+        }
+      },
+
+      colorizedUser: function(latency, user) {
+        return `${user} ${this.hourColor(latency)}-border`;
+      },
+
+      issueLink(item) {
+        if (item.source == 'codereview')
+          return "https://codereview.chromium.org/" + item.issue;
+        return "https://chromium-review.googlesource.com/c/" + item.issue;
+      },
+      shortName: function(email) {
+        var name = this.userMap[email];
+        if (name !== undefined)
+          return name;
+        return email.split('@')[0] + '@';
+      },
       usersChanged: function(users) {
+        this.userMap = {};
+        users.forEach(user => this.userMap[user.email] = user.user);
       	users.forEach((user, idx) => {
           registerSource('cz-review-latency', {user: user.user, email: user.email}, data => {
             let fromReviewsWaitingForMe = [];
+            let fromReviewsWaitingForThem = [];
             let seenIssues = new Set();
             for (let fromUser in data) {
               for (let bug of data[fromUser].latencyPerBug) {
-                fromReviewsWaitingForMe.push({user: [bug.owner], issue: bug.issue});
+                if (fromUser == user.email)
+                  fromReviewsWaitingForMe.push({user: [this.shortName(bug.owner)], issue: bug.issue, latency: bug.latency, source: bug.source, waitingFor: 'review'})
+                else
+                  fromReviewsWaitingForThem.push({user: [this.shortName(bug.owner)], issue: bug.issue, latency: bug.latency, source: bug.source, waitingFor: 'changes'});
               }
               for (let bug of data[fromUser].multipleOutstanding) {
                 if (seenIssues.has(bug.issue))
                   continue;
                 seenIssues.add(bug.issue);
-                fromReviewsWaitingForMe.push({user: [bug.owner], issue: bug.issue, shared: true})
+                if (fromUser == user.email)
+                  fromReviewsWaitingForMe.push({user: [this.shortName(bug.owner)], issue: bug.issue, shared: true, latency: bug.latency, source: bug.source, waitingFor: 'review'});
+                else
+                  fromReviewsWaitingForThem.push({user: [this.shortName(bug.owner)], issue: bug.issue, shared: true, latency: bug.latency, source: bug.source, waitingFor: 'changes'})
               }
             }
 
+            var latency = data[user.email] ? data[user.email].latency : 0;
+            var multipleLatency = data[user.email] ? data[user.email].multipleLatency : 0;
             this.set('users.' + idx + '.fromReviewsWaitingForMe', fromReviewsWaitingForMe);
+            this.set('users.' + idx + '.fromReviewsWaitingForThem', fromReviewsWaitingForThem);
+            this.set('users.' + idx + '.latency', latency);
+            this.set('users.' + idx + '.multipleLatency', multipleLatency);
+            this.async(() => this.drawArrows(user.user, idx));
           });
+
           registerSource('cz-review-latency', {user: user.user, email: user.email, isOwner: true}, data => {
             var toReviewsWaitingForThem = [];
+            var toReviewsWaitingForMe = [];
             var sharedByIssue = {};
-            for (var fromUser in data) {
-              for (var bug of data[fromUser].latencyPerBug) {
-                toReviewsWaitingForThem.push({user: [fromUser], issue: bug.issue});
-              }
-              for (var bug of data[fromUser].multipleOutstanding) {
+            for (let fromUser in data) {
+              for (let bug of data[fromUser].multipleOutstanding) {
                 if (sharedByIssue[bug.issue] == undefined)
-                  sharedByIssue[bug.issue] = [];
-                sharedByIssue[bug.issue].push(fromUser);
+                  sharedByIssue[bug.issue] = bug;
               }
+              for (let bug of data[fromUser].latencyPerBug) {
+                if (fromUser == user.email)
+                  toReviewsWaitingForMe.push({user: bug.reviewers.map(email => this.shortName(email)), issue: bug.issue, latency: bug.latency, source: bug.source, waitingFor: 'changes'});
+                else
+                  toReviewsWaitingForThem.push({user: [this.shortName(fromUser)], issue: bug.issue, latency: bug.latency, source: bug.source, waitingFor: 'review'});
+              }
+
             }
-            for (issue in sharedByIssue) {
-              toReviewsWaitingForThem.push({user: sharedByIssue[issue], issue, shared: true});
+            for (let issue in sharedByIssue) {
+              var bug = sharedByIssue[issue];
+              if (bug.reviewers.length == 1 && bug.reviewers[0] == user.email)
+                toReviewsWaitingForMe.push({user: bug.reviewers.map(email => this.shortName(email)), issue, shared: true, latency: bug.latency, source: bug.source, waitingFor: 'changes'});
+              else
+                toReviewsWaitingForThem.push({user: bug.reviewers.map(email => this.shortName(email)), issue, shared: true, latency: bug.latency, source: bug.source, waitingFor: 'review'});
             }
+``
             this.set('users.' + idx + '.toReviewsWaitingForThem', toReviewsWaitingForThem);
+            this.set('users.' + idx + '.toReviewsWaitingForMe', toReviewsWaitingForMe);
+            this.async(() => this.drawArrows(user.user));
           });
       	});
+      },
+      drawArrows: function(user, idx) {
+
+        var colorMap = {red: '#f44336', amber: '#ffc107', green: '#4caf50'}
+        var canvas = Polymer.dom(this.root).querySelector(`#left-canvas-${user}`);
+        var rect = canvas.getBoundingClientRect();
+        canvas.height = rect.height;
+        canvas.width = rect.width;
+        var ctx = canvas.getContext('2d');
+        var froms = Polymer.dom(this.root).querySelectorAll(`.${user} .for-them`);
+        var center = Polymer.dom(this.root).querySelector(`.${user}[user-box]`);
+        if (center == null)
+          return;
+        var centerRect = center.getBoundingClientRect();
+        var increment = centerRect.height / (froms.length + 1);
+        var arrowEnd = centerRect.top - rect.top + increment;
+        froms.forEach(elem => {
+          var elemRect = elem.getBoundingClientRect();
+          ctx.strokeStyle = (elem.item.waitingFor == 'review' ? colorMap[this.hourColor(elem.item.latency)] : 'darkgrey');
+          ctx.beginPath();
+          ctx.moveTo(0, elemRect.top - rect.top + elemRect.height / 2);
+          ctx.lineTo(rect.width, arrowEnd);
+          ctx.stroke();
+          arrowEnd += increment;
+        });
+
+        canvas = Polymer.dom(this.root).querySelector(`#right-canvas-${user}`);
+        var rect = canvas.getBoundingClientRect();
+        canvas.height = rect.height;
+        canvas.width = rect.width;
+        var ctx = canvas.getContext('2d');
+        var froms = Polymer.dom(this.root).querySelectorAll(`.${user} .for-me`);
+        var center = Polymer.dom(this.root).querySelector(`.${user}[user-box]`);
+        if (center == null)
+          return;
+        var centerRect = center.getBoundingClientRect();
+        var increment = centerRect.height / (froms.length + 1);
+        var arrowEnd = centerRect.top - rect.top + increment;
+        froms.forEach(elem => {
+          var elemRect = elem.getBoundingClientRect();
+          ctx.strokeStyle = (elem.item.waitingFor == 'review' ? colorMap[this.hourColor(elem.item.latency)] : 'darkgrey');
+          ctx.beginPath();
+          ctx.moveTo(rect.width, elemRect.top - rect.top + elemRect.height / 2);
+          ctx.lineTo(0, arrowEnd);
+          ctx.stroke();
+          arrowEnd += increment;
+        });
       }
     });
   </script>

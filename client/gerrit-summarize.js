@@ -308,6 +308,7 @@ function computeAggregateWaitingTimes(data) {
     data.waitingTimes[type] = (data.waitingTimes[type] || 0) + finalDelta;
 
   var alloc = (message.reviewers.length == 1 ? "sole" : "shared");
+  data.reviewers = message.reviewers;
 
   if (type == WaitingForReview) {
     let reviewers = new Set(message.reviewers);
