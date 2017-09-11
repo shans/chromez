@@ -1,0 +1,105 @@
+<script>
+class InlineCard extends HTMLElement {
+  constructor() {
+    super();
+    this._valid = true;
+    this._observers = new WeakMap();
+    this._positions = new WeakMap();
+    this.attachShadow({mode: 'open'});
+    let template = document.createElement('template');
+    template.innerHTML = `
+      <style>
+        ::host {
+          display: inline;
+        }
+        #cards > div {
+          position: absolute;
+          box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
+        }
+      </style>
+      <div id="cards"></div>
+      <slot></slot>`;
+    this.shadowRoot.appendChild(template.content.cloneNode(true));
+  }
+  connectedCallback() {
+    this.slot.addEventListener('slotchange', e => {
+      this.invalidate();
+    });
+  }
+  _intersectionCallback(e) {
+    let {target, boundingClientRect} = e[0];
+    let position = this._positions.get(target) || {top: NaN, left: NaN};
+    if (boundingClientRect.top != position.top || boundingClientRect.left != position.left) {
+      this._positions.set(target, boundingClientRect);
+      this._observers.delete(target);
+      this.invalidate();
+    }
+  }
+  invalidate() {
+    if (!this._valid) {
+      return;
+    }
+    this._valid = false;
+    requestAnimationFrame(() => {
+      this._valid = true;
+      let elements = this.slot.assignedNodes().filter(node => node instanceof Element);
+      let columns = [];
+      let column = null;
+      let offset = NaN;
+      let root = this.parentElement;
+      while (root && !['relative','absolute'].includes(getComputedStyle(root).position)) {
+        root = root.parentElement;
+      }
+      let rootBounds = root.getBoundingClientRect();
+      for (let element of elements) {
+        let elementBounds = element.getBoundingClientRect();
+        // TODO: Need to deal with display:none.
+        if (elementBounds.left != offset) {
+          columns.push(column = {
+            top: Infinity,
+            left: Infinity,
+            right: -Infinity,
+            bottom: -Infinity,
+          });
+          offset = elementBounds.left;
+        }
+        column.top = Math.min(column.top, elementBounds.top - rootBounds.top);
+        column.left = Math.min(column.left, elementBounds.left - rootBounds.left);
+        column.right = Math.max(column.right, elementBounds.right - rootBounds.left);
+        column.bottom = Math.max(column.bottom, elementBounds.bottom - rootBounds.top);
+        let observer = this._observers.get(element);
+        if (!observer) {
+          let margin = {
+            left: elementBounds.left - rootBounds.left,
+            top: elementBounds.top - rootBounds.top,
+            bottom: elementBounds.bottom - rootBounds.bottom,
+            right: elementBounds.right - rootBounds.right,
+          };
+          let options = {
+            root,
+            rootMargin: `${margin.top}px ${margin.right}px ${margin.bottom}px ${margin.left}px`,
+            threshold: 1.0,
+          };
+          observer = new IntersectionObserver(e => this._intersectionCallback(e), options);
+          observer.observe(element);
+          this._observers.set(element, observer);
+        }
+      }
+      let cards = this.shadowRoot.querySelector('#cards');
+      cards.innerHTML = '';
+      for (let column of columns) {
+        let card = document.createElement('div');
+        cards.appendChild(card);
+        card.style.left = `${column.left}px`;
+        card.style.top = `${column.top}px`;
+        card.style.width = `${column.right - column.left}px`;
+        card.style.height = `${column.bottom - column.top}px`;
+      }
+    });
+  }
+  get slot() {
+    return this.shadowRoot.querySelector('slot');
+  }
+}
+customElements.define('inline-card', InlineCard)
+</script>
