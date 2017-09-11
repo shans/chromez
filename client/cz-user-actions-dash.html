@@ -3,15 +3,29 @@
 <link rel="import" href="../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../bower_components/paper-item/paper-item-body.html">
 
-<link rel="import" href="cz-review-latency-card.html">
+<link rel="import" href="inline-card.html">
 
 <dom-module id="cz-user-actions-dash">
 
   <template>
   	<style>
-      paper-card .card-flex {
+      :host {
+        display: inline !important;
+        margin-top: 5px;
+      }
+
+      .grid-outside {
+        display: inline-block;
+        background: white;
+        padding: 15px;
+        margin-left: 5px;
+        margin-right: 5px;
+        width: calc(100% - 40px);
+      }
+
+      .grid {
         display: grid;
-        grid-template-columns: 1fr 1fr max-content 1fr 1fr;
+        grid-template-columns: 11fr 8fr 12fr 8fr 11fr;
         grid-row-gap: 20px;
         align-items: center;
       }
@@ -19,10 +33,6 @@
       canvas {
         width: 100%;
         height: 100%;
-      }
-
-      paper-card {
-        width: calc(100% - 20px);
       }
 
   	  div[user-box] {
@@ -72,7 +82,7 @@
 
       .bottom-line {
         display: flex;
-        padding-left: 20px;
+        padding-left: 5px;
         justify-content: space-between;
         font-size: 16px;
       }
@@ -83,7 +93,7 @@
       }
 
       .bottom-line.right {
-        padding-right: 20px;
+        padding-right: 5px;
       }
 
       .latency {
@@ -106,10 +116,10 @@
         text-decoration: none;
       }
   	</style>
-	  <paper-card id='card' heading='Pending User Actions'>
-	    <div class="card-content">
-        <div class='card-flex'>
-          <template is="dom-repeat" items="{{users}}" sort="sortUsers">
+    <inline-card>
+      <template is="dom-repeat" items="{{users}}" sort="sortUsers">
+        <div class='grid-outside'>
+          <div class='grid'>
             <div class$="{{item.user}}">
               <template is="dom-if" if="{{item.toReviewsWaitingForThem.length}}">
                 waiting for review
@@ -183,10 +193,10 @@
                 </div>
               </template>
             </div>
-          </template>
+          </div>
         </div>
-      </div>
-    </paper-card>
+      </template>
+    </inline-card>
   </template>
 
   <script>

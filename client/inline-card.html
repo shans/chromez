@@ -77,9 +77,10 @@ class InlineCard extends HTMLElement {
           };
           let options = {
             root,
-            rootMargin: `${margin.top}px ${margin.right}px ${margin.bottom}px ${margin.left}px`,
+            rootMargin: elementBounds.width == 0 ? undefined : `${margin.top}px ${margin.right}px ${margin.bottom}px ${margin.left}px`,
             threshold: 1.0,
           };
+          console.log(options, elementBounds, rootBounds);
           observer = new IntersectionObserver(e => this._intersectionCallback(e), options);
           observer.observe(element);
           this._observers.set(element, observer);

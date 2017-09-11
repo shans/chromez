@@ -4,6 +4,9 @@
 
   <template>
     <style>
+      :host {
+        width: var(--column-percent);
+      }
       #distribute {
         display: block;
         column-count: var(--columns);
@@ -11,7 +14,7 @@
         align-content: center;
         height: 100%;
         overflow: hidden;
-        display: relative;
+        position: relative;
       }
       #distribute > * {
         display: inline-block;
@@ -35,7 +38,7 @@
 
       columnsChanged() {
         this.customStyle['--columns'] = this.columns;
-        this.customStyle['--column-percent'] = (100/Number(this.totalColumns)) + '%';
+        this.customStyle['--column-percent'] = Number(this.columns) * (100/Number(this.totalColumns)) + '%';
         this.updateStyles();
       },
 
