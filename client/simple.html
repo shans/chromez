@@ -68,4 +68,6 @@ registerSource('cz-config', 'dashview-columns', dvColumns => {
     dash.totalColumns = Number(dvColumns) + Number(feed.columns);
   }
 });
+
+registerSource('cz-gerrit-strings', {email: 'meade@chromium.org'}, results => console.log(results));
 </script>

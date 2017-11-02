@@ -1,0 +1,33 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+
+<dom-module id="cz-gerrit-strings">
+
+  <template>
+  </template>
+
+  <script>
+    var PENDING = 0;
+    var COMPLETE = 1;
+    var ERROR = 2;
+
+    Polymer({
+      is: "cz-gerrit-strings",
+
+      registerQuery: function(query, callback) {
+        registerSource("cz-gerrit", {user: query.email, type: 'search', isOwner: query.isOwner}, data => {
+          if (data !== null) {
+            callback(data.map(review => {
+              var strings = {
+                url: "https://chromium-review.googlesource.com/c/" + review.issue,
+                user: query.email,
+              }
+              strings.strings = [review.subject].concat(review.messages.map(message => message.message));
+              return strings;
+            }));
+          }
+        });
+      },
+    });
+  </script>
+
+</dom-module>
