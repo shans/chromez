@@ -18,6 +18,7 @@
 
       paper-item {
         box-sizing: border-box;
+        padding-bottom: 10px;
       }
 
       .avatar {
@@ -41,13 +42,24 @@
             <template is="dom-if" if="{{count(item.data)}}">
               <paper-item>
                 <paper-item-body>
-                  <div>{{item.user}}
+                  <div><b>{{item.user}}</b>
                     <div inner-h-t-m-l={{tooltip(item.data)}}></div>
                   </div>
                 </paper-item-body>
               </paper-item>
             </template>
           </template>
+
+          <paper-item>
+            <paper-item-body>
+              <template is="dom-if" if="{{count(blinkDev)}}"
+                <div><b>blink-dev</b>
+                  <div inner-h-t-m-l={{tooltip(blinkDev)}}></div>
+                </div>
+              </template>
+            </paper-item-body?
+          <paper-item>
+
         </div>
       </paper-card>
   </template>
@@ -60,6 +72,10 @@
           type: 'Object',
           value: function() { return []; },
           observer: "usersChanged",
+        },
+        blinkDev: {
+          type: 'Object',
+          value: function() { return []; },
         }
       },
 
@@ -77,24 +93,50 @@
 
       tooltip: function(data) {
         return data.map(report => {
-          let result = `<a href=${report.url}>${report.title}</a>: `;
+          let result = `<a href=${report.url}>${report.title}</a><br> `;
+          var fragments = [];
           report.strings.forEach(({string, positions}) => {
             for (var i = 0; i < positions.length; i++) {
               var position = positions[i];
               var windowStart = Math.max(position - 50, 0);
+              if (windowStart > 0 && string[windowStart - 1] !== ' ') {
+                while (string[windowStart] !== ' ')
+                  windowStart++;
+                windowStart++;
+                var startEllipsis = '...';
+              } else {
+                var startEllipsis = '';
+              }
+
               var windowEnd = Math.min(windowStart + 100, string.length);
-              console.log(windowStart, windowEnd, string.substring(windowStart, windowEnd));
+              if (windowEnd < string.length && !'. '.includes(string[windowEnd] !== ' ')) {
+                while (string[windowEnd] !== ' ')
+                  windowEnd--;
+                windowEnd--;
+                var endEllipsis = '...';
+              } else {
+                var endEllipsis = '';
+              }
+
               while (i < positions.length - 1 && positions[i] < windowEnd)
                 i++;
-              result += string.substring(windowStart, windowEnd) + '<br>';
+              var fragment = string.substring(windowStart, windowEnd);
+              fragment = fragment.replace(/\</g, "&lt;");
+              if (fragments.includes(fragment))
+                continue;
+              fragments.push(fragment);
+              result += `${startEllipsis}${fragment}${endEllipsis}<br>`;
             }
           });
-          return result;}).join("<br>");
+          return result;}).join('');
       },
 
       attached: function() {
         registerSource('cz-config', 'users', function(users) {
           this.set('users', users);
+        }.bind(this));
+        registerSource('cz-word-detector', {component: 'cz-mailing-list', query: {list: 'blink-dev'}}, function(data) {
+          this.set('blinkDev', data);
         }.bind(this));
       },
 

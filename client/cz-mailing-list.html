@@ -1,0 +1,38 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+<script src="chromez-behaviors.js"></script>
+
+<dom-module id="cz-mailing-list">
+
+  <template>
+    <template is="dom-repeat" items="{{searchQueries}}">
+      <iron-ajax
+        auto
+        params="{{item.params}}"
+        url="//script.google.com/macros/s/AKfycbyiRvHXRov-qSlSpSyo98blOaGQyyJmyl7NsjfE4YZRYDi6BTYN/exec"
+        handle-as="text"
+        on-response="handleResponse"></iron-ajax>
+    </template>
+  </template>
+
+  <script>
+    Polymer({
+      is: "cz-mailing-list",
+      behaviors: [ChromeZBehaviors.AJAXBehavior],
+
+      registerQuery: function(query, callback) {
+        this.addCallbackToQuery(query, callback, {list: query.list});
+      },
+
+      onResponse: function(data) {
+        data = data.substring(0, data.lastIndexOf(']') + 1);
+        try {
+          return JSON.parse(data);
+        } catch (e) {
+          return null;
+        }
+      }
+    });
+  </script>
+
+</dom-module>
