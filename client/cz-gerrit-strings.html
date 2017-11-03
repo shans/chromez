@@ -18,8 +18,9 @@
           if (data !== null) {
             callback(data.map(review => {
               var strings = {
-                url: "https://chromium-review.googlesource.com/c/" + review.issue,
+                url: "https://chromium-review.googlesource.com/c/" + review._number,
                 user: query.email,
+                title: review._number
               }
               strings.strings = [review.subject].concat(review.messages.map(message => message.message));
               return strings;

@@ -23,6 +23,7 @@
     "papaparse": "mholt/PapaParse#~4.1.2",
     "paper-badge": "PolymerElements/paper-badge#~1.1.1",
     "moment": "^2.13.0",
-    "moment-timezone": "^0.5.4"
+    "moment-timezone": "^0.5.4",
+    "paper-tooltip": "PolymerElements/paper-tooltip#^2.0.1"
   }
 }

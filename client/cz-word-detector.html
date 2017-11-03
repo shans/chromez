@@ -1,0 +1,62 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+
+<dom-module id="cz-word-detector">
+
+  <template>
+  </template>
+
+  <script>
+    var PENDING = 0;
+    var COMPLETE = 1;
+    var ERROR = 2;
+
+    Polymer({
+      is: "cz-word-detector",
+
+      removeWords: true,
+
+      attached: function() {
+        registerSource('cz-config', 'words', words => this.re = new RegExp(words.join("|"), "gi"));
+      },
+
+      registerQuery: function(query, callback) {
+        registerSource(query.component, query.query, data => {
+          if (!this.re)
+            return;
+          var detectedThings = [];
+          for (var item of data) {
+            var detected = {
+              url: item.url,
+              user: item.user,
+              title: item.title,
+              strings: []
+            }
+
+            for (var s of item.strings) {
+              var result = this.re.exec(s);
+              if (result) {
+                var poslist = [];
+                s = s.replace(this.re, (word, pos) => {
+                  if (this.removeWords) {
+                    poslist.push(pos);
+                    var newWord = word[0];
+                      for (var i = 1; i < word.length - 1; i++)
+                        newWord += '*';
+                      newWord += word[word.length - 1];
+                      return newWord;
+                    }
+                    return word;
+                  });
+                detected.strings.push({string: s, positions: poslist});
+              }
+            }
+            if (detected.strings.length > 0)
+              detectedThings.push(detected);
+          }
+          callback(detectedThings);
+        });
+      },
+    });
+  </script>
+
+</dom-module>

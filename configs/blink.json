@@ -18,12 +18,9 @@
   {"user": "Tim Ansell", "email": "mithro@mithis.com"}
 ],
 "dashes": [
-  "cz-clock-dash",
-  "cz-review-latency-dash(true)",
-  "cz-review-load-dash",
-  "cz-calendar-feed-source",
-  "cz-shields-dash(customelements)"
+  "cz-words-dash"
 ],
+"words": ["background", "token", "motion"],
 "timezones": [
   {"city": "MTV", "timezone": "US/Pacific"},
   {"city": "Waterloo", "timezone": "America/Nipigon"},

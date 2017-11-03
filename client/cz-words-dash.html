@@ -1,0 +1,112 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../bower_components/paper-item/paper-item-body.html">
+<link rel="import" href="../bower_components/paper-tooltip/paper-tooltip.html">
+<link rel="import" href="../bower_components/neon-animation/web-animations.html">
+
+<dom-module id="cz-words-dash">
+
+  <template>
+    <style>
+
+      paper-card .card-flex {
+        display: flex;
+        flex-wrap: wrap;
+        align-content: flex-start;
+      }
+
+      paper-item {
+        box-sizing: border-box;
+      }
+
+      .avatar {
+        display: inline-block;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        margin-right: 10px;
+        overflow: hidden;
+        background: #ccc;
+      }
+
+      paper-badge {
+        --paper-badge-background: var(--paper-blue-300);
+      }
+    </style>
+      <paper-card id='card' heading='Bad Word Detector'>
+        <div class="card-content">
+          <template is="dom-repeat" items="{{users}}"
+                    observe="data" sort="sortUsers">
+            <template is="dom-if" if="{{count(item.data)}}">
+              <paper-item>
+                <paper-item-body>
+                  <div>{{item.user}}
+                    <div inner-h-t-m-l={{tooltip(item.data)}}></div>
+                  </div>
+                </paper-item-body>
+              </paper-item>
+            </template>
+          </template>
+        </div>
+      </paper-card>
+  </template>
+  <script>
+    Polymer({
+      is: "cz-words-dash",
+
+      properties: {
+        users: {
+          type: 'Object',
+          value: function() { return []; },
+          observer: "usersChanged",
+        }
+      },
+
+      sortUsers: function(a, b) {
+        if (a.user < b.user)
+          return -1;
+        if (a.user > b.user)
+          return 1;
+        return 0;
+      },
+
+      count: function(data) {
+        return data ? data.length : false;
+      },
+
+      tooltip: function(data) {
+        return data.map(report => {
+          let result = `<a href=${report.url}>${report.title}</a>: `;
+          report.strings.forEach(({string, positions}) => {
+            for (var i = 0; i < positions.length; i++) {
+              var position = positions[i];
+              var windowStart = Math.max(position - 50, 0);
+              var windowEnd = Math.min(windowStart + 100, string.length);
+              console.log(windowStart, windowEnd, string.substring(windowStart, windowEnd));
+              while (i < positions.length - 1 && positions[i] < windowEnd)
+                i++;
+              result += string.substring(windowStart, windowEnd) + '<br>';
+            }
+          });
+          return result;}).join("<br>");
+      },
+
+      attached: function() {
+        registerSource('cz-config', 'users', function(users) {
+          this.set('users', users);
+        }.bind(this));
+      },
+
+      usersChanged: function(users) {
+        // TODO: this probably only works for all-or-nothing changes to users right now.
+        var count = 0;
+        users.forEach(function(user, idx) {
+          registerSource('cz-word-detector', {component: 'cz-gerrit-strings', query: {user: user.user, email: user.email}}, function(data) {
+            this.set('users.' + idx + '.data', data);
+          }.bind(this));
+        }.bind(this));
+      }
+    });
+  </script>
+</dom-module>
