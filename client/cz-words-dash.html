@@ -100,13 +100,15 @@
               var position = positions[i];
               var windowStart = Math.max(position - 50, 0);
               if (windowStart > 0 && string[windowStart - 1] !== ' ') {
-                while (string[windowStart] !== ' ')
-                  windowStart++;
-                windowStart++;
-                var startEllipsis = '...';
+                var newStart = string.indexOf(' ', windowStart);
+                if (newStart == -1)
+                  newStart = string.lastIndexOf(' ', newStart);
+                  if (newStart == -1)
+                    newStart = 0;
+                windowStart = newStart;
               } else {
-                var startEllipsis = '';
               }
+              var startEllipsis = windowStart == 0 ? '' : '...';
 
               var windowEnd = Math.min(windowStart + 100, string.length);
               if (windowEnd < string.length && !'. '.includes(string[windowEnd] !== ' ')) {
