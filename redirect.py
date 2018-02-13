@@ -8,6 +8,15 @@ from httplib2 import Http
 import json
 
 class MainPage(webapp2.RequestHandler):
+  Monorail_cans = {
+    '': 'open',
+    '1': 'all',
+    '2': 'open',
+    'closed': 'all',
+  }
+  for x in ['all', 'new', 'open', 'owned', 'reported', 'starred', 'to_verify']:
+    Monorail_cans[x] = x
+
   def get(self):
       scope = 'https://www.googleapis.com/auth/userinfo.email'
       credentials = AppAssertionCredentials(scope)
@@ -35,15 +44,8 @@ class MainPage(webapp2.RequestHandler):
           except:
             startIndex = 0
           self.response.headers.add_header("Access-Control-Allow-Origin", "*")
-          def monorail_cans = {
-            1: 'open',
-            2: 'closed',
-            'open': 'open',
-            'closed': 'closed',
-            '': 'open'
-          }
           result = monorail.issues().list(projectId='chromium', q=self.request.get('q'),
-                                          can=monorail_cans.get(self.request.get('can',''),'open'),
+                                          can=MainPage.Monorail_cans.get(self.request.get('can',''),'open'),
                                           startIndex=startIndex).execute()
           self.response.write(json.dumps(result))
       elif self.request.get('site') == 'issue':
