@@ -1,4 +1,4 @@
-{"cardview-heading": "🍻🍕🍑🍔🍟🍦🍫🍰🍩🍪🍗🍝🍣🍱🍙🍘🍡🍠🍨🍵🍖🍯🌽🍜🍥🍤🍳🍻",
+{"cardview-heading": "Animations Dashboard",
 "users": [
   {"user": "Rob", "email": "flackr@chromium.org"},
   {"user": "Majid", "email": "majidvp@chromium.org"},
@@ -7,13 +7,22 @@
   {"user": "Xianda", "email": "sunxd@chromium.org"},
   {"user": "Yi", "email": "yigu@chromium.org"},
   {"user": "Sandra", "email": "sunyunjia@chromium.org"},
-  {"user": "Peter", "email": "petermayo@chromium.org"}
+  {"user": "Peter", "email": "petermayo@chromium.org"},
+  {"user": "Kevin", "email": "kevers@chromium.org"}
 ],
+"updateSLO": {
+  "daily": "1",
+  "weekly": "7",
+  "fortnightly": "14",
+  "monthly": "30"
+},
 "dashes": [
   "cz-clock-dash",
-  "cz-outgoing-author-actions-dash",
-  "cz-review-latency-dash(true)",
   "cz-review-load-dash",
+  "cz-outgoing-author-actions-dash",
+  "cz-component-dash(Blink Animations)",
+  "cz-issue-priority-dash",
+  "cz-review-latency-dash(true)",
   "cz-calendar-feed-source"
 ],
 "timezones": [
@@ -21,5 +30,11 @@
   {"city": "Waterloo", "timezone": "America/Nipigon", "local": true},
   {"city": "Tokyo", "timezone": "Asia/Tokyo"},
   {"city": "Sydney", "timezone": "Australia/Sydney"}
-  ]
+],
+"issue-sources": {
+  "Blink Animations": {
+    "tag": "cz-crbug-issues",
+    "query": {"component": "Blink>Animation,Internals>Compositing>Animation,Internals>Compositing>Scroll"}
+  }
+}
 }
