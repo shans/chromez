@@ -11,16 +11,11 @@
   {"user": "Kevin", "email": "kevers@chromium.org"}
 ],
 "updateSLO": {
-  "daily": "1",
-  "weekly": "7",
-  "fortnightly": "14",
-  "monthly": "30"
 },
 "dashes": [
   "cz-clock-dash",
   "cz-review-load-dash",
   "cz-outgoing-author-actions-dash",
-  "cz-component-dash(Blink Animations)",
   "cz-issue-priority-dash",
   "cz-review-latency-dash(true)",
   "cz-calendar-feed-source"
