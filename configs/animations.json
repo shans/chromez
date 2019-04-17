@@ -4,11 +4,10 @@
   {"user": "Majid", "email": "majidvp@chromium.org"},
   {"user": "Stephen", "email": "smcgruer@chromium.org"},
   {"user": "Xida", "email": "xidachen@chromium.org"},
-  {"user": "Xianda", "email": "sunxd@chromium.org"},
   {"user": "Yi", "email": "yigu@chromium.org"},
-  {"user": "Sandra", "email": "sunyunjia@chromium.org"},
   {"user": "Peter", "email": "petermayo@chromium.org"},
-  {"user": "Kevin", "email": "kevers@chromium.org"}
+  {"user": "Kevin", "email": "kevers@chromium.org"},
+  {"user": "Gene", "email": "girard@chromium.org"}
 ],
 "updateSLO": {
 },
